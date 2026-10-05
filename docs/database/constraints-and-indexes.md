@@ -1,6 +1,6 @@
 # Constraints e índices propostos
 
-**Fase 2B — constraints e índices aprovados implementados em `database/migrations/001_initial_schema.sql`.** FKs usam comportamento restritivo padrão (NO ACTION); não há exclusão em cascata para histórico. Cadastros referenciados devem ser inativados.
+**Fase 2B.2 — constraints e índices vigentes em `database/migrations/001_initial_schema.sql` e `002_add_store_address.sql`.** FKs usam comportamento restritivo padrão (NO ACTION); não há exclusão em cascata para histórico. Cadastros referenciados devem ser inativados.
 
 ## Convenções e validação pelo banco
 
@@ -18,7 +18,7 @@ A notação “PK” identifica a chave primária; as FKs indicam colunas → de
 
 | Tabela | PK e FKs | UNIQUE / CHECK propostos |
 |---|---|---|
-| stores | PK(store_id) | UNIQUE(store_code); status ∈ {active, inactive, closed}; closed_on ≥ opened_on quando ambos preenchidos. |
+| stores | PK(store_id) | UNIQUE(store_code); postal_code tem exatamente 8 dígitos; state_code ∈ siglas das 27 UFs brasileiras; country_code = BR; status ∈ {active, inactive, closed}; closed_on ≥ opened_on quando ambos preenchidos. |
 | employees | PK(employee_id) | UNIQUE(employee_code); status ∈ {active, inactive, terminated}; terminated_on ≥ hired_on. |
 | employee_roles | PK(employee_role_id) | UNIQUE(role_code); UNIQUE(name). |
 | employee_assignments | PK(employee_assignment_id); employee_id → employees; employee_role_id → employee_roles; store_id opcional → stores | valid_to nulo ou ≥ valid_from. |
@@ -120,6 +120,7 @@ Além dos índices de PK/UNIQUE acima, criar somente os seguintes grupos de apoi
 | Índice (nome lógico) | Colunas / condição | Motivo |
 |---|---|---|
 | idx_employee_assignments_employee_dates | employee_id, valid_from DESC | Histórico e vigência de lotação. |
+| idx_stores_state_city | state_code, city | Filtro e agrupamento operacional de lojas por UF/município; região deriva de state_code. |
 | idx_customer_contacts_customer_active | customer_id, is_active | Contatos ativos. |
 | idx_customer_addresses_customer_active | customer_id, is_active | Endereços do cliente. |
 | idx_categories_parent | parent_category_id | Navegação hierárquica. |

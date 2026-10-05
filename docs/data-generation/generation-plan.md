@@ -4,7 +4,7 @@
 
 Este documento especifica a geração futura para a empresa fictícia brasileira de informática e eletrônicos. É planejamento: não há código de gerador, seed executada, carga, dado sintético persistido ou alteração do schema nesta fase. Os dados devem ser plausíveis, relacionais, reproduzíveis e temporalmente coerentes, sem erros fabricados para testar limpeza.
 
-O schema operacional aplicado e validado tem 9 schemas e 40 tabelas. A revisão de adequação conclui **SCHEMA CHANGES RECOMMENDED**: falta geografia estruturada em `core.stores`, recomendação a decidir antes de iniciar a Fase 3B. Não foi encontrado blocker para gerar os demais domínios.
+O schema operacional aplicado e validado tem 9 schemas e 40 tabelas. A geografia estruturada de `core.stores` foi adicionada e validada na Fase 2B.2. A revisão de adequação conclui **READY FOR GENERATOR**; não há blocker de schema para iniciar futuramente a Fase 3B. A melhoria opcional de data de descontinuação de SKU permanece fora do gate.
 
 ## Período, relógio e moeda
 
@@ -53,7 +53,7 @@ Não é necessário inventar sequência de INSERTs independente: a ordem exata r
 
 ## Princípios comerciais e correlações
 
-- Empresa fictícia sem nome definitivo. Dez lojas com datas de abertura, escala, mix, ticket, equipe e perfil de estoque distintos; diferenças graduais, nenhuma unidade domina o resultado.
+- Empresa fictícia sem nome definitivo. Dez lojas com datas de abertura, endereço estruturado estável, escala, mix, ticket, equipe e perfil de estoque distintos; diferenças graduais, nenhuma unidade domina o resultado. Gravar cidade, UF e endereço em `core.stores`; derivar região por UF em mapeamento versionado. Não simular mudança de endereço na V1.
 - Quatro canais iniciais: físico, e-commerce próprio e dois marketplaces genéricos. Participação digital cresce ao longo dos anos; marketplaces seguem identificados como canal.
 - 88–92% dos clientes identificados PF e 8–12% PJ. PJ é minoria em quantidade, mas contribui parcela maior da receita, com compras em dias úteis, mais unidades e ticket superior sem assumir que toda PJ é grande.
 - 25–35% dos pedidos físicos podem ser anônimos (`customer_id = NULL`); pedidos digitais sempre identificados. Nunca cadastrar “cliente genérico”.
@@ -141,9 +141,9 @@ As verificações executáveis ficam para fases de implementação/carga, defini
 
 ## Fases sugeridas e gate humano
 
-- **3B — fundação e master data:** configuração, sub-seeds, dimensões operacionais, catálogos, clientes, pessoas e preços, após revisão humana e decisão sobre geografia de loja.
+- **3B — fundação e master data:** configuração, sub-seeds, dimensões operacionais, catálogos, clientes, pessoas e preços, após autorização da fase pelo usuário.
 - **3C — engine operacional de compras, vendas e estoque:** bootstrap, compras/recebimentos, reposições, pedidos, descontos, reservas, saídas e custo móvel.
 - **3D — pagamentos, fulfillment, logística, devoluções e reembolsos:** eventos relacionados e conciliações por operação.
 - **3E — carga portfolio, qualidade e baselines:** volume principal, validação integral e resultados SQL de referência.
 
-Este documento encerra o planejamento da Fase 3A. A implementação não deve começar até revisão humana do plano e decisão sobre a recomendação marcada em [schema-gap-review.md](schema-gap-review.md).
+Este documento encerra o planejamento da Fase 3A e foi revisado após a Fase 2B.2. A próxima fase de implementação continua dependente de solicitação do usuário.

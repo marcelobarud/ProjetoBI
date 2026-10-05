@@ -6,23 +6,21 @@ Pergunta: o schema operacional existente consegue representar a operação sint�
 
 ## Resultado
 
-# SCHEMA CHANGES RECOMMENDED
+# READY FOR GENERATOR
 
-Não foi identificado **BLOCKER** para integridade ou geração de vendas, pagamentos, compras, estoque, logística e devoluções. Existe uma recomendação antes do gerador: `core.stores` não contém endereço ou atributos geográficos estruturados. Sem essa informação, análises e mapa por cidade/UF de loja não podem ser feitos a partir do ponto de venda; inferir localização do nome da loja ou de pedidos vinculados não é equivalente e criaria uma geografia falsa.
+Não foi identificado **BLOCKER** para a geração planejada. A recomendação anterior sobre geografia de lojas foi resolvida na Fase 2B.2: `core.stores` agora tem endereço brasileiro estruturado, com CEP, logradouro, número, complemento, bairro, cidade, UF e país. O schema não armazena região; ela será derivada de forma determinística a partir da UF. A estrutura foi aplicada e validada antes da criação do master data sintético.
 
-### Recomendação — geografia estruturada da loja
+### Geografia estruturada da loja — resolvida em 2B.2
 
-- **Classe:** RECOMMENDED; decisão humana necessária antes da Fase 3B.
-- **Problema/impacto:** `core.stores` tem código, nome, status e datas operacionais, mas não cidade, UF, CEP ou endereço. `sales.sales_orders.store_id` permite performance por loja, mas não geografia da unidade. `inventory.stock_locations` pode apontar para uma loja, porém não resolve localização quando a loja não está georreferenciada.
-- **Sugestão para avaliação em fase própria:** adicionar atributos estruturados de endereço da unidade (no mínimo `city` e `state_code`, preferencialmente também `postal_code` e `country_code`) ou criar uma tabela de endereço de loja se histórico/múltiplos endereços forem requisitos. O escopo atual não exige histórico de endereço de loja; não se recomenda criar uma dimensão geográfica completa sem requisito aprovado.
-- **Por que não resolver apenas no Power Query:** transformação não consegue recuperar cidade/UF ausente sem fonte de referência verdadeira. Embutir a cidade em `name` ou inferir pela associação do pedido perde a semântica de local físico e pode atribuir ao estabelecimento a geografia do cliente/entrega.
-- **Momento:** deliberar antes de gerar master data. Se aprovada, implementar migration específica numa fase de schema (por exemplo 2B.2), atualizar dicionário/relatório e validar antes da 3B. Se rejeitada, aceitar explicitamente que análises geográficas de lojas não estarão disponíveis; não inventar a localização no gerador.
+- **Implementação:** `database/migrations/002_add_store_address.sql` adicionou as oito colunas aprovadas, três CHECKs locais e índice `idx_stores_state_city`; sem nova tabela ou dados.
+- **Limite vigente:** a loja mantém um endereço operacional corrente na V1. Não há histórico de mudança, geocódigo, latitude/longitude, validação externa de CEP nem coluna de região.
+- **Uso analítico:** performance por loja usa a chave da unidade; agregação municipal usa `city`; UF usa `state_code`; região é derivada por mapeamento versionado das UFs. O endereço do cliente continua independente.
 
 ## Revisão por área
 
 | Área | Classe | Capacidade e limite observado |
 |---|---|---|
-| Geografia de lojas | **RECOMMENDED** | Sem cidade/UF/endereço em `core.stores`; performance por loja existe, mapa/geografia da loja não. Ver recomendação acima. |
+| Geografia de lojas | Adequado | `core.stores` tem endereço estruturado corrente; cidade/UF estão disponíveis e região deriva de UF. Não há histórico de endereço ou coordenadas, fora do escopo aprovado. |
 | Geografia de clientes/pedidos | Adequado | `crm.customer_addresses` tem CEP, logradouro, bairro, município, UF e país; `sales.sales_orders` guarda snapshot do endereço. Dados sintéticos podem preencher endereço para digital e deixar vendas presenciais sem entrega conforme contexto. O endereço não é coordenada nem código IBGE, portanto granularidade municipal deve ser interpretada com cautela. |
 | Regiões de venda | Adequado com derivação | `state_code`/`state_code_snapshot` permitem derivar região brasileira por mapeamento estável das UFs (N, NE, CO, SE, S). Região não é atributo físico separado; manter mapeamento documentado/versionado no gerador/consulta, sem copiar região arbitrariamente. |
 | Canais | Adequado | `sales.sales_channels` distingue `physical`, `ecommerce` e `marketplace`; pedido tem FK composta que preserva o tipo. Referência externa é snapshot. Não há limitação para 4 canais iniciais. |
@@ -51,6 +49,6 @@ Não foi identificado **BLOCKER** para integridade ou geração de vendas, pagam
 - O schema não registra campanha como entidade própria; `applied_discounts` tem snapshots de código/referência/descrição suficientes para distribuição planejada, sem motor de promoção.
 - O endereço do cliente/pedido não substitui o endereço da loja. Não popular `city_snapshot` como se fosse geografia do estabelecimento.
 
-## Decisão pendente para revisão
+## Gate para a Fase 3B
 
-Decidir se a geografia estruturada das lojas deve entrar numa migration anterior ao gerador. Até a decisão, o plano de geração pode ser detalhado, mas a Fase 3B não deve criar lojas com localização inventada no nome ou inferida de pedidos.
+Geografia de lojas foi aprovada e resolvida pela migration 002. Não há blockers de schema para implementar o gerador conforme o plano. A melhoria opcional de `catalog.products.discontinued_at` permanece OPTIONAL e não é gate da Fase 3B.

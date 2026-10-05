@@ -4,7 +4,7 @@ O roteiro cobre as **40 tabelas físicas** da migration inicial em 41 estágios 
 
 ## Master data e relações de referência
 
-1. `core.stores` — preparar lojas e datas de abertura/fechamento. Geografia estruturada está pendente de decisão humana; não codificar cidade em `name`.
+1. `core.stores` — preparar lojas, endereço estruturado brasileiro e datas de abertura/fechamento. Preencher cidade/UF/endereço aprovados; não codificar cidade em `name`. Derivar região da UF fora do schema operacional.
 2. `core.employee_roles` — catálogo curto de funções.
 3. `core.employees` — funcionários e vínculos temporais básicos.
 4. `core.employee_assignments` — função/loja por período, cobrindo somente períodos ativos.

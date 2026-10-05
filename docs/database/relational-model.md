@@ -1,6 +1,6 @@
 # Proposta de modelo relacional operacional
 
-**Fase 2B — estrutura física aprovada.** Este documento descreve o modelo de origem da migration PostgreSQL 18. Os artefatos locais foram preparados; a database `projeto_bi` não foi acessada nem criada nesta execução porque a conexão não estava configurada. O Server Group `ProjetoBI` do pgAdmin é apenas organização local e não foi acessado.
+**Fase 2B.2 — estrutura física vigente.** O modelo PostgreSQL 18 foi aplicado e validado em `projeto_bi` pelas migrations `001_initial_schema.sql` e `002_add_store_address.sql`. O endereço operacional corrente das lojas é estruturado em `core.stores`; a V1 não mantém histórico de mudança de endereço.
 
 O modelo representa o sistema operacional da empresa brasileira, com valores monetários em BRL. Não é um modelo estrela, não prescreve tabelas para o Power BI e não inclui views analíticas.
 
@@ -23,7 +23,7 @@ O modelo representa o sistema operacional da empresa brasileira, com valores mon
 
 | Tabela | Finalidade | PK e principais FKs | Cardinalidades e histórico |
 | --- | --- | --- | --- |
-| `stores` | Pontos físicos de operação e retirada. | `store_id`; nenhuma FK obrigatória. | Uma loja pode possuir locais de estoque e vínculos de funcionários; mantém estado atual e datas de abertura/fechamento. |
+| `stores` | Pontos físicos de operação e retirada, com endereço brasileiro estruturado. | `store_id`; nenhuma FK obrigatória. | Uma loja pode possuir locais de estoque e vínculos de funcionários; mantém estado atual, datas de abertura/fechamento e endereço operacional corrente (`postal_code`, logradouro/número/complemento, bairro, cidade, UF e país). Não há histórico de endereço na V1. |
 | `employees` | Cadastro operacional de funcionários, inclusive vendedor. | `employee_id`; nenhuma FK obrigatória. | Um funcionário pode ter vários vínculos históricos; desligamento não apaga vendas nem movimentos. |
 | `employee_roles` | Catálogo enxuto de funções. | `employee_role_id`; nenhuma FK obrigatória. | Uma função pode aparecer em muitos vínculos; função desativada permanece referenciada pelo histórico. |
 | `employee_assignments` | Períodos de função e lotação de um funcionário. | `employee_assignment_id`; FKs para `employees`, `employee_roles` e, opcionalmente, `stores`. | Um funcionário pode ter vários períodos/funções; vigência usa datas civis e não sobrescreve o histórico. |
@@ -183,7 +183,7 @@ As 37 entidades conceituais foram revistas, não convertidas mecanicamente. O re
 
 ## Estado da implementação
 
-As decisões físicas foram aprovadas para implementação. A migration e sua aplicação à instância alvo ainda precisam de validação quando a conexão PostgreSQL estiver configurada.
+As migrations 001 e 002 foram aplicadas e validadas no PostgreSQL 18.6. A estrutura atual possui 9 schemas e 40 tabelas; os totais vigentes de constraints e índices estão em `docs/database/validation-report.md`.
 
 ## Detalhes para a Fase 2B / camada operacional
 
@@ -193,6 +193,10 @@ As decisões físicas foram aprovadas para implementação. A migration e sua ap
 - Avaliar índices adicionais com consultas e volume reais; JSONB não recebe GIN sem necessidade observada.
 - `catalog.products.unit_of_measure` permanece `NOT NULL`, sem CHECK de domínio nesta versão; o vocabulário não foi especificado.
 
+## Geografia operacional das lojas
+
+`core.stores` contém `postal_code`, `street`, `street_number`, `complement`, `district`, `city`, `state_code` e `country_code`. CEP aceita oito dígitos, UF usa sigla brasileira e país é `BR`. A região brasileira não é armazenada; deriva-se de modo determinístico pela UF nas camadas analíticas/gerador. Cada loja tem um endereço operacional corrente, sem histórico de mudança na V1.
+
 ## Limites do modelo físico
 
-Este modelo continua sendo a especificação documental. A migration inicial em `database/migrations/` implementa tabelas, constraints e índices; aplicação real requer conexão PostgreSQL 18. Não inclui triggers, funções, procedures, seeds, scripts Python de geração, dados, projeto Power BI ou estrutura analítica.
+O modelo não inclui triggers, funções, procedures, seeds, scripts Python de geração, dados sintéticos, projeto Power BI ou estrutura analítica.

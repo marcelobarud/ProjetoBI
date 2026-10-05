@@ -2,6 +2,9 @@ DO $validate$
 DECLARE
     actual_count BIGINT;
     expected_count BIGINT;
+    store_address_column_count BIGINT;
+    expected_check_count BIGINT;
+    expected_index_count BIGINT;
     missing_names TEXT;
     unexpected_names TEXT;
 BEGIN
@@ -66,6 +69,16 @@ BEGIN
         RAISE EXCEPTION 'Quantidade de tabelas por schema diverge do dicionário.';
     END IF;
 
+    SELECT count(*) INTO store_address_column_count
+    FROM information_schema.columns
+    WHERE table_schema = 'core' AND table_name = 'stores'
+      AND column_name IN ('postal_code','street','street_number','complement','district','city','state_code','country_code');
+    IF store_address_column_count NOT IN (0, 8) THEN
+        RAISE EXCEPTION 'Migration de endereço de loja está parcial: % de 8 colunas presentes.', store_address_column_count;
+    END IF;
+    expected_check_count := CASE WHEN store_address_column_count = 8 THEN 78 ELSE 75 END;
+    expected_index_count := CASE WHEN store_address_column_count = 8 THEN 149 ELSE 148 END;
+
     SELECT count(*) INTO actual_count
     FROM pg_constraint c
     JOIN pg_class t ON t.oid = c.conrelid
@@ -88,7 +101,7 @@ BEGIN
     JOIN pg_namespace n ON n.oid = t.relnamespace
     WHERE n.nspname IN ('core','crm','catalog','sales','procurement','inventory','payments','logistics','after_sales')
       AND c.contype = 'c';
-    IF actual_count <> 75 THEN RAISE EXCEPTION 'Esperados 75 CHECKs, encontrados %.', actual_count; END IF;
+    IF actual_count <> expected_check_count THEN RAISE EXCEPTION 'Esperados % CHECKs, encontrados %.', expected_check_count, actual_count; END IF;
 
     SELECT count(*) INTO actual_count
     FROM pg_constraint c
@@ -98,8 +111,8 @@ BEGIN
       AND c.contype = 'u';
     IF actual_count <> 37 THEN RAISE EXCEPTION 'Esperadas 37 constraints UNIQUE, encontradas %.', actual_count; END IF;
 
-    IF (SELECT count(*) FROM pg_indexes WHERE schemaname IN ('core','crm','catalog','sales','procurement','inventory','payments','logistics','after_sales')) <> 148 THEN
-        RAISE EXCEPTION 'Esperados 148 índices físicos (PK, UNIQUE e índices declarados).';
+    IF (SELECT count(*) FROM pg_indexes WHERE schemaname IN ('core','crm','catalog','sales','procurement','inventory','payments','logistics','after_sales')) <> expected_index_count THEN
+        RAISE EXCEPTION 'Esperados % índices físicos, contagem divergente.', expected_index_count;
     END IF;
 
     IF (SELECT count(*) FROM information_schema.columns
@@ -117,6 +130,30 @@ BEGIN
     END IF;
     IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema IN ('sales','inventory') AND column_name='unit_cost_snapshot') THEN
         RAISE EXCEPTION 'unit_cost_snapshot não deve existir.';
+    END IF;
+
+    IF store_address_column_count = 8 THEN
+        IF (SELECT count(*) FROM (VALUES
+            ('postal_code','varchar',8,'NO'), ('street','varchar',180,'NO'),
+            ('street_number','varchar',30,'NO'), ('complement','varchar',100,'YES'),
+            ('district','varchar',100,'NO'), ('city','varchar',120,'NO'),
+            ('state_code','bpchar',2,'NO'), ('country_code','bpchar',2,'NO')
+        ) AS expected(column_name, udt_name, max_length, nullable)
+        JOIN information_schema.columns c
+          ON c.table_schema='core' AND c.table_name='stores'
+         AND c.column_name=expected.column_name AND c.udt_name=expected.udt_name
+         AND c.character_maximum_length=expected.max_length AND c.is_nullable=expected.nullable) <> 8 THEN
+            RAISE EXCEPTION 'Tipos, comprimentos ou nulabilidade das colunas de endereço de core.stores divergem.';
+        END IF;
+        IF (SELECT count(*) FROM pg_constraint
+            WHERE conrelid='core.stores'::regclass AND contype='c'
+              AND conname IN ('ck_stores_postal_code','ck_stores_state_code','ck_stores_country_code')) <> 3 THEN
+            RAISE EXCEPTION 'CHECKs de CEP, UF e país de core.stores estão ausentes.';
+        END IF;
+        IF NOT EXISTS (SELECT 1 FROM pg_indexes WHERE schemaname='core' AND indexname='idx_stores_state_city'
+                       AND indexdef ILIKE '%(state_code, city)%') THEN
+            RAISE EXCEPTION 'Índice core.idx_stores_state_city está ausente ou divergente.';
+        END IF;
     END IF;
 
     IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname='ck_sales_orders_currency' AND pg_get_constraintdef(oid) LIKE '%BRL%')
@@ -144,6 +181,6 @@ BEGIN
         RAISE EXCEPTION 'Índices essenciais de consulta/rastreabilidade estão ausentes.';
     END IF;
 
-    RAISE NOTICE 'Validação estrutural aprovada: database projeto_bi, 9 schemas, 40 tabelas, PK/FK/CHECK/UNIQUE e índices conferidos.';
+    RAISE NOTICE 'Validação estrutural aprovada: database projeto_bi, 9 schemas, 40 tabelas, colunas vigentes, PK/FK/CHECK/UNIQUE e índices conferidos.';
 END;
 $validate$;

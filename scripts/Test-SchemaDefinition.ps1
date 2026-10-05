@@ -4,8 +4,11 @@ $ErrorActionPreference = 'Stop'
 $root = Split-Path -Parent $PSScriptRoot
 $dictionaryPath = Join-Path $root 'docs/database/data-dictionary.md'
 $migrationPath = Join-Path $root 'database/migrations/001_initial_schema.sql'
+$incrementalMigrationPath = Join-Path $root 'database/migrations/002_add_store_address.sql'
 $dictionaryText = Get-Content -Raw $dictionaryPath
 $migrationText = Get-Content -Raw $migrationPath
+$incrementalMigrationText = Get-Content -Raw $incrementalMigrationPath
+$allMigrationText = $migrationText + "`n" + $incrementalMigrationText
 $expected = @([regex]::Matches($dictionaryText, '(?m)^### ([a-z_]+\.[a-z_]+)$') | ForEach-Object { $_.Groups[1].Value } | Sort-Object -Unique)
 $actual = @([regex]::Matches($migrationText, '(?m)^CREATE TABLE ([a-z_]+\.[a-z_]+)') | ForEach-Object { $_.Groups[1].Value } | Sort-Object -Unique)
 $expectedSchemas = @('after_sales', 'catalog', 'core', 'crm', 'inventory', 'logistics', 'payments', 'procurement', 'sales') | Sort-Object
@@ -27,11 +30,18 @@ foreach ($section in $sections) {
     $dictionaryColumns[$tableName] = @([regex]::Matches($section.Groups[2].Value, '(?m)^\| ([a-z_]+) \|') | ForEach-Object { $_.Groups[1].Value })
     $tableMatch = [regex]::Match($migrationText, "(?ms)^CREATE TABLE $([regex]::Escape($tableName)) \(\r?\n(.*?)^\);")
     if (-not $tableMatch.Success) { continue }
+    $tableDefinitions = $tableMatch.Groups[1].Value
+    if ($tableName -eq 'core.stores') {
+        $storeAddressColumns = [regex]::Match($incrementalMigrationText, '(?ms)^ALTER TABLE core\.stores\s+ADD COLUMN (.*?);')
+        if (-not $storeAddressColumns.Success) { throw 'Migration 002 não contém as colunas incrementais esperadas de core.stores.' }
+        $incrementalDefinitions = $storeAddressColumns.Groups[1].Value -replace '(?m)^\s*ADD COLUMN\s+', "`n    "
+        $tableDefinitions += "`n    " + $incrementalDefinitions
+    }
     foreach ($column in [regex]::Matches($section.Groups[2].Value, '(?m)^\| ([a-z_]+) \| ([^|]+) \| (Não|Sim) \|')) {
         $columnName = $column.Groups[1].Value
         $expectedType = $column.Groups[2].Value.Trim()
         $expectedNotNull = $column.Groups[3].Value -eq 'Não'
-        $line = @($tableMatch.Groups[1].Value -split '\r?\n' | Where-Object { $_ -match "^\s+$([regex]::Escape($columnName))\s+" }) | Select-Object -First 1
+        $line = @($tableDefinitions -split '\r?\n' | Where-Object { $_ -match "^\s+$([regex]::Escape($columnName))\s+" }) | Select-Object -First 1
         if (-not $line) { $columnMismatches.Add("$tableName.$columnName ausente"); continue }
         $definition = $line.Trim().TrimEnd(',')
         $definition = $definition.Substring($columnName.Length).Trim()
@@ -43,7 +53,11 @@ foreach ($section in $sections) {
     }
 }
 if ($columnMismatches.Count -gt 0) { throw "Colunas divergentes entre dicionário e migration: $($columnMismatches -join '; ')" }
-if ($migrationText -match 'unit_cost_snapshot|\b(FLOAT|REAL|DOUBLE PRECISION)\b|USING GIN|CREATE EXTENSION|DEFAULT\s+now\s*\(') { throw 'A migration contém referência proibida (custo legado, ponto flutuante, GIN, extensão ou default temporal).' }
+if ($allMigrationText -match 'unit_cost_snapshot|\b(FLOAT|REAL|DOUBLE PRECISION)\b|USING GIN|CREATE EXTENSION|DEFAULT\s+now\s*\(') { throw 'A migration contém referência proibida (custo legado, ponto flutuante, GIN, extensão ou default temporal).' }
+$alterTargets = @([regex]::Matches($incrementalMigrationText, '(?m)^ALTER TABLE ([a-z_]+\.[a-z_]+)') | ForEach-Object { $_.Groups[1].Value } | Sort-Object -Unique)
+if ($alterTargets.Count -ne 1 -or $alterTargets[0] -ne 'core.stores' -or $incrementalMigrationText -match '(?im)^\s*(CREATE\s+(SCHEMA|TABLE|DATABASE)|INSERT|UPDATE|DELETE|TRUNCATE|DROP)\b') {
+    throw 'Migration 002 deve alterar somente core.stores, sem criar tabelas ou inserir/alterar dados.'
+}
 $keySignatures = [System.Collections.Generic.HashSet[string]]::new([StringComparer]::OrdinalIgnoreCase)
 foreach ($tableMatch in [regex]::Matches($migrationText, '(?ms)^CREATE TABLE ([a-z_]+\.[a-z_]+) \(\r?\n(.*?)^\);')) {
     $tableName = $tableMatch.Groups[1].Value
@@ -70,14 +84,15 @@ if ($foreignKeys.Count -ne 70 -or $foreignKeyProblems.Count -gt 0) { throw "FKs 
 $expectedDdlCounts = @{
     '(?m)^\s+CONSTRAINT pk_' = 40
     '(?m)^ALTER TABLE .* ADD CONSTRAINT fk_' = 70
-    '(?m)^ALTER TABLE .* ADD CONSTRAINT ck_' = 75
+    '(?m)^ALTER TABLE .* ADD CONSTRAINT ck_' = 78
     '(?m)^ALTER TABLE .* ADD CONSTRAINT uq_' = 37
-    '(?m)^CREATE INDEX ' = 64
+    '(?m)^CREATE INDEX ' = 65
     '(?m)^CREATE UNIQUE INDEX ' = 7
 }
 foreach ($pattern in $expectedDdlCounts.Keys) {
-    $count = [regex]::Matches($migrationText, $pattern).Count
+    $count = [regex]::Matches($allMigrationText, $pattern).Count
     if ($count -ne $expectedDdlCounts[$pattern]) { throw "Contagem DDL inesperada para '$pattern': esperado $($expectedDdlCounts[$pattern]), encontrado $count." }
 }
 if (-not $migrationText.TrimEnd().EndsWith('COMMIT;') -or -not $migrationText.StartsWith('-- ProjetoBI') -or $migrationText -notmatch '(?m)^BEGIN;\r?$') { throw 'Migration deve estar envolvida por BEGIN/COMMIT e ser identificada como migration do projeto.' }
-Write-Output "Definição estática conferida: $($actualSchemas.Count) schemas, $($actual.Count) tabelas, colunas/tipos/nulabilidades e 70 FKs com destinos únicos compatíveis."
+if (-not $incrementalMigrationText.TrimEnd().EndsWith('COMMIT;') -or $incrementalMigrationText -notmatch '(?m)^BEGIN;\r?$') { throw 'Migration 002 deve estar envolvida por BEGIN/COMMIT.' }
+Write-Output "Definição estática conferida: $($actualSchemas.Count) schemas, $($actual.Count) tabelas, colunas/tipos/nulabilidades e 70 FKs com destinos únicos compatíveis nas migrations 001/002."

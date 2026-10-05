@@ -6,6 +6,7 @@ Este plano será implementado junto ao gerador/carga nas fases futuras. Não há
 
 - Garantir que todos os FKs resolvem, inclusive compostos que exigem pedido/item/fulfillment correspondentes.
 - Não criar IDs lógicos duplicados: códigos de loja, funcionário, cliente, produto/SKU, fornecedor, pedido/compra, canal, carrier, pagamento e devolução devem obedecer às UNIQUEs e índices parciais.
+- Endereço operacional de loja deve usar CEP de oito dígitos, UF brasileira e `country_code = 'BR'`; `city` é estruturada, região é derivada da UF e não se copia endereço do cliente para a loja.
 - Confirmar perfil correto para cada `customer_type`; CPF/CNPJ, se presentes, têm dígitos/checksum válidos, unicidade e formato; não usar dados reais.
 - Confirmar que `specifications` é nulo ou JSON object, com chave snake_case e template compatível com família/categoria.
 - Confirmar valores de status, método, destino e tipo contra CHECKs existentes. `unit_of_measure` recebe apenas `unit` até nova decisão.

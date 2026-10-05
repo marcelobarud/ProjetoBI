@@ -19,7 +19,7 @@ São bandas orientadoras para o profile `portfolio`, não quotas fixas nem resul
 | Pedido anônimo | 25–35% dos pedidos físicos sem `customer_id`; zero anônimos no e-commerce/marketplace. Não criar cadastro genérico. |
 | Recorrência | Como proporção de clientes identificados ativos no horizonte: 35–50% com um pedido; 30–40% com 2–4; 10–18% com 5–10; 2–6% com 11 ou mais. Normalizar categorias para 100% dentro das bandas; limitar concentração. PJ tem maior recorrência média que PF. |
 | Ticket PF/PJ | Ticket PJ tipicamente 1,5–3,0x o PF, com variância e sobreposição; parcela PJ na receita pode ficar em 18–32%, sem transformar toda PJ em grande comprador. |
-| Geografia | Predomínio Sul/Sudeste, com presença menor de Centro-Oeste, Nordeste e Norte; usar concentração comercial fictícia, não proporção populacional perfeita. Cidade/UF para clientes/pedidos vêm de endereço sintético. Geografia de loja aguarda decisão de schema; não inferir do nome. |
+| Geografia | Predomínio Sul/Sudeste, com presença menor de Centro-Oeste, Nordeste e Norte; usar concentração comercial fictícia, não proporção populacional perfeita. Cidade/UF de lojas vêm de `core.stores`; cidade/UF de clientes/pedidos vêm de endereço sintético. Derivar região da UF por mapeamento versionado; não inferir localização do nome da loja nem usar endereço do cliente como endereço da loja. |
 
 Distribuir pedidos repetidos entre coortes. `customer.created_at <= placed_at`; frequência depende de tipo PF/PJ, canal, tempo desde cadastro e atividade. Clientes não compram antes do cadastro e frequência extrema permanece rara.
 

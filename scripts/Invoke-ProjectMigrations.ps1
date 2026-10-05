@@ -9,6 +9,10 @@ Import-ProjectBIEnvironment
 $psql = Resolve-ProjectBIPsql
 $migrationFiles = @(Get-ChildItem (Join-Path $root 'database/migrations') -Filter '*.sql' -File | Sort-Object Name)
 if ($migrationFiles.Count -eq 0) { throw 'Nenhuma migration encontrada.' }
+$expectedMigrationNames = @('001_initial_schema.sql', '002_add_store_address.sql')
+if (($migrationFiles.Name -join '|') -ne ($expectedMigrationNames -join '|')) {
+    throw 'O runner atual suporta explicitamente 001_initial_schema.sql e 002_add_store_address.sql. Revise o fluxo antes de adicionar outra migration.'
+}
 $oldPgPassword = $env:PGPASSWORD
 $env:PGPASSWORD = $env:POSTGRES_PASSWORD
 try {
@@ -23,10 +27,21 @@ try {
             & $psql -X -w -v ON_ERROR_STOP=1 -h $env:POSTGRES_HOST -p $env:POSTGRES_PORT -U $env:POSTGRES_USER -d projeto_bi -f $file.FullName
             if ($LASTEXITCODE -ne 0) { throw "Migration $($file.Name) falhou; a transação deve ter sido revertida." }
         }
+        & (Join-Path $PSScriptRoot 'Invoke-DatabaseValidation.ps1')
+        Write-Output 'Bootstrap concluído: migrations 001 e 002 aplicadas e validadas.'
     }
     else {
+        $storeAddressColumnCount = & $psql -X -w -v ON_ERROR_STOP=1 -h $env:POSTGRES_HOST -p $env:POSTGRES_PORT -U $env:POSTGRES_USER -d projeto_bi -Atc "SELECT count(*) FROM information_schema.columns WHERE table_schema='core' AND table_name='stores' AND column_name IN ('postal_code','street','street_number','complement','district','city','state_code','country_code');"
+        if ($LASTEXITCODE -ne 0) { throw 'Não foi possível determinar a versão do schema de core.stores.' }
+        $storeAddressColumnCount = [int]($storeAddressColumnCount | Select-Object -Last 1)
+        if ($storeAddressColumnCount -notin @(0, 8)) { throw 'Schema de endereço de core.stores está parcial; nenhuma migration foi executada.' }
         & (Join-Path $PSScriptRoot 'Invoke-DatabaseValidation.ps1')
-        Write-Output 'Estrutura já está aplicada e foi validada; nenhuma migration repetida.'
+        if ($storeAddressColumnCount -eq 0) {
+            Write-Output 'Migration 001 validada; migration 002 está pendente. Execute scripts/Invoke-StoreAddressMigration.ps1. Nenhuma migration foi repetida.'
+        }
+        else {
+            Write-Output 'Migrations 001 e 002 já estão aplicadas e validadas; nenhuma migration foi repetida.'
+        }
     }
 }
 finally {

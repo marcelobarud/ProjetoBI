@@ -1,4 +1,4 @@
-# Relatório de validação PostgreSQL — Fase 2B.1
+# Relatório de validação PostgreSQL — Fases 2B.1 e 2B.2
 
 **Data:** 2026-10-05
 
@@ -42,3 +42,44 @@ Também foram confirmados:
 ## Dados persistidos
 
 Após o smoke test, foram contadas as linhas em todas as 40 tabelas dos nove schemas operacionais. O resultado foi zero em todas: nenhum registro de smoke permaneceu e não há dados de negócio persistidos. Nenhum dado sintético foi gerado.
+
+## Fase 2B.2 — endereço estruturado de lojas
+
+**Validação concluída:** 2026-10-05
+**Database:** `projeto_bi`
+**Servidor:** PostgreSQL 18.6
+
+`database/migrations/002_add_store_address.sql` já havia sido aplicada e concluído com `COMMIT` antes desta retomada. A retomada confirmou as oito colunas no banco e **não reaplicou nem reverteu** a migration. `database/migrations/001_initial_schema.sql` permaneceu inalterada; a mudança continua isolada na migration incremental 002.
+
+### Correção e smoke test
+
+Na primeira tentativa do teste, um `store_code` temporário excedeu `VARCHAR(30)`, impedindo que o caso chegasse ao `NOT NULL` pretendido. O teste foi corrigido para usar token curto com sufixos distintos. As exceções esperadas agora verificam também o nome do CHECK ou da coluna, garantindo que cada cenário falhe pela regra-alvo.
+
+O teste transacional foi executado com sucesso:
+
+- Inserção válida: passou com código/nome/status válidos, CEP de oito dígitos, endereço preenchido, UF `SP`, país `BR` e timestamps.
+- CEP com letras e CEP com sete dígitos: rejeitados por `ck_stores_postal_code`.
+- UF `XX`: rejeitada por `ck_stores_state_code`.
+- País `AR`: rejeitado por `ck_stores_country_code`.
+- Campos obrigatórios nulos: `postal_code`, `street`, `street_number`, `district`, `city`, `state_code` e `country_code` foram rejeitados individualmente pela nulabilidade da coluna correspondente.
+- A transação terminou em `ROLLBACK`. Uma consulta posterior confirmou `COUNT(*) = 0` em `core.stores`.
+
+### Estrutura atual confirmada
+
+`database/tests/001_structure.sql` passou contra o banco real. A validação conferiu os tipos e comprimentos aprovados (`VARCHAR(8)`, `VARCHAR(180)`, `VARCHAR(30)`, `VARCHAR(100)`, `VARCHAR(100)`, `VARCHAR(120)`, `CHAR(2)`, `CHAR(2)`), nulabilidade correta, três CHECKs de endereço e o índice `idx_stores_state_city` sobre `(state_code, city)`. Também confirmou as colunas críticas pré-existentes e ausência de tabelas extras.
+
+| Verificação | Resultado real |
+| --- | ---: |
+| Versão do servidor | PostgreSQL 18.6 |
+| Schemas operacionais | 9 |
+| Tabelas | 40 |
+| Primary keys | 40 |
+| Foreign keys | 70 |
+| CHECK constraints | 78 |
+| UNIQUE constraints | 37 |
+| Índices físicos totais | 149 |
+| Colunas de endereço em `core.stores` | 8 |
+| Linhas em `core.stores` após rollback | 0 |
+| Linhas em todas as 40 tabelas operacionais | 0 |
+
+As PKs e FKs mantiveram as contagens validadas na Fase 2B.1. O schema está **READY FOR GENERATOR** para a futura implementação, sujeita à autorização da fase. `catalog.products.discontinued_at` permanece uma melhoria **OPTIONAL**, fora do gate. Nenhum dado sintético foi gerado e a Fase 3B e o Power BI não foram iniciados.

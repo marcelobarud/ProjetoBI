@@ -1,6 +1,6 @@
 # Dicionário de dados proposto
 
-**Fase 2B — modelo físico aprovado.** Os tipos são PostgreSQL 18. “Não”/“Sim” indicam nulabilidade proposta; identidade e colunas calculadas são indicadas nas observações. A migration versionada implementa esta especificação.
+**Fase 2B.2 — modelo físico vigente no PostgreSQL 18.6.** “Não”/“Sim” indicam nulabilidade; identidade e colunas calculadas são indicadas nas observações. As migrations versionadas implementam esta especificação.
 
 ## Convenções
 
@@ -19,6 +19,14 @@
 | store_id | BIGINT GENERATED ALWAYS AS IDENTITY | Não | PK técnica. |
 | store_code | VARCHAR(30) | Não | Código interno único. |
 | name | VARCHAR(160) | Não | Nome da loja. |
+| postal_code | VARCHAR(8) | Não | CEP operacional com oito dígitos. |
+| street | VARCHAR(180) | Não | Logradouro da unidade. |
+| street_number | VARCHAR(30) | Não | Número ou indicação operacional de endereço sem número. |
+| complement | VARCHAR(100) | Sim | Complemento opcional. |
+| district | VARCHAR(100) | Não | Bairro/distrito. |
+| city | VARCHAR(120) | Não | Município da loja. |
+| state_code | CHAR(2) | Não | UF brasileira; região é derivada da UF. |
+| country_code | CHAR(2) | Não | País da operação; CHECK fixa `BR`. |
 | status | VARCHAR(20) | Não | Estado operacional. |
 | opened_on | DATE | Sim | Data civil de abertura. |
 | closed_on | DATE | Sim | Data civil de encerramento. |

@@ -1,6 +1,6 @@
 # Diagrama entidade-relacionamento proposto
 
-**Fase 2B — visão do modelo físico aprovado.** Os diagramas mostram cardinalidades e FKs principais, sem listar todas as colunas. O modelo permanece operacional e normalizado; não há dimensões ou fatos analíticos. Algumas tabelas aparecem em mais de um diagrama para tornar os vínculos entre domínios legíveis.
+**Fase 2B.2 — visão do modelo físico vigente.** Os diagramas mostram cardinalidades e FKs principais. `core.stores` inclui endereço operacional estruturado; a região brasileira deriva de `state_code`. O modelo permanece operacional e normalizado; não há dimensões ou fatos analíticos. Algumas tabelas aparecem em mais de um diagrama para tornar os vínculos entre domínios legíveis.
 
 Para manter os identificadores Mermaid legíveis, nomes de entidade usam o schema e a tabela unidos por sublinhado; por exemplo, sales_order_status_history representa sales.order_status_history.
 
@@ -54,6 +54,14 @@ erDiagram
   core_employees o|--o{ catalog_product_prices : registra
   core_stores {
     bigint store_id PK
+    varchar postal_code
+    varchar street
+    varchar street_number
+    varchar complement
+    varchar district
+    varchar city
+    char state_code
+    char country_code
   }
   core_employees {
     bigint employee_id PK
@@ -205,6 +213,14 @@ erDiagram
   }
   core_stores {
     bigint store_id PK
+    varchar postal_code
+    varchar street
+    varchar street_number
+    varchar complement
+    varchar district
+    varchar city
+    char state_code
+    char country_code
   }
   sales_sales_order_items {
     bigint sales_order_item_id PK
@@ -300,6 +316,14 @@ erDiagram
   }
   core_stores {
     bigint store_id PK
+    varchar postal_code
+    varchar street
+    varchar street_number
+    varchar complement
+    varchar district
+    varchar city
+    char state_code
+    char country_code
   }
   core_employees {
     bigint employee_id PK
@@ -352,6 +376,14 @@ erDiagram
   }
   core_stores {
     bigint store_id PK
+    varchar postal_code
+    varchar street
+    varchar street_number
+    varchar complement
+    varchar district
+    varchar city
+    char state_code
+    char country_code
   }
   core_employees {
     bigint employee_id PK
