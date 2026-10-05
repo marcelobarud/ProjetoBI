@@ -36,11 +36,11 @@ O banco operacional deverá representar um ecossistema empresarial coerente, e n
 
 ## Estado atual
 
-**Fase 1 — definição conceitual do domínio e do ecossistema operacional.** A Fase 0 de fundação foi concluída. Esta fase documenta o escopo, as regras de negócio e as entidades operacionais candidatas, sujeitos à revisão antes da modelagem relacional. Nenhum banco, schema, tabela, dado, modelo físico ou projeto Power BI foi criado.
+**Fase 1.1 — consolidação das decisões do domínio.** As Fases 0 e 1 foram concluídas, e o domínio conceitual foi revisado. As decisões aprovadas estão consolidadas na documentação; o projeto está pronto para iniciar a proposta de modelagem relacional. Nenhum banco, schema, tabela, dado, modelo físico ou projeto Power BI foi criado.
 
 ## Fases previstas
 
-1. Revisar e aprovar o domínio conceitual; em seguida, converter o ecossistema aprovado em uma proposta de modelagem relacional.
+1. Revisar e aprovar o domínio conceitual (concluído); converter o ecossistema aprovado em uma proposta de modelagem relacional.
 2. Implementar e documentar o banco PostgreSQL após aprovação da modelagem.
 3. Planejar e desenvolver a geração de dados sintéticos consistentes em Python.
 4. Explorar e selecionar os dados que farão parte da camada analítica.
