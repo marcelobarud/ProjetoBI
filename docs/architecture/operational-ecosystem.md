@@ -64,9 +64,9 @@ As relações atravessam domínios: a origem comercial do pedido não determina 
 | Fornecedor | Representar entidade que oferece mercadorias, com referências cadastrais, contatos e situação. | Relaciona-se a produtos e compras. | Avaliado, ativo, suspenso ou inativo; transações anteriores são preservadas. |
 | Relação produto-fornecedor | Registrar que um fornecedor pode abastecer um produto, com referências comerciais e preferência eventual. | Liga produtos a fornecedores; pode contextualizar itens de compra. | Ativada/desativada por vigência; preferência não impede compras alternativas. |
 
-**Decisões do projeto:** cada combinação comercial distinta pode ser representada por um produto/SKU próprio; a primeira versão não exige uma camada adicional de variantes. Especificações podem variar por categoria, e sua organização será decidida na modelagem. Produto pode ter vários fornecedores. O método inicial aprovado de valorização é custo médio móvel; cada item vendido preserva o custo aplicável no momento da venda, e detalhes de cálculo e custos elegíveis permanecem para decisão posterior.
+**Decisões do projeto:** cada combinação comercial distinta pode ser representada por um produto/SKU próprio; a primeira versão não exige uma camada adicional de variantes. Especificações podem variar por categoria; a proposta física usa um objeto JSONB opcional no produto, validado pelo gerador conforme categoria. Produto pode ter vários fornecedores. A valorização usa custo médio móvel por produto/local. O custo realizado é reconhecido em cada saída física e preservado no movimento de estoque vinculado ao item atendido; uma linha do pedido pode ter várias saídas com custos diferentes. Transferências carregam o custo da origem para a entrada no destino.
 
-**Hipótese ainda revisável:** organizar categorias e subcategorias como hierarquia conceitual.
+**Decisão do projeto:** categorias e subcategorias usam uma hierarquia autorreferente; a camada operacional/gerador deve impedir ciclos.
 
 ## Comercial e vendas
 
@@ -75,11 +75,11 @@ As relações atravessam domínios: a origem comercial do pedido não determina 
 | Entidade candidata | Responsabilidade e principais conceitos | Relações conceituais | Ciclo de vida |
 | --- | --- | --- | --- |
 | Pedido de venda | Registrar canal, cliente quando identificado, momento comercial, endereço/atendimento, referências externas, situação e valores. | Tem vários itens; cliente é obrigatório nos canais digitais e opcional em venda presencial. Pode ter vendedor, pagamentos, uma ou mais unidades de atendimento, reservas e devoluções. | Criado, aguardando condições, confirmado, em atendimento, concluído ou cancelado segundo etapas a aprovar. |
-| Item de pedido | Registrar produto/SKU, quantidade, preço, desconto e custo considerado na venda, preservando o contexto comercial e de custo daquele momento. | Pertence ao pedido e referencia produto/SKU; pode gerar movimentos, uma ou mais unidades de atendimento e devolução. | Criado com o pedido; quantidades atendidas e devolvidas e o custo histórico não são reescritos por mudanças posteriores de catálogo ou custo médio. |
+| Item de pedido | Registrar produto/SKU, quantidade, preço e desconto, preservando o contexto comercial daquele momento. | Pertence ao pedido e referencia produto/SKU; pode gerar vários atendimentos, movimentos de saída e linhas de devolução. | Criado com o pedido; dados comerciais permanecem históricos. O custo realizado é mantido nos movimentos de saída associados às unidades de atendimento, não como custo único da linha. |
 | Histórico de situação do pedido | Guardar transições, momento e motivo de mudanças relevantes. | Relaciona-se ao pedido e, quando disponível, ao responsável pela alteração. | Cada transição é adicionada como evento; situação atual deriva da sequência definida. |
 | Regra/campanha de desconto | Descrever campanha ou condição promocional e seu período/escopo. | Pode ser aplicada ao pedido ou item e registrada como origem do desconto. | Planejada, vigente, encerrada ou cancelada; aplicação passada permanece identificável. |
 
-**Decisões do projeto:** pedido e item são conceitos separados; preço, desconto e custo aplicável são preservados no contexto histórico do item vendido. O cliente pode estar ausente somente na venda presencial aprovada; nos canais digitais é identificado. Vendedor é opcional em e-commerce e marketplace.
+**Decisões do projeto:** pedido e item são conceitos separados; preço e desconto são preservados no contexto histórico do item vendido. O custo realizado é rastreado nas saídas físicas relacionadas aos atendimentos. O cliente pode estar ausente somente na venda presencial aprovada; nos canais digitais é identificado. Vendedor é opcional em e-commerce e marketplace.
 
 ## Suprimentos e recebimento
 
@@ -158,4 +158,4 @@ As relações atravessam domínios: a origem comercial do pedido não determina 
 
 ## Limites para a modelagem posterior
 
-A lista pode resultar aproximadamente em algumas dezenas de entidades, mas não é uma meta nem compromisso de quantidade. A Fase 2 deverá revisar este domínio e decidir cardinalidades exatas, obrigatoriedades, nomenclatura, histórico, chaves e regras de integridade antes de criar qualquer objeto PostgreSQL. Não há aqui modelo estrela, seleção de fontes para o Power BI, SQL ou definição física de colunas.
+A lista de entidades candidatas não é uma meta nem compromisso de quantidade. A proposta relacional, cardinalidades, obrigatoriedades, nomenclatura, histórico, chaves e regras de integridade consolidadas na Fase 2A.1 estão documentadas em `docs/database/`; qualquer implementação PostgreSQL depende de revisão final. Não há aqui modelo estrela, seleção de fontes para o Power BI nem SQL executável.

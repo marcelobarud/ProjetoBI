@@ -1,6 +1,6 @@
 # Diagrama entidade-relacionamento proposto
 
-**Fase 2A — visão da proposta física para revisão.** Os diagramas mostram cardinalidades e FKs principais, sem listar colunas. O modelo permanece operacional e normalizado; não há dimensões ou fatos analíticos. Algumas tabelas aparecem em mais de um diagrama para tornar os vínculos entre domínios legíveis.
+**Fase 2A.1 — visão da proposta física consolidada.** Os diagramas mostram cardinalidades e FKs principais, sem listar todas as colunas. O modelo permanece operacional e normalizado; não há dimensões ou fatos analíticos. Algumas tabelas aparecem em mais de um diagrama para tornar os vínculos entre domínios legíveis.
 
 Para manter os identificadores Mermaid legíveis, nomes de entidade usam o schema e a tabela unidos por sublinhado; por exemplo, sales_order_status_history representa sales.order_status_history.
 
@@ -95,6 +95,7 @@ erDiagram
     bigint product_id PK
     bigint category_id FK
     bigint brand_id FK
+    jsonb specifications
   }
   catalog_product_suppliers {
     bigint product_supplier_id PK
@@ -141,6 +142,7 @@ erDiagram
   procurement_goods_receipt_items o|--o{ inventory_stock_movements : origem_entrada
   logistics_fulfillment_items o|--o{ inventory_stock_movements : origem_saida
   after_sales_return_items o|--o{ inventory_stock_movements : origem_retorno
+  logistics_fulfillment_items o|--o{ after_sales_return_items : origem_fisica
   inventory_stock_transfer_items o|--o{ inventory_stock_movements : origem_transferencia
   procurement_suppliers {
     bigint supplier_id PK
@@ -177,6 +179,8 @@ erDiagram
     bigint stock_movement_id PK
     bigint product_id FK
     bigint stock_location_id FK
+    bigint fulfillment_item_id FK
+    numeric unit_cost
   }
   inventory_stock_reservations {
     bigint stock_reservation_id PK
@@ -283,6 +287,7 @@ erDiagram
     bigint return_item_id PK
     bigint return_id FK
     bigint sales_order_item_id FK
+    bigint source_fulfillment_item_id FK
   }
   sales_sales_channels {
     bigint sales_channel_id PK

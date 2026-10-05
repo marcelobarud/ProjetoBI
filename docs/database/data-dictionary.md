@@ -1,6 +1,6 @@
 # Dicionário de dados proposto
 
-**Fase 2A — proposta documental para revisão.** Os tipos são PostgreSQL 18. “Não”/“Sim” indicam nulabilidade proposta; identidade e colunas calculadas são indicadas nas observações. Não há script executável neste documento.
+**Fase 2A.1 — proposta física consolidada, pronta para revisão final.** Os tipos são PostgreSQL 18. “Não”/“Sim” indicam nulabilidade proposta; identidade e colunas calculadas são indicadas nas observações. Não há script executável neste documento.
 
 ## Convenções
 
@@ -174,6 +174,7 @@
 | brand_id | BIGINT | Sim | FK para brands. |
 | name | VARCHAR(180) | Não | Nome comercial. |
 | description | TEXT | Sim | Descrição operacional. |
+| specifications | JSONB | Sim | Objeto opcional com especificações técnicas variáveis do SKU; chaves snake_case; coerência por categoria validada pelo gerador; sem schema rígido ou GIN inicial. |
 | unit_of_measure | VARCHAR(12) | Não | Unidade comercial/de estoque. |
 | status | VARCHAR(20) | Não | Estado de comercialização. |
 | created_at | TIMESTAMPTZ | Não | Criação. |
@@ -242,7 +243,7 @@
 | stock_location_id | BIGINT | Não | FK para stock_locations. |
 | movement_type | VARCHAR(24) | Não | Tipo/direção do movimento. |
 | quantity_delta | BIGINT | Não | Variação assinada da quantidade física. |
-| unit_cost | NUMERIC(20,8) | Sim | Custo aplicado se pertinente. |
+| unit_cost | NUMERIC(20,8) | Sim | Custo unitário aplicado ao movimento; obrigatório em recebimento, saída fulfillment, retorno físico e transferências; saídas fulfillment registram a média vigente e retornos vendáveis usam custo histórico alocado. |
 | goods_receipt_item_id | BIGINT | Sim | Origem opcional: item de recebimento. |
 | fulfillment_item_id | BIGINT | Sim | Origem opcional: item atendido. |
 | return_item_id | BIGINT | Sim | Origem opcional: item de devolução. |
@@ -451,6 +452,7 @@
 | sales_order_id | BIGINT | Não | Chave para consistência devolução/item. |
 | return_id | BIGINT | Não | FK composta para returns/sales_order. |
 | sales_order_item_id | BIGINT | Não | FK composta para item/pedido. |
+| source_fulfillment_item_id | BIGINT | Sim | FK composta para fulfillment item do mesmo pedido e item vendido; exigido antes de confirmar recebimento físico/devolução vendável. |
 | quantity_requested | BIGINT | Não | Quantidade solicitada. |
 | quantity_approved | BIGINT | Não | Quantidade aprovada. |
 | quantity_received | BIGINT | Não | Quantidade fisicamente recebida. |
@@ -519,7 +521,6 @@
 | product_name_snapshot | VARCHAR(180) | Não | Nome comercial snapshot. |
 | quantity | BIGINT | Não | Quantidade vendida positiva. |
 | unit_sale_price | NUMERIC(19,2) | Não | Preço unitário aplicado. |
-| unit_cost_snapshot | NUMERIC(20,8) | Não | Custo unitário histórico usado na venda. |
 | created_at | TIMESTAMPTZ | Não | Criação da linha. |
 
 ### sales.order_status_history

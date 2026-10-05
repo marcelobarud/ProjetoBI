@@ -1,6 +1,6 @@
 # Proposta de modelo relacional operacional
 
-**Fase 2A — proposta para revisão.** Este documento descreve uma estrutura física candidata para PostgreSQL 18. Nada aqui foi executado no PostgreSQL; a database proposta é `projeto_bi`. O Server Group `ProjetoBI` do pgAdmin é apenas organização local e não foi acessado.
+**Fase 2A.1 — decisões físicas consolidadas, pronta para revisão final.** Este documento descreve a estrutura física aprovada conceitualmente para PostgreSQL 18. Nada aqui foi executado no PostgreSQL; a database proposta é `projeto_bi`. O Server Group `ProjetoBI` do pgAdmin é apenas organização local e não foi acessado.
 
 O modelo representa o sistema operacional da empresa brasileira, com valores monetários em BRL. Não é um modelo estrela, não prescreve tabelas para o Power BI e não inclui views analíticas. A documentação é uma proposta para revisão humana antes da Fase 2B.
 
@@ -14,6 +14,8 @@ O modelo representa o sistema operacional da empresa brasileira, com valores mon
 - **Nomenclatura:** inglês, `snake_case`, tabelas no plural, PK `<singular>_id`, FK com o nome da chave referenciada, constraints `pk_`, `fk_`, `uq_`, `ck_` e índices `idx_`.
 - **Exclusões:** registros cadastrais usados por transações não são apagados em cascata; as relações usam restrição de exclusão e cadastros são inativados.
 - **Estados:** `VARCHAR` com `CHECK` para conjuntos pequenos e estáveis; tabelas de referência para cadastros operacionais que precisam ser administrados (canais, formas de pagamento, funções, motivos não foram todos separados em tabelas).
+- **Especificações de produto:** coluna JSONB opcional em `catalog.products`, limitada a objeto; coerência semântica por categoria cabe ao gerador/aplicação. Sem EAV, tabela de atributos ou índice GIN inicial.
+- **Custo realizado:** reconhecido na saída física de estoque; `inventory.stock_movements` do tipo `fulfillment` é a fonte canônica, relacionada ao item atendido e ao pedido. `sales_order_items` não carrega um custo realizado único.
 
 ## Schemas e tabelas
 
@@ -40,9 +42,9 @@ O modelo representa o sistema operacional da empresa brasileira, com valores mon
 
 | Tabela | Finalidade | PK e principais FKs | Cardinalidades e histórico |
 | --- | --- | --- | --- |
-| `categories` | Categorias e eventual relação hierárquica entre elas. | `category_id`; autorreferência opcional a `categories`. | Categoria pode ter subcategorias e muitos produtos. A hierarquia é uma proposta física para a hipótese conceitual ainda revisável. |
+| `categories` | Categorias com hierarquia opcional. | `category_id`; autorreferência opcional a `categories`. | Categoria pode ter subcategorias e muitos produtos; a camada operacional/gerador impede ciclos. |
 | `brands` | Marcas associadas ao catálogo. | `brand_id`; nenhuma FK obrigatória. | Uma marca pode estar em muitos produtos; inativação preserva o histórico. |
-| `products` | SKU efetivamente comercializável. | `product_id`; FKs para `categories` e, opcionalmente, `brands`. | Um SKU aparece em preços, fornecedores, compras, vendas e estoque; descontinuação mantém referências históricas. Atributos técnicos livres não são implementados nesta versão. |
+| `products` | SKU efetivamente comercializável. | `product_id`; FKs para `categories` e, opcionalmente, `brands`. | Um SKU aparece em preços, fornecedores, compras, vendas e estoque; descontinuação mantém referências históricas. `specifications` é JSONB opcional com objeto de atributos variáveis, sem schema rígido ou índice GIN inicial. |
 | `product_suppliers` | Associação N:N entre produto e fornecedor, com referência comercial do fornecedor. | `product_supplier_id`; FKs para `products` e `procurement.suppliers`. | Produto pode ter vários fornecedores; uma associação pode ser marcada como preferencial (no máximo uma preferencial ativa por produto). |
 | `product_prices` | Histórico de preços de venda por SKU e canal, com vigência. | `product_price_id`; FKs para `products`, `sales.sales_channels` e, opcionalmente, `core.employees`. | Um produto/canal pode ter vários períodos; não sobreposição de vigências é validada pela aplicação/gerador. |
 
@@ -52,7 +54,7 @@ O modelo representa o sistema operacional da empresa brasileira, com valores mon
 | --- | --- | --- | --- |
 | `sales_channels` | Canais físicos, e-commerce próprio e marketplaces. | `sales_channel_id`; nenhuma FK obrigatória. | Um canal pode ter muitos pedidos e preços. O tipo pertence a um conjunto `CHECK` curto. |
 | `sales_orders` | Cabeçalho do pedido, situação comercial e snapshots de destinatário/endereço. | `sales_order_id`; FKs para canal, cliente opcional, loja opcional, vendedor opcional e endereço cadastrado opcional. | Um pedido tem um ou mais itens, eventos de status, descontos, pagamentos, remessas e devoluções. Cliente é nulo permitido apenas em venda física; a proposta usa `channel_type` redundante protegido por FK composta e `CHECK` para permitir validação pelo banco sem trigger. |
-| `sales_order_items` | Itens/SKUs vendidos e seus snapshots comerciais e de custo. | `sales_order_item_id`; FK para pedido e FK para produto; chave única composta `(sales_order_id, sales_order_item_id)` dá suporte a relacionamentos que validam o pedido da linha. | Pedido 1:N itens; cada item pode ser dividido entre vários atendimentos e referenciado em várias devoluções. Quantidade, preço unitário e custo unitário histórico permanecem fixos para preservar o evento. |
+| `sales_order_items` | Itens/SKUs vendidos e seus snapshots comerciais. | `sales_order_item_id`; FK para pedido e FK para produto; chave única composta `(sales_order_id, sales_order_item_id)` dá suporte a relacionamentos que validam o pedido da linha. | Pedido 1:N itens; cada item pode ser dividido entre vários atendimentos e referenciado em várias devoluções. Quantidade, preço e desconto preservam o contexto comercial; custo realizado não é consolidado artificialmente numa linha que pode ter saídas com custos distintos. |
 | `order_status_history` | Eventos imutáveis de mudança de situação do pedido. | `order_status_history_id`; FKs para `sales_orders` e, opcionalmente, `core.employees`. | Pedido 1:N eventos; sequência e situação atual devem ser mantidas em uma transação pela aplicação. |
 | `applied_discounts` | Descontos efetivamente aplicados a itens, incluindo rateio de desconto de pedido. | `applied_discount_id`; FK composta para o item e pedido. | Um item pode receber vários registros de desconto. Não há cadastro de campanhas nem motor promocional; referência/nome de campanha é snapshot opcional. Descontos de pedido são alocados a itens para permitir reconciliação do valor por item. |
 
@@ -100,7 +102,7 @@ O modelo representa o sistema operacional da empresa brasileira, com valores mon
 | Tabela | Finalidade | PK e principais FKs | Cardinalidades e histórico |
 | --- | --- | --- | --- |
 | `returns` | Solicitação e ciclo administrativo de devolução referenciada a um pedido. | `return_id`; FK para pedido e FKs opcionais para funcionários solicitante/aprovador; chave única `(sales_order_id, return_id)` dá contexto às linhas e reembolsos. | Pedido 1:N devoluções; cliente é obtido do pedido quando identificado. Motivos são um conjunto `CHECK`, evitando tabela de domínio sem necessidade inicial. |
-| `return_items` | Quantidades solicitadas, aprovadas, recebidas e destinadas por item vendido. | `return_item_id`; FKs compostas para devolução/pedido e item de venda/pedido. | Devolução 1:N itens; vários retornos podem referenciar um item vendido. Limite agregado de quantidade devolvida é regra transacional da aplicação. |
+| `return_items` | Quantidades solicitadas, aprovadas, recebidas e destinadas por item físico atendido. | `return_item_id`; FKs compostas para devolução/pedido, item de venda/pedido e, opcionalmente, fulfillment item do mesmo pedido/item. | A granularidade permite várias linhas do mesmo item vendido em uma devolução quando vieram de fulfillments diferentes. A origem física deve estar identificada antes de confirmar o recebimento; limites acumulados são transacionais. |
 
 ## Cardinalidades principais
 
@@ -132,52 +134,66 @@ Estados pequenos e estáveis usam `VARCHAR` mais `CHECK`; canais, meios de pagam
 3. **Lotações:** `core.employee_assignments` guarda função, loja e datas civis de vigência.
 4. **Status de pedido e logística:** estado atual no cabeçalho e eventos append-only (`order_status_history`, `fulfillment_events`). Atualização do estado corrente e inserção do evento devem ocorrer na mesma transação.
 5. **Endereço/destinatário:** pedido guarda referência opcional ao endereço cadastrado e snapshot brasileiro utilizado no momento da venda; alterações cadastrais não reescrevem o pedido.
-6. **Custo médio:** o saldo/custo médio corrente por SKU/local será persistido na posição de estoque (coluna proposta `average_unit_cost`); recebimentos aceitos guardam custo de entrada; item vendido guarda `unit_cost_snapshot`. Movimento guarda custo unitário aplicado quando relevante. A aplicação recalcula e atualiza movimento, posição e item da venda atomicamente; fórmula, ordem de concorrência, arredondamento e momento de reconhecimento ainda precisam de revisão.
-7. **Devoluções:** aprovação no cabeçalho/itens, recebimento e eventual movimento para saldo vendável, e reembolso são eventos distintos. A aprovação não altera automaticamente estoque ou pagamento.
+6. **Custo realizado:** reconhecido no instante da saída física. Cada movimento `fulfillment` registra a quantidade, SKU, local, `fulfillment_item_id` de origem e custo unitário médio vigente. O custo canônico da venda é a soma de `ABS(quantity_delta) × unit_cost` desses movimentos relacionados ao item/pedido; a linha comercial não guarda um custo realizado único.
+7. **Custo médio:** `stock_positions.average_unit_cost` é mantido por SKU/local. Entrada elegível pondera o saldo anterior e a entrada; saída usa o custo médio vigente, reduz o físico e não recalcula a média. Transferência leva o custo da saída da origem à entrada do destino, que recalcula sua própria média.
+8. **Devoluções:** `return_items.source_fulfillment_item_id` identifica a origem física quando conhecida, e deve estar definida antes do recebimento físico. Reentrada vendável usa uma alocação determinística do custo histórico das saídas originais; outros destinos não aumentam estoque vendável. Aprovação, recebimento, movimento e reembolso são eventos distintos.
 
 ### Valores persistidos versus derivados
 
 - `stock_positions.on_hand_quantity` é um saldo operacional persistido, conciliado aos movimentos; `reserved_quantity` é mantido com as reservas ativas. `available_quantity` é gerada pelo banco como `on_hand_quantity - reserved_quantity`.
 - Custo médio por SKU/local (`average_unit_cost`) é persistido para atualizações operacionais eficientes; o total de custo do saldo pode ser derivado de quantidade e custo médio.
-- `sales_order_items.unit_cost_snapshot` é persistido por unidade vendida. Custo histórico total do item pode ser derivado de quantidade × custo unitário snapshot.
+- Custo realizado da venda é derivado exclusivamente dos movimentos `fulfillment`: `ABS(quantity_delta) × unit_cost`, associado aos itens/pedidos pelo `fulfillment_item_id`. Uma linha pode ter unidades com custos históricos diferentes.
 - Preço unitário, desconto aplicado e valores totais do cabeçalho são snapshots comerciais do evento. Totais de pedido devem ser recalculados/reconciliados transacionalmente com itens, descontos e frete; não se recalculam com preços atuais.
 - Quantidade disponível, subtotal de itens, rateio de desconto e totais agregados são derivados para consulta, mas snapshots de total da transação são mantidos para auditoria/reconciliação.
 
 ## Estoque e custo médio móvel
 
-A proposta adota combinação de **posição persistida + trilha de movimentos**. A posição por `(product_id, stock_location_id)` mantém quantidade física, reservada, disponível gerada e custo médio unitário. `stock_movements` documenta entradas/saídas efetivas e é a trilha para conciliação; movimentos não são apagados nem editados como rotina.
+A proposta adota combinação de **posição persistida + trilha de movimentos**. A posição por `(product_id, stock_location_id)` mantém quantidade física, reservada, disponibilidade gerada e custo médio unitário. `stock_movements` documenta eventos físicos e é a trilha canônica para conciliação e custo realizado; movimentos não são apagados nem editados como rotina.
 
-- Recebimento: `goods_receipt_items.accepted_quantity` e `unit_acquisition_cost` são origem da entrada elegível. Somente a aceitação gera movimento positivo e altera a posição/custo médio.
+- Entrada elegível: `goods_receipt_items.accepted_quantity` e `unit_acquisition_cost` são origem. Novo custo médio = `(quantidade_anterior × custo_médio_anterior + quantidade_entrada × custo_unitário_entrada) / (quantidade_anterior + quantidade_entrada)`. A entrada aceita gera movimento positivo e atualiza posição/média na mesma transação.
 - Reserva: `stock_reservations` aumenta quantidade reservada e reduz disponibilidade, sem alterar quantidade física nem criar movimento de saída.
-- Atendimento: `fulfillment_items.fulfilled_quantity` confirma a quantidade entregue/retirada; movimento de saída reduz posição física e guarda o custo histórico unitário aplicado.
-- Devolução: `return_items` registra aprovação/recebimento/destino; apenas quantidade destinada a retorno vendável cria entrada positiva, conforme política futura de custo.
-- Transferência: itens geram movimentos de saída no local de origem e entrada no destino relacionados ao mesmo `stock_transfer_item_id`; transferência em trânsito não fica disponível no destino antes de concluída.
+- Atendimento físico: saída usa o `average_unit_cost` vigente no local, grava o custo em `stock_movements.unit_cost` e reduz o físico sem recalcular a média. O custo realizado é `ABS(quantity_delta) × unit_cost`; múltiplas saídas do mesmo item podem ter custos distintos.
+- Devolução: `return_items` referencia o `fulfillment_item` de origem. Retorno `sellable` reentra com custo unitário alocado das saídas originais e recalcula a média do local; `quarantine`, `repair` e `discard` não aumentam disponibilidade vendável. A alocação determinística por unidade permanece para implementação futura.
+- Transferência: a saída `transfer_out` grava o custo médio da origem; a entrada `transfer_in` leva esse mesmo custo como custo de transferência e recalcula a média no destino. Saída e entrada vinculam-se ao mesmo `stock_transfer_item_id`; trânsito não fica disponível no destino antes da conclusão.
 - Ajustes: movimento positivo/negativo exige motivo e funcionário responsável; o gerador não criará divergências artificiais.
 
-**Não implementado nesta proposta:** fórmula de custo médio, regras de custos elegíveis, sincronização concorrente, precisão operacional e arredondamento. Em especial, a aplicação terá de bloquear/serializar atualizações do mesmo saldo para que entradas e vendas concorrentes usem uma sequência de custo determinística.
+**Requisitos para implementação:** serializar transacionalmente alterações da mesma `(product_id, stock_location_id)` e bloquear a posição durante mudanças de quantidade, reserva ou custo médio. A implementação futura definirá locking, isolamento, precisão, arredondamento e custos elegíveis. Se as saídas originais tiverem custos diferentes, a camada operacional/gerador precisará alocar deterministicamente esses custos a cada unidade devolvida.
 
 ## Mapa de entidades da Fase 1
 
 As 37 entidades conceituais foram revistas, não convertidas mecanicamente. O resultado proposto é de **40 tabelas em 9 schemas**.
 
-- **Consolidadas:** endereço usado em pedido é snapshot no cabeçalho, além do cadastro de endereços; perfis PF/PJ são extensões 1:1 do cliente-base; categoria e subcategoria podem compartilhar tabela com autorreferência (a hierarquia ainda é proposta); canal e modalidade de atendimento permanecem conceitos separados; pagamento e tentativa são uma operação com estado; situação atual + tabela de eventos tratam histórico sem tabelas de status.
+- **Consolidadas:** endereço usado em pedido é snapshot no cabeçalho, além do cadastro de endereços; perfis PF/PJ são extensões 1:1 do cliente-base; categoria e subcategoria compartilham tabela com autorreferência; canal e modalidade de atendimento permanecem conceitos separados; pagamento e tentativa são uma operação com estado; situação atual + tabela de eventos tratam histórico sem tabelas de status.
 - **Representadas por tabelas:** cadastro e contato de cliente; produto/SKU; relação produto-fornecedor; preço por vigência; pedido e itens; histórico de status; compras e itens; recebimentos e itens; saldo e movimentos; reservas; transferências; pagamentos, parcelas, reembolsos; remessas, linhas de atendimento e eventos; devoluções e itens.
-- **Não mantidas como tabelas próprias na primeira versão:** cadastro/motor de campanhas, categoria de motivo de devolução, cada valor de status como tabela, atributos técnicos genéricos (EAV/JSONB), uma camada de variantes e uma tabela de consumidor anônimo. Descontos guardam a aplicação e referência/campanha em snapshot; motivos/estados são `CHECK`; especificações detalhadas ficam fora da primeira versão; venda anônima é pedido físico com `customer_id` nulo.
-- **Adicionadas para fechar necessidades operacionais:** `applied_discounts` para proveniência/rateio de descontos; `fulfillment_items` para quantidades parciais por remessa; `fulfillment_events` para trilha de execução; `stock_transfers` e `stock_transfer_items` para transferências rastreáveis. A projeção de saldo foi escolhida como tabela persistida reconciliável, em vez de tabela derivada somente sob consulta.
+- **Não mantidas como tabelas próprias na primeira versão:** cadastro/motor de campanhas, categoria de motivo de devolução, cada valor de status como tabela, estrutura EAV, tabela de atributos, camada obrigatória de variantes e consumidor anônimo. Especificações variáveis usam a coluna JSONB opcional do produto; descontos guardam aplicação/referência em snapshot; venda anônima é pedido físico com `customer_id` nulo.
+- **Adicionadas para fechar necessidades operacionais:** `applied_discounts` para proveniência/rateio de descontos; `fulfillment_items` para quantidades parciais por remessa e custo de saída por origem; `fulfillment_events` para trilha de execução; `stock_transfers` e `stock_transfer_items` para transferências rastreáveis. A projeção de saldo foi escolhida como tabela persistida reconciliável, em vez de tabela derivada somente sob consulta.
+
+## Decisões consolidadas na Fase 2A.1
+
+1. Clientes ativos identificados têm exatamente o perfil correspondente a `customer_type`; a camada operacional/gerador garante isso e terá verificações de consistência, sem trigger ou herança. CPF/CNPJ continuam opcionais, apenas dígitos e únicos quando informados; o gerador produzirá identificadores sintéticos válidos.
+2. `sales_orders.channel_type` permanece protegido com `sales_channel_id` por FK composta. `customer_id` só pode ser nulo em `physical`; e-commerce e marketplace exigem cliente. Não há cliente genérico.
+3. `catalog.products.specifications` é JSONB opcional, objeto sem schema rígido no banco; chaves snake_case e coerência semântica/categoria são validadas pelo gerador. Não há EAV, variante obrigatória, tabela de atributos ou GIN inicial.
+4. Custo realizado é reconhecido em cada saída física `fulfillment` de `stock_movements`; seu custo é `ABS(quantity_delta) × unit_cost`. `sales_order_items` não guarda custo realizado unitário.
+5. `stock_positions` persiste quantidades e custo médio móvel por SKU/local; entradas elegíveis ponderam a média; saídas usam a média vigente sem recalculá-la; transferências carregam o custo da origem para a entrada no destino, que então recalcula sua média.
+6. Reservas, recebimentos, atendimento, transferências e devoluções respeitam limites agregados validados transacionalmente pela camada operacional/gerador, sem triggers complexos ou `btree_gist` nesta versão.
+7. `return_items` pode indicar `source_fulfillment_item_id` do mesmo pedido/item. O vínculo é necessário antes de confirmar recebimento físico e reentrada vendável; custo vendável volta pela base histórica das saídas originais, não pelo custo médio atual. Destinos não vendáveis não aumentam estoque disponível.
+8. Descontos continuam alocados às linhas; soma das alocações concilia com o desconto do pedido e nenhuma linha fica com valor líquido negativo. O algoritmo e o arredondamento serão implementados depois.
+9. `catalog.categories.parent_category_id` é autorreferente; a camada operacional impede ciclos. BRL é a única moeda suportada em vendas, compras e pagamentos.
+10. Instantes usam `TIMESTAMPTZ`, datas civis `DATE`; timestamps são fornecidos explicitamente para permitir histórico sintético de 2023–2026, sem `DEFAULT now()` generalizado.
 
 ## Decisões pendentes para aprovação
 
-1. **Estado do cliente PF/PJ:** a correspondência entre `customers.customer_type` e exatamente um perfil (`individual_profiles` ou `business_profiles`) não é garantida por FK/CHECK simples entre tabelas. **Recomendação:** validar na aplicação/gerador e incluir verificação de consistência transacional; alternativa é trigger ou estrutura de herança por tabelas específicas, com maior complexidade. **Impacto:** integridade do cadastro.
-2. **Obrigatoriedade de cliente por canal:** a proposta duplica `channel_type` no pedido, protege a cópia por FK composta ao canal e usa `CHECK` para cliente não nulo nos canais digitais. **Recomendação:** aceitar essa redundância controlada, sem trigger; alternativa é validar somente no serviço/gerador, deixando o banco permitir incoerência. **Impacto:** integridade e simplicidade do esquema.
-3. **CPF/CNPJ:** perfis permitem identificadores nulos, com formato numérico e unicidade quando preenchidos; checksum e obrigatoriedade não são definidos. **Recomendação:** manter opcionais nesta fase por não definir política fiscal/legal; alternativa é torná-los obrigatórios conforme canal/cliente após revisão. **Impacto:** cadastro, privacidade e elegibilidade de venda.
-4. **Saldo persistido e custo médio:** `stock_positions` materializa saldo/custo médio e é atualizada na mesma transação que os movimentos. **Recomendação:** aprovar a projeção persistida + ledger e revisão por bloqueio transacional; alternativa é derivar saldo do ledger, com consultas mais caras e custo médio mais difícil de materializar. **Impacto:** concorrência, desempenho e reconciliação.
-5. **Especificações de SKU:** não há atributos técnicos estruturados nesta versão. **Recomendação:** começar com descrição e referências comerciais, revisitando atributos específicos após catálogo realista ser aprovado; alternativa é JSONB opcional validado por aplicação, sem EAV. **Impacto:** evolução do catálogo e consultas operacionais.
-6. **Descontos por pedido:** `applied_discounts` exige item-alvo; desconto de cabeçalho é alocado às linhas. **Recomendação:** guardar alocações por item e ratear no serviço de venda; alternativa é guardar desconto somente no cabeçalho, com margem e devolução por item menos precisas. **Impacto:** totalização, margem histórica e devoluções parciais.
-7. **Limites agregados transacionais:** recebimentos acumulados ≤ comprado; remessas atendidas ≤ vendido; devoluções aceitas ≤ vendido; reembolsos ≤ valores elegíveis; períodos de preço/lotações sem sobreposição. **Recomendação:** validar em transações da aplicação/gerador com bloqueio das linhas-pai; alternativa é triggers/exclusões, algumas exigindo extensão `btree_gist`. **Impacto:** integridade sob concorrência e necessidade de código operacional.
-8. **Brasil e dados cadastrais:** formatos simples podem usar `CHECK`, mas validação de dígitos verificadores e regras legais não foram definidas. **Recomendação:** permitir os identificadores como opcionais, validar formato na aplicação e postergar checksum/legalidade; alternativa é adicionar validadores depois, com regras claramente aprovadas. **Impacto:** qualidade e requisitos de cadastro.
-9. **Custo elegível e devolução:** frete/impostos/custos acessórios e custo atribuído a mercadoria devolvida continuam abertos. **Recomendação:** armazenar custo de aquisição aceito e custo unitário histórico de venda sem fixar nesta fase todos os componentes nem a política de custo de retorno; alternativa é adotar política contábil detalhada antes da modelagem. **Impacto:** custo médio e margem histórica.
-10. **Hierarquia de categorias:** a autorreferência permite níveis hierárquicos sem tabela de subcategoria separada. **Recomendação:** manter uma tabela com relação opcional pai/filha, como hipótese revisável; alternativa é usar categorias planas. **Impacto:** manutenção e navegação do catálogo.
+As decisões físicas desta fase foram consolidadas. Resta a revisão humana final desta proposta antes de iniciar a Fase 2B.
 
-## Limites da Fase 2A
+## Detalhes para a Fase 2B / camada operacional
+
+- Determinar a implementação concreta de bloqueio/serialização de `stock_positions` para `(product_id, stock_location_id)` durante alterações de quantidade, reserva e custo médio.
+- Definir precisão intermediária/arredondamento da média ponderada e quais componentes de custo de compra são elegíveis.
+- Definir alocação determinística do custo entre múltiplas saídas originais quando uma unidade devolvida tiver origem em `fulfillment_item` com mais de um movimento/custo.
+- Implementar verificações transacionais de limites agregados, reconciliação entre posição e ledger, totalizações/descontos, parcelas e custos.
+- Validar no gerador a correspondência de perfil PF/PJ, CPF/CNPJ sintéticos válidos, objetos JSONB e atributos coerentes com categoria.
+- Avaliar índices adicionais com consultas e volume reais; JSONB não recebe GIN sem necessidade observada.
+
+## Limites da Fase 2A.1
 
 Não foram criados database, schemas reais, tabelas, constraints, índices, views, migrations, triggers, funções, procedures, seeds, scripts Python, dados, projeto Power BI ou estrutura analítica. Os nomes e tipos descritos são uma proposta documental para revisão, não SQL executável.

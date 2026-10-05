@@ -2,7 +2,7 @@
 
 ## Como interpretar este documento
 
-As regras marcadas como **Decisão do projeto** foram aprovadas nas Fases 1 e 1.1. As marcadas como **Proposta** são recomendações que ainda podem ser revistas antes ou durante a modelagem. Nenhum item define colunas ou restrições físicas.
+As regras marcadas como **Decisão do projeto** foram aprovadas nas fases anteriores e consolidadas na Fase 2A.1. As marcadas como **Proposta** são recomendações que ainda podem ser revistas na implementação. Este documento mantém foco conceitual e não define colunas ou constraints físicas.
 
 ## Contexto operacional
 
@@ -58,7 +58,7 @@ As regras marcadas como **Decisão do projeto** foram aprovadas nas Fases 1 e 1.
 
 - O catálogo inclui produtos, categorias e subcategorias, marcas e referências relevantes.
 - Produto representa o item/SKU efetivamente comercializável. Configurações comerciais distintas podem ser produtos/SKUs diferentes; não há uma camada separada obrigatória de variantes na primeira versão do domínio.
-- As especificações de produto podem variar conforme a categoria; como serão organizadas é uma decisão da modelagem futura.
+- As especificações técnicas podem variar por categoria e são opcionais; a proposta física usa um objeto JSONB em `catalog.products`, com chaves `snake_case` e coerência semântica validada pelo gerador.
 - Um produto pode ser descontinuado sem apagar seu histórico comercial.
 - Um produto pode ser obtido de mais de um fornecedor.
 - O sistema deve comportar alterações de preço e histórico ao longo do tempo.
@@ -66,11 +66,12 @@ As regras marcadas como **Decisão do projeto** foram aprovadas nas Fases 1 e 1.
 ### Propostas
 
 - Descontinuar um produto impede sua oferta em novos pedidos a partir da data definida, mas preserva catálogo, compras e vendas históricas. Produtos descontinuados podem permanecer vendáveis enquanto houver política explícita de liquidação.
-- Um produto pode pertencer a uma categoria terminal e possuir uma marca; a proposta de uma hierarquia entre categorias ainda será validada na modelagem.
+- Categorias podem formar hierarquia autorreferente; a camada operacional/gerador deve impedir ciclos. Produto pode pertencer a uma categoria terminal e possuir uma marca.
 - Associar fornecedores a produtos com referências de compra e, se necessário, indicar um fornecedor preferencial. A preferência é operacional e não impede compras de outro fornecedor.
 - Manter períodos de vigência para os preços comerciais; alterações futuras não modificam o preço registrado nos pedidos existentes.
-- Usar custo médio móvel como método conceitual inicial de valorização do estoque. O custo médio poderá mudar quando novas entradas elegíveis forem efetivadas.
-- Preservar no contexto histórico de cada item vendido o custo considerado no momento da venda, para que atualizações posteriores do custo médio não reescrevam a margem histórica.
+- Usar custo médio móvel como método de valorização do estoque: entrada elegível recalcula a média ponderada entre saldo e custo anterior e quantidade/custo da entrada.
+- Reconhecer o custo realizado no momento de cada saída física. A saída usa o custo médio vigente no local, preserva esse custo junto ao movimento físico e não recalcula a média. O custo da venda por SKU/pedido é a soma dos custos das saídas relacionadas aos atendimentos; uma linha comercial pode ter saídas com custos diferentes.
+- Em transferência, a saída carrega o custo médio da origem e a entrada no destino usa esse custo para recalcular a média própria do destino.
 - Preços e custos pertencem a contextos temporais distintos: preço é condição de venda; custo nasce de aquisições e da política de valorização definida. Não presumir que o último preço de compra seja automaticamente o custo de todo o estoque.
 - O tratamento de frete de compra, impostos e custos acessórios no cálculo do custo continua sem definição detalhada.
 
@@ -101,7 +102,7 @@ As regras marcadas como **Decisão do projeto** foram aprovadas nas Fases 1 e 1.
 
 ### Propostas
 
-- Uma loja pode ter vários locais de estoque; podem existir locais associados ao atendimento digital. Um saldo operacional conciliável com os movimentos pode ser mantido para consulta rápida; a abordagem física será decidida na modelagem.
+- Uma loja pode ter vários locais de estoque; podem existir locais associados ao atendimento digital. A proposta física mantém saldo persistido por produto/local, conciliável com os movimentos.
 - Cancelamento antes da saída física libera a reserva, sem criar entrada de devolução; se já houve saída, o retorno segue o processo de devolução.
 - Reservar itens quando o pedido for confirmado e liberá-los em cancelamento ou expiração antes do atendimento. O prazo e os eventos exatos dependem da política de pagamento e separação.
 - Transferências entre locais produzem saída de origem e entrada de destino vinculadas à mesma operação; uma transferência em trânsito poderá exigir uma etapa intermediária se essa necessidade for confirmada.
@@ -151,8 +152,9 @@ As regras marcadas como **Decisão do projeto** foram aprovadas nas Fases 1 e 1.
 ### Propostas
 
 - Registrar uma solicitação de devolução por pedido, com um ou mais itens, quantidades, motivo, análise e decisão. A quantidade aceita cumulativamente não pode superar a quantidade vendida, descontadas devoluções anteriores.
-- Registrar solicitação, aprovação/recusa, recebimento físico e reembolso como etapas operacionais distintas; a forma de representá-las será decidida na modelagem.
-- Após inspeção, destinar o item a estoque vendável, quarentena/avaliação ou descarte, conforme condição e política. Só o destino vendável gera entrada no saldo disponível; os outros destinos continuam rastreados.
+- Registrar solicitação, aprovação/recusa, recebimento físico e reembolso como etapas operacionais distintas.
+- Identificar a unidade de atendimento físico de origem da quantidade devolvida. A quantidade devolvida acumulada não pode superar o efetivamente atendido daquela origem. O retorno vendável usa o custo histórico das saídas originais dessa origem, com alocação determinística a ser implementada; não usa arbitrariamente a média atual. Após reentrada, o custo médio do local é recalculado como entrada elegível.
+- Após inspeção, destinar o item a estoque vendável, quarentena/avaliação, reparo ou descarte. Só o destino vendável gera entrada no estoque disponível; os outros destinos continuam rastreados sem aumentar a posição vendável.
 - Relacionar o reembolso à devolução e à operação de pagamento original sempre que possível.
 - Cancelar pedido antes do atendimento é diferente de devolver item após entrega ou retirada; os dois processos devem manter estados e impactos distintos.
 
