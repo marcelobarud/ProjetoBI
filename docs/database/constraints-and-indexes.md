@@ -1,6 +1,6 @@
 # Constraints e índices propostos
 
-**Fase 2A.1 — proposta física consolidada.** Esta especificação não é migration nem SQL executável. Os nomes seguem os prefixos documentados em relational-model.md. FKs usam comportamento restritivo padrão (NO ACTION/RESTRICT); não há exclusão em cascata para histórico. Cadastros referenciados devem ser inativados.
+**Fase 2B — constraints e índices aprovados implementados em `database/migrations/001_initial_schema.sql`.** FKs usam comportamento restritivo padrão (NO ACTION); não há exclusão em cascata para histórico. Cadastros referenciados devem ser inativados.
 
 ## Convenções e validação pelo banco
 
@@ -41,7 +41,7 @@ A regra que vincula customer_type a exatamente um perfil PF/PJ depende de consis
 |---|---|---|
 | categories | PK(category_id); parent_category_id opcional → categories | UNIQUE(category_code); parent_category_id <> category_id. Não permitir ciclos exige validação na aplicação. |
 | brands | PK(brand_id) | UNIQUE(brand_code); UNIQUE(name). |
-| products | PK(product_id); category_id → categories; brand_id opcional → brands | UNIQUE(sku); status ∈ {active, inactive, discontinued}; unit_of_measure dentro do conjunto aprovado; specifications nulo ou JSONB object. Coerência interna/por categoria cabe ao gerador; sem schema rígido ou índice GIN inicial. |
+| products | PK(product_id); category_id → categories; brand_id opcional → brands | UNIQUE(sku); status ∈ {active, inactive, discontinued}; unit_of_measure NOT NULL (sem CHECK de domínio nesta versão; vocabulário não especificado); specifications nulo ou JSONB object. Coerência interna/por categoria cabe ao gerador; sem schema rígido ou índice GIN inicial. |
 | product_suppliers | PK(product_supplier_id); product_id → products; supplier_id → procurement.suppliers | UNIQUE(product_id, supplier_id); no máximo um fornecedor preferido ativo por produto via índice único parcial. |
 | product_prices | PK(product_price_id); product_id → products; sales_channel_id → sales.sales_channels; created_by_employee_id opcional → core.employees | amount ≥ 0; valid_to nulo ou > valid_from. Períodos de um mesmo SKU/canal não se sobrepõem (validação transacional). |
 
@@ -168,8 +168,8 @@ Além dos grupos acima, criar índices simples nas FKs opcionais ou nas FKs que 
 9. Reentrada vendável referencia as saídas originais e usa custo histórico alocado; quarentena, reparo ou descarte não aumenta estoque disponível. Transferência replica custo unitário da saída na entrada do destino.
 10. Limitar reembolsos ao valor elegível, conciliar parcelas ao pagamento e manter moeda BRL em venda/compra/pagamento.
 11. Inserir eventos históricos e atualizar estado atual juntos. Timestamps vêm explicitamente da camada de gravação; não há default de horário atual generalizado.
-12. Atualizar posição+custo médio segundo a entrada ponderada aprovada, sem recalcular a média na saída. Definir detalhes de arredondamento, custo elegível, alocação de custo de retorno e mecanismo concreto de locking na Fase 2B/camada operacional.
+12. Atualizar posição+custo médio segundo a entrada ponderada aprovada, sem recalcular a média na saída. O custo elegível, arredondamento, custo de retorno e locking estão especificados para a camada operacional em `docs/database/operational-transactions.md`.
 
 ## Exclusão e preservação histórica
 
-As FKs não usam ON DELETE CASCADE. Cadastros transacionais referenciados não devem ser apagados; inativar. Remoção de rascunhos sem histórico pode ser avaliada futuramente em política explícita, fora desta proposta. A revisão humana final antecede a implementação da Fase 2B.
+As FKs não usam ON DELETE CASCADE. Cadastros transacionais referenciados não devem ser apagados; inativar. Remoção de rascunhos sem histórico pode ser avaliada futuramente em política explícita.

@@ -19,10 +19,10 @@ O banco operacional deverá representar um ecossistema empresarial coerente, e n
 
 | Diretório/arquivo | Finalidade |
 | --- | --- |
-| `database/migrations/` | Futuras migrações do banco, após aprovação da modelagem. |
+| `database/migrations/` | Migrações SQL versionadas do banco operacional. |
 | `database/seeds/` | Futuras cargas iniciais controladas. |
 | `database/queries/` | Consultas SQL do projeto. |
-| `database/tests/` | Verificações relacionadas ao banco e às consultas. |
+| `database/tests/` | Verificações estruturais e smoke tests SQL transacionais. |
 | `data-generator/src/` | Código-fonte futuro do gerador de dados sintéticos em Python. |
 | `data-generator/tests/` | Testes futuros do gerador. |
 | `powerbi/` | Futuros arquivos do Power BI, incluindo o formato Power BI Project quando a fase correspondente começar. |
@@ -36,12 +36,12 @@ O banco operacional deverá representar um ecossistema empresarial coerente, e n
 
 ## Estado atual
 
-**Fase 2A.1 — decisões físicas consolidadas.** A proposta relacional operacional, o dicionário, as constraints/índices e os diagramas ERD estão atualizados em `docs/database/` e prontos para implementação PostgreSQL após revisão final. Nenhuma database, schema, tabela ou migration foi criada; a Fase 2B não começou.
+**Fase 2B — implementação local preparada, aguardando aplicação e validação PostgreSQL.** A migration estrutural, scripts PowerShell e consultas de validação foram preparados a partir do modelo aprovado. A conexão não estava configurada nesta execução, então a database `projeto_bi` não foi inspecionada nem criada e as migrations não foram aplicadas. Nenhum dado foi gerado.
 
 ## Fases previstas
 
 1. Revisar e aprovar o domínio conceitual (concluído) e consolidar a proposta relacional operacional (Fases 2A e 2A.1 concluídas).
-2. Implementar e documentar o banco PostgreSQL após a revisão final da modelagem (Fase 2B, não iniciada).
+2. Implementar e validar o esquema no PostgreSQL 18 (artefatos da Fase 2B criados localmente; aplicação pendente).
 3. Planejar e desenvolver a geração de dados sintéticos consistentes em Python.
 4. Explorar e selecionar os dados que farão parte da camada analítica.
 5. Construir as transformações, o modelo semântico e as medidas no Power BI.

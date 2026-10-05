@@ -1,12 +1,12 @@
 # Proposta de modelo relacional operacional
 
-**Fase 2A.1 — decisões físicas consolidadas, pronta para revisão final.** Este documento descreve a estrutura física aprovada conceitualmente para PostgreSQL 18. Nada aqui foi executado no PostgreSQL; a database proposta é `projeto_bi`. O Server Group `ProjetoBI` do pgAdmin é apenas organização local e não foi acessado.
+**Fase 2B — estrutura física aprovada.** Este documento descreve o modelo de origem da migration PostgreSQL 18. Os artefatos locais foram preparados; a database `projeto_bi` não foi acessada nem criada nesta execução porque a conexão não estava configurada. O Server Group `ProjetoBI` do pgAdmin é apenas organização local e não foi acessado.
 
-O modelo representa o sistema operacional da empresa brasileira, com valores monetários em BRL. Não é um modelo estrela, não prescreve tabelas para o Power BI e não inclui views analíticas. A documentação é uma proposta para revisão humana antes da Fase 2B.
+O modelo representa o sistema operacional da empresa brasileira, com valores monetários em BRL. Não é um modelo estrela, não prescreve tabelas para o Power BI e não inclui views analíticas.
 
 ## Resumo da proposta
 
-- **Database proposta:** `projeto_bi` (não criada nesta fase).
+- **Database alvo:** `projeto_bi` (a criação depende de conexão configurada).
 - **PostgreSQL:** versão 18, sem extensões externas obrigatórias.
 - **Schemas:** 9.
 - **Tabelas:** 40.
@@ -181,19 +181,18 @@ As 37 entidades conceituais foram revistas, não convertidas mecanicamente. O re
 9. `catalog.categories.parent_category_id` é autorreferente; a camada operacional impede ciclos. BRL é a única moeda suportada em vendas, compras e pagamentos.
 10. Instantes usam `TIMESTAMPTZ`, datas civis `DATE`; timestamps são fornecidos explicitamente para permitir histórico sintético de 2023–2026, sem `DEFAULT now()` generalizado.
 
-## Decisões pendentes para aprovação
+## Estado da implementação
 
-As decisões físicas desta fase foram consolidadas. Resta a revisão humana final desta proposta antes de iniciar a Fase 2B.
+As decisões físicas foram aprovadas para implementação. A migration e sua aplicação à instância alvo ainda precisam de validação quando a conexão PostgreSQL estiver configurada.
 
 ## Detalhes para a Fase 2B / camada operacional
 
-- Determinar a implementação concreta de bloqueio/serialização de `stock_positions` para `(product_id, stock_location_id)` durante alterações de quantidade, reserva e custo médio.
-- Definir precisão intermediária/arredondamento da média ponderada e quais componentes de custo de compra são elegíveis.
-- Definir alocação determinística do custo entre múltiplas saídas originais quando uma unidade devolvida tiver origem em `fulfillment_item` com mais de um movimento/custo.
+- Aplicar as regras de locking, média ponderada e custo de devolução definidas em `operational-transactions.md` na camada operacional futura.
 - Implementar verificações transacionais de limites agregados, reconciliação entre posição e ledger, totalizações/descontos, parcelas e custos.
 - Validar no gerador a correspondência de perfil PF/PJ, CPF/CNPJ sintéticos válidos, objetos JSONB e atributos coerentes com categoria.
 - Avaliar índices adicionais com consultas e volume reais; JSONB não recebe GIN sem necessidade observada.
+- `catalog.products.unit_of_measure` permanece `NOT NULL`, sem CHECK de domínio nesta versão; o vocabulário não foi especificado.
 
-## Limites da Fase 2A.1
+## Limites do modelo físico
 
-Não foram criados database, schemas reais, tabelas, constraints, índices, views, migrations, triggers, funções, procedures, seeds, scripts Python, dados, projeto Power BI ou estrutura analítica. Os nomes e tipos descritos são uma proposta documental para revisão, não SQL executável.
+Este modelo continua sendo a especificação documental. A migration inicial em `database/migrations/` implementa tabelas, constraints e índices; aplicação real requer conexão PostgreSQL 18. Não inclui triggers, funções, procedures, seeds, scripts Python de geração, dados, projeto Power BI ou estrutura analítica.

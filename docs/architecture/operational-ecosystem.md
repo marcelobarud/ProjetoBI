@@ -8,7 +8,7 @@ Este documento descreve os domínios operacionais e entidades candidatas que pod
 - **Proposta** identifica recomendações sujeitas à revisão antes da modelagem.
 - As entidades são candidatas, não uma lista definitiva de tabelas.
 - Os “principais conceitos mantidos” descrevem informação de negócio, não nomes ou tipos de colunas.
-- Não estão definidos tipos SQL, identificadores físicos, constraints, índices, migrations ou quais fontes entrarão no Power BI.
+- Este documento permanece conceitual; tipos SQL, identificadores físicos, constraints, índices e migrations aprovados estão em `docs/database/` e `database/`. As fontes do Power BI serão selecionadas em fase própria.
 
 ## Contexto operacional aprovado
 

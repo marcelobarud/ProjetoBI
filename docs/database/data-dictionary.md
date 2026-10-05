@@ -1,6 +1,6 @@
 # Dicionário de dados proposto
 
-**Fase 2A.1 — proposta física consolidada, pronta para revisão final.** Os tipos são PostgreSQL 18. “Não”/“Sim” indicam nulabilidade proposta; identidade e colunas calculadas são indicadas nas observações. Não há script executável neste documento.
+**Fase 2B — modelo físico aprovado.** Os tipos são PostgreSQL 18. “Não”/“Sim” indicam nulabilidade proposta; identidade e colunas calculadas são indicadas nas observações. A migration versionada implementa esta especificação.
 
 ## Convenções
 

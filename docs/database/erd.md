@@ -1,6 +1,6 @@
 # Diagrama entidade-relacionamento proposto
 
-**Fase 2A.1 — visão da proposta física consolidada.** Os diagramas mostram cardinalidades e FKs principais, sem listar todas as colunas. O modelo permanece operacional e normalizado; não há dimensões ou fatos analíticos. Algumas tabelas aparecem em mais de um diagrama para tornar os vínculos entre domínios legíveis.
+**Fase 2B — visão do modelo físico aprovado.** Os diagramas mostram cardinalidades e FKs principais, sem listar todas as colunas. O modelo permanece operacional e normalizado; não há dimensões ou fatos analíticos. Algumas tabelas aparecem em mais de um diagrama para tornar os vínculos entre domínios legíveis.
 
 Para manter os identificadores Mermaid legíveis, nomes de entidade usam o schema e a tabela unidos por sublinhado; por exemplo, sales_order_status_history representa sales.order_status_history.
 

@@ -2,7 +2,7 @@
 
 ## Objetivo
 
-Este documento registra o fluxo conceitual previsto para o ProjetoBI. A arquitetura será detalhada em fases futuras, conforme as decisões de negócio e técnicas forem aprovadas.
+Este documento registra o fluxo conceitual do ProjetoBI. O modelo operacional foi aprovado e sua implementação local PostgreSQL está em `database/migrations/`; a aplicação à instância alvo depende da configuração de conexão documentada em `docs/database/implementation.md`.
 
 ## Fluxo analítico futuro
 
@@ -20,7 +20,7 @@ Relatórios
 
 ### PostgreSQL — sistema operacional
 
-O PostgreSQL representará o sistema e o ecossistema operacional da empresa fictícia. Seu desenho deverá atender a um cenário empresarial coerente, e não apenas aos dados que serão usados por um dashboard. Poderá incluir informações operacionais, administrativas e cadastrais realistas, além dos dados transacionais. A modelagem ainda não foi definida.
+O PostgreSQL representa o sistema e o ecossistema operacional da empresa fictícia. Seu desenho atende a um cenário empresarial coerente, e não apenas aos dados de um dashboard. O modelo relacional aprovado, as migrations e as regras transacionais estão documentados em `docs/database/` e `database/`.
 
 ### Power Query — seleção e transformação
 
@@ -40,4 +40,4 @@ A camada visual será construída principalmente de forma manual no Power BI. A 
 
 ## Limites desta fase
 
-Esta fundação documental não cria nem modifica objetos PostgreSQL e não define tabelas de origem, fatos, dimensões, medidas ou relatórios. Essas decisões pertencem às fases futuras correspondentes.
+Esta visão arquitetural não define fatos, dimensões, medidas ou relatórios. Esses elementos analíticos pertencem às fases futuras correspondentes. O estado real da database é informado no README e no guia de implementação.

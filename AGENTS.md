@@ -11,6 +11,9 @@
 
 - O ambiente de trabalho é Windows; use PowerShell para operações locais.
 - PostgreSQL será a fonte operacional de dados. Não crie, altere ou remova bancos, schemas, tabelas, usuários, dados ou outros objetos sem autorização expressa na fase correspondente. Inspecionar ou usar uma conexão também deve respeitar o escopo aprovado para a fase.
+- A database alvo aprovada é `projeto_bi`, em PostgreSQL 18. O modelo relacional operacional aprovado em `docs/database/` é a fonte de verdade; mantenha migrations SQL versionadas e não o converta em modelo estrela nesta fase.
+- Nunca use `DROP DATABASE` ou recrie uma database preexistente automaticamente. Inspecione e pare diante de objetos inesperados; credenciais ficam em variáveis locais e nunca no Git.
+- Regras de concorrência, custo médio, movimentos e devoluções devem seguir `docs/database/operational-transactions.md` quando a camada operacional for implementada.
 - Python será usado futuramente para geração de dados sintéticos. Prefira dependências e ambientes isolados quando esse trabalho começar.
 - Power BI será a camada analítica, com Power Query, modelo semântico, DAX e relatórios. O Power BI Project (`.pbip`) deverá ser usado quando a fase do Power BI for autorizada; seus arquivos de definição necessários devem ser versionados.
 
