@@ -36,12 +36,12 @@ O banco operacional deverá representar um ecossistema empresarial coerente, e n
 
 ## Estado atual
 
-**Fase 2B — implementação local preparada, aguardando aplicação e validação PostgreSQL.** A migration estrutural, scripts PowerShell e consultas de validação foram preparados a partir do modelo aprovado. A conexão não estava configurada nesta execução, então a database `projeto_bi` não foi inspecionada nem criada e as migrations não foram aplicadas. Nenhum dado foi gerado.
+**Fase 2B.1 — schema operacional aplicado e validado.** A database `projeto_bi` foi criada no servidor PostgreSQL 18.6 e recebeu a migration inicial. A validação confirmou 9 schemas, 40 tabelas, constraints e índices esperados. O smoke test terminou em `ROLLBACK`, e a conferência posterior encontrou zero linhas de negócio persistidas. Nenhum dado sintético foi gerado. Consulte [`docs/database/validation-report.md`](docs/database/validation-report.md) para os resultados detalhados.
 
 ## Fases previstas
 
 1. Revisar e aprovar o domínio conceitual (concluído) e consolidar a proposta relacional operacional (Fases 2A e 2A.1 concluídas).
-2. Implementar e validar o esquema no PostgreSQL 18 (artefatos da Fase 2B criados localmente; aplicação pendente).
+2. Implementar e validar o esquema operacional no PostgreSQL 18 (Fases 2B e 2B.1 concluídas; database vazia, sem dados sintéticos).
 3. Planejar e desenvolver a geração de dados sintéticos consistentes em Python.
 4. Explorar e selecionar os dados que farão parte da camada analítica.
 5. Construir as transformações, o modelo semântico e as medidas no Power BI.

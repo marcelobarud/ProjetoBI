@@ -4,7 +4,7 @@
 
 O modelo aprovado é PostgreSQL 18, database `projeto_bi`, nove schemas e quarenta tabelas. O schema é criado pela migration `database/migrations/001_initial_schema.sql`; a criação da database fica separada nos scripts PowerShell. Esta versão não cria dados, seeds, triggers, procedures ou estruturas analíticas.
 
-Os arquivos da Fase 2B foram preparados localmente. A instância alvo ainda não foi acessada nem validada. A conexão depende da configuração segura das variáveis indicadas abaixo.
+Na Fase 2B.1, a migration inicial foi aplicada e validada no servidor PostgreSQL 18.6. A database `projeto_bi` estava ausente e foi criada vazia antes da aplicação. O smoke test foi executado em transação com `ROLLBACK`; após a execução, as 40 tabelas continuaram sem linhas. O relatório detalhado está em `docs/database/validation-report.md`.
 
 ## Configuração local
 
@@ -41,7 +41,7 @@ Para reproduzir em ambiente descartável, use uma database vazia e execute o mes
 - `database/tests/001_structure.sql` confere database, schemas, quarenta tabelas, ausência de tabelas extras nos schemas aprovados, PKs, FKs, constraints, índices e colunas críticas.
 - `database/tests/002_smoke_rollback.sql` é um smoke test mínimo em transação que termina em `ROLLBACK`; execute por `Invoke-SmokeTest.ps1` apenas em `projeto_bi` depois da migration.
 
-A conexão e aplicação continuam pendentes até que os cinco campos de conexão sejam configurados e o cliente `psql` PostgreSQL 18 esteja disponível. Nenhuma conexão é feita apenas ao carregar o `.env`; ela ocorre quando `Test-PostgresConnection.ps1` é executado. A validação SQL informa erro se a base alvo não for `projeto_bi`.
+Conexão, aplicação e validação estrutural da Fase 2B.1 concluídas. O cliente e o servidor reportaram PostgreSQL 18.6. A migration terminou com `COMMIT`; a validação confirmou os objetos esperados. Depois do smoke test com `ROLLBACK`, uma contagem exata nas 40 tabelas confirmou zero linhas persistidas. A database permanece pronta para uma fase futura de geração de dados, que não foi iniciada.
 
 ## Pendência de domínio
 
