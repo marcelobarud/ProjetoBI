@@ -36,13 +36,13 @@ O banco operacional deverá representar um ecossistema empresarial coerente, e n
 
 ## Estado atual
 
-**Fase 2B.1 — schema operacional aplicado e validado.** A database `projeto_bi` foi criada no servidor PostgreSQL 18.6 e recebeu a migration inicial. A validação confirmou 9 schemas, 40 tabelas, constraints e índices esperados. O smoke test terminou em `ROLLBACK`, e a conferência posterior encontrou zero linhas de negócio persistidas. Nenhum dado sintético foi gerado. Consulte [`docs/database/validation-report.md`](docs/database/validation-report.md) para os resultados detalhados.
+**Fase 3A — planejamento dos dados sintéticos em revisão humana.** A Fase 2B.1 aplicou e validou a migration no PostgreSQL 18.6: 9 schemas, 40 tabelas, constraints e índices esperados; o smoke test terminou em `ROLLBACK`, e a conferência encontrou zero linhas de negócio persistidas. Nenhum dado sintético foi gerado. O plano documenta escalas, regras e validações futuras. A revisão do schema recomenda decidir sobre geografia estruturada das lojas antes de implementar o gerador. Consulte [`docs/data-generation/generation-plan.md`](docs/data-generation/generation-plan.md) e [`docs/database/validation-report.md`](docs/database/validation-report.md).
 
 ## Fases previstas
 
 1. Revisar e aprovar o domínio conceitual (concluído) e consolidar a proposta relacional operacional (Fases 2A e 2A.1 concluídas).
 2. Implementar e validar o esquema operacional no PostgreSQL 18 (Fases 2B e 2B.1 concluídas; database vazia, sem dados sintéticos).
-3. Planejar e desenvolver a geração de dados sintéticos consistentes em Python.
+3. Planejar e desenvolver a geração de dados sintéticos consistentes em Python. O planejamento da Fase 3A está documentado; o gerador ainda não foi implementado. A próxima etapa depende da revisão humana do plano e da recomendação de schema registrada em `docs/data-generation/schema-gap-review.md`.
 4. Explorar e selecionar os dados que farão parte da camada analítica.
 5. Construir as transformações, o modelo semântico e as medidas no Power BI.
 6. Desenvolver e revisar os relatórios, mantendo documentação e versionamento alinhados.

@@ -15,6 +15,7 @@
 - Nunca use `DROP DATABASE` ou recrie uma database preexistente automaticamente. Inspecione e pare diante de objetos inesperados; credenciais ficam em variáveis locais e nunca no Git.
 - Regras de concorrência, custo médio, movimentos e devoluções devem seguir `docs/database/operational-transactions.md` quando a camada operacional for implementada.
 - Python será usado futuramente para geração de dados sintéticos. Prefira dependências e ambientes isolados quando esse trabalho começar.
+- Dados de estudo devem ser 100% sintéticos, determinísticos por seed/configuração e sem defeitos intencionais. Respeite o cutoff comercial aprovado para cada conjunto; nunca desabilite constraints de integridade para facilitar cargas.
 - Power BI será a camada analítica, com Power Query, modelo semântico, DAX e relatórios. O Power BI Project (`.pbip`) deverá ser usado quando a fase do Power BI for autorizada; seus arquivos de definição necessários devem ser versionados.
 
 ## Forma de trabalhar
