@@ -36,12 +36,12 @@ O banco operacional deverá representar um ecossistema empresarial coerente, e n
 
 ## Estado atual
 
-**Fase 1.1 — consolidação das decisões do domínio.** As Fases 0 e 1 foram concluídas, e o domínio conceitual foi revisado. As decisões aprovadas estão consolidadas na documentação; o projeto está pronto para iniciar a proposta de modelagem relacional. Nenhum banco, schema, tabela, dado, modelo físico ou projeto Power BI foi criado.
+**Fase 2A — proposta relacional em revisão humana.** O modelo físico operacional PostgreSQL está documentado em `docs/database/`: proposta de modelo relacional, dicionário de dados, constraints/índices e diagramas ERD. A implementação no PostgreSQL ainda não foi executada; nenhuma database, schema, tabela ou migration foi criada.
 
 ## Fases previstas
 
-1. Revisar e aprovar o domínio conceitual (concluído); converter o ecossistema aprovado em uma proposta de modelagem relacional.
-2. Implementar e documentar o banco PostgreSQL após aprovação da modelagem.
+1. Revisar e aprovar o domínio conceitual (concluído) e preparar a proposta relacional operacional (Fase 2A documentada, aguardando revisão humana).
+2. Implementar e documentar o banco PostgreSQL após aprovação da modelagem (Fase 2B, não iniciada).
 3. Planejar e desenvolver a geração de dados sintéticos consistentes em Python.
 4. Explorar e selecionar os dados que farão parte da camada analítica.
 5. Construir as transformações, o modelo semântico e as medidas no Power BI.
