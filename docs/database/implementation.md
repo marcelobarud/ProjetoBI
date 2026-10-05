@@ -4,7 +4,7 @@
 
 O modelo aprovado é PostgreSQL 18, database `projeto_bi`, nove schemas e quarenta tabelas. O schema é criado pela migration `database/migrations/001_initial_schema.sql`; a criação da database fica separada nos scripts PowerShell. Esta versão não cria dados, seeds, triggers, procedures ou estruturas analíticas.
 
-Na Fase 2B.1, a migration inicial foi aplicada e validada no servidor PostgreSQL 18.6. A database `projeto_bi` estava ausente e foi criada vazia antes da aplicação. O smoke test foi executado em transação com `ROLLBACK`; após a execução, as 40 tabelas continuaram sem linhas. O relatório detalhado está em `docs/database/validation-report.md`.
+Na Fase 2B.1, a migration inicial foi aplicada e validada em um cluster local PostgreSQL 18.6 dedicado ao ProjetoBI, na porta `5433`. A database `projeto_bi` foi criada vazia antes da aplicação. O smoke test foi executado em transação com `ROLLBACK`; após a execução, as 40 tabelas continuaram sem linhas. O relatório detalhado está em `docs/database/validation-report.md`.
 
 ## Configuração local
 
@@ -17,6 +17,10 @@ Copy-Item .env.example .env
 ```
 
 `POSTGRES_DB` deve ser `projeto_bi`. `POSTGRES_PSQL_PATH` é opcional e pode apontar para `psql.exe`; sem ela, os scripts procuram `psql` no PATH e depois nos caminhos padrão do PostgreSQL 18. Nunca use senha em argumento de comando, script versionado, log ou connection string commitada. `.env.example` contém somente nomes com valores vazios.
+
+Neste ambiente, `.env` aponta para `127.0.0.1:5433`. O cluster fica em `.local-postgres/data`, diretório ignorado pelo Git, e roda sob a conta local do usuário. Ele não foi registrado como serviço Windows; após reiniciar o computador, inicie-o com `./scripts/Start-ProjectBI-Postgres.ps1` e pare-o com `./scripts/Stop-ProjectBI-Postgres.ps1` quando necessário.
+
+Para ver apenas as databases deste cluster no pgAdmin, registre um servidor dentro do grupo do ProjetoBI com **Host** `127.0.0.1`, **Port** `5433`, **Maintenance database** `postgres` e o usuário configurado no `.env`. A árvore mostrará `projeto_bi` e as databases padrão do PostgreSQL (`postgres`, `template0` e `template1`), sem as databases do cluster compartilhado na porta `5432`.
 
 ## Conectividade e aplicação
 
@@ -41,7 +45,7 @@ Para reproduzir em ambiente descartável, use uma database vazia e execute o mes
 - `database/tests/001_structure.sql` confere database, schemas, quarenta tabelas, ausência de tabelas extras nos schemas aprovados, PKs, FKs, constraints, índices e colunas críticas.
 - `database/tests/002_smoke_rollback.sql` é um smoke test mínimo em transação que termina em `ROLLBACK`; execute por `Invoke-SmokeTest.ps1` apenas em `projeto_bi` depois da migration.
 
-Conexão, aplicação e validação estrutural da Fase 2B.1 concluídas. O cliente e o servidor reportaram PostgreSQL 18.6. A migration terminou com `COMMIT`; a validação confirmou os objetos esperados. Depois do smoke test com `ROLLBACK`, uma contagem exata nas 40 tabelas confirmou zero linhas persistidas. A database permanece pronta para uma fase futura de geração de dados, que não foi iniciada.
+Conexão, aplicação e validação estrutural da Fase 2B.1 concluídas no cluster dedicado da porta `5433`. O cliente e o servidor reportaram PostgreSQL 18.6. A migration terminou com `COMMIT`; a validação confirmou os objetos esperados. Depois do smoke test com `ROLLBACK`, uma contagem exata nas 40 tabelas confirmou zero linhas persistidas. A database permanece pronta para uma fase futura de geração de dados, que não foi iniciada. A instância compartilhada anterior na porta `5432` foi mantida intacta; o `.env` do ProjetoBI aponta para a instância dedicada.
 
 ## Pendência de domínio
 

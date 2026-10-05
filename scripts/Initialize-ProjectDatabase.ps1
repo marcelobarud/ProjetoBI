@@ -14,8 +14,12 @@ try {
     if (-not $exists) {
         $createdb = Get-Command createdb -ErrorAction SilentlyContinue
         $createdbPath = if ($createdb -and $createdb.CommandType -eq 'Application') { $createdb.Source } else { Join-Path (Split-Path -Parent $psql) 'createdb.exe' }
-        if (-not (Test-Path -LiteralPath $createdbPath -PathType Leaf)) { throw 'createdb não foi encontrado no PATH nem ao lado de psql. Nenhuma database foi criada.' }
-        & $createdbPath -w -h $env:POSTGRES_HOST -p $env:POSTGRES_PORT -U $env:POSTGRES_USER projeto_bi
+        if (Test-Path -LiteralPath $createdbPath -PathType Leaf) {
+            & $createdbPath -w -h $env:POSTGRES_HOST -p $env:POSTGRES_PORT -U $env:POSTGRES_USER projeto_bi
+        }
+        else {
+            & $psql -X -w -v ON_ERROR_STOP=1 -h $env:POSTGRES_HOST -p $env:POSTGRES_PORT -U $env:POSTGRES_USER -d postgres -c 'CREATE DATABASE projeto_bi;'
+        }
         if ($LASTEXITCODE -ne 0) { throw 'Não foi possível criar projeto_bi. Verifique as permissões do usuário.' }
         Write-Output 'Database projeto_bi criada vazia.'
         return
