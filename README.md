@@ -4,7 +4,7 @@ Projeto de Business Intelligence para estudo e prática, com foco em construir g
 
 ## Objetivo
 
-Criar um ambiente coerente para praticar integração de dados, transformação, modelagem semântica, métricas e visualização. O domínio será uma empresa fictícia do segmento de informática. Os detalhes do negócio e a modelagem ainda serão definidos em fases futuras.
+Criar um ambiente coerente para praticar integração de dados, transformação, modelagem semântica, métricas e visualização. O domínio será uma empresa fictícia do segmento de informática. Os detalhes do negócio e a modelagem são definidos em fases, com revisão antes da implementação.
 
 ## Visão geral da arquitetura
 
@@ -27,6 +27,7 @@ O banco operacional deverá representar um ecossistema empresarial coerente, e n
 | `data-generator/tests/` | Testes futuros do gerador. |
 | `powerbi/` | Futuros arquivos do Power BI, incluindo o formato Power BI Project quando a fase correspondente começar. |
 | `docs/architecture/` | Documentação conceitual de arquitetura. |
+| `docs/business/` | Escopo, regras e conceitos do domínio empresarial. |
 | `docs/database/` | Documentação futura do banco de dados. |
 | `docs/powerbi/` | Documentação futura da camada Power BI. |
 | `scripts/` | Scripts auxiliares do projeto. |
@@ -35,12 +36,12 @@ O banco operacional deverá representar um ecossistema empresarial coerente, e n
 
 ## Estado atual
 
-**Fase 0 — fundação estrutural, documental e de versionamento.** Nesta fase foram preparados os diretórios e documentos iniciais. Nenhum banco, schema, tabela, usuário ou dado foi criado; também não foi iniciada a modelagem de negócio ou criado um projeto Power BI.
+**Fase 1 — definição conceitual do domínio e do ecossistema operacional.** A Fase 0 de fundação foi concluída. Esta fase documenta o escopo, as regras de negócio e as entidades operacionais candidatas, sujeitos à revisão antes da modelagem relacional. Nenhum banco, schema, tabela, dado, modelo físico ou projeto Power BI foi criado.
 
 ## Fases previstas
 
-1. Definir e aprovar o escopo e a modelagem do ecossistema operacional.
-2. Implementar o banco PostgreSQL e documentar sua estrutura, após aprovação explícita da fase.
+1. Revisar e aprovar o domínio conceitual; em seguida, converter o ecossistema aprovado em uma proposta de modelagem relacional.
+2. Implementar e documentar o banco PostgreSQL após aprovação da modelagem.
 3. Planejar e desenvolver a geração de dados sintéticos consistentes em Python.
 4. Explorar e selecionar os dados que farão parte da camada analítica.
 5. Construir as transformações, o modelo semântico e as medidas no Power BI.
