@@ -2,7 +2,6 @@
 .env
 .env.*
 !.env.example
-.local-postgres/
 *.secrets
 .secrets/
 credentials.json

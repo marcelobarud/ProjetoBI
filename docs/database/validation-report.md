@@ -8,8 +8,6 @@
 
 **Cliente:** `psql` PostgreSQL 18.6 (`D:\PostGre\pgAdmin 4\runtime\psql.exe`)
 
-**Instância dedicada:** `127.0.0.1:5433`; diretório de dados local `.local-postgres/data` (ignorado pelo Git).
-
 ## Execução
 
 - O teste de conectividade confirmou a versão real do servidor como PostgreSQL 18.6.
@@ -17,8 +15,6 @@
 - `database/migrations/001_initial_schema.sql` foi aplicada e terminou com `COMMIT`.
 - `scripts/Invoke-DatabaseValidation.ps1` e `database/tests/001_structure.sql` concluíram sem erro.
 - `scripts/Invoke-SmokeTest.ps1` executou `database/tests/002_smoke_rollback.sql`; a transação terminou em `ROLLBACK`.
-- A instância dedicada contém `projeto_bi` e as três databases padrão do PostgreSQL; não há databases de outros projetos nesse cluster.
-- A instância compartilhada anterior, na porta `5432`, foi mantida sem alterações. O `.env` local do ProjetoBI aponta para a instância dedicada.
 
 ## Estrutura confirmada
 

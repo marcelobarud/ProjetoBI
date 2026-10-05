@@ -36,7 +36,7 @@ O banco operacional deverá representar um ecossistema empresarial coerente, e n
 
 ## Estado atual
 
-**Fase 2B.1 — schema operacional aplicado e validado em instância PostgreSQL dedicada.** O ProjetoBI usa agora um cluster local PostgreSQL 18.6 na porta `5433`, com a database `projeto_bi`. A validação confirmou 9 schemas, 40 tabelas, constraints e índices esperados. O smoke test terminou em `ROLLBACK`, e a conferência posterior encontrou zero linhas de negócio persistidas. Nenhum dado sintético foi gerado. Consulte [`docs/database/validation-report.md`](docs/database/validation-report.md) para os resultados detalhados.
+**Fase 2B.1 — schema operacional aplicado e validado.** A database `projeto_bi` foi criada no servidor PostgreSQL 18.6 e recebeu a migration inicial. A validação confirmou 9 schemas, 40 tabelas, constraints e índices esperados. O smoke test terminou em `ROLLBACK`, e a conferência posterior encontrou zero linhas de negócio persistidas. Nenhum dado sintético foi gerado. Consulte [`docs/database/validation-report.md`](docs/database/validation-report.md) para os resultados detalhados.
 
 ## Fases previstas
 
