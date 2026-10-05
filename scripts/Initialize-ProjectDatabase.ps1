@@ -2,8 +2,10 @@ param()
 
 $ErrorActionPreference = 'Stop'
 $root = Split-Path -Parent $PSScriptRoot
+. (Join-Path $PSScriptRoot 'ProjectBI.Environment.ps1')
+Import-ProjectBIEnvironment
 & (Join-Path $PSScriptRoot 'Test-PostgresConnection.ps1')
-$psql = (Get-Command psql).Source
+$psql = Resolve-ProjectBIPsql
 $oldPgPassword = $env:PGPASSWORD
 $env:PGPASSWORD = $env:POSTGRES_PASSWORD
 try {
@@ -11,8 +13,9 @@ try {
     if ($LASTEXITCODE -ne 0) { throw 'Não foi possível verificar a database alvo.' }
     if (-not $exists) {
         $createdb = Get-Command createdb -ErrorAction SilentlyContinue
-        if (-not $createdb) { throw 'createdb não foi encontrado no PATH. Nenhuma database foi criada.' }
-        & $createdb.Source -w -h $env:POSTGRES_HOST -p $env:POSTGRES_PORT -U $env:POSTGRES_USER projeto_bi
+        $createdbPath = if ($createdb -and $createdb.CommandType -eq 'Application') { $createdb.Source } else { Join-Path (Split-Path -Parent $psql) 'createdb.exe' }
+        if (-not (Test-Path -LiteralPath $createdbPath -PathType Leaf)) { throw 'createdb não foi encontrado no PATH nem ao lado de psql. Nenhuma database foi criada.' }
+        & $createdbPath -w -h $env:POSTGRES_HOST -p $env:POSTGRES_PORT -U $env:POSTGRES_USER projeto_bi
         if ($LASTEXITCODE -ne 0) { throw 'Não foi possível criar projeto_bi. Verifique as permissões do usuário.' }
         Write-Output 'Database projeto_bi criada vazia.'
         return

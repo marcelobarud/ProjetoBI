@@ -8,17 +8,15 @@ Os arquivos da Fase 2B foram preparados localmente. A instância alvo ainda não
 
 ## Configuração local
 
-Defina no ambiente local, sem salvar credenciais no repositório:
+Configure os cinco valores de conexão em variáveis do processo PowerShell ou no arquivo local `.env`, na raiz do projeto. As variáveis já definidas no processo têm prioridade; `.env` preenche apenas as que estiverem ausentes ou vazias. O arquivo `.env` é ignorado pelo Git e não deve ser versionado.
+
+Comece copiando `.env.example` para `.env` e preencha o arquivo localmente. O parser aceita linhas `NOME=VALOR`, ignora linhas vazias e comentários iniciados por `#`, e separa o valor pela primeira ocorrência de `=`. Valores podem ser colocados entre aspas simples ou duplas. Não imprima nem registre o conteúdo do arquivo.
 
 ```powershell
-$env:POSTGRES_HOST = 'host-do-servidor'
-$env:POSTGRES_PORT = '5432'
-$env:POSTGRES_DB = 'projeto_bi'
-$env:POSTGRES_USER = 'usuario'
-$env:POSTGRES_PASSWORD = 'senha-local'
+Copy-Item .env.example .env
 ```
 
-Use um gerenciador local de segredos ou configure essas variáveis fora do Git. `.env.example` contém somente os nomes, sem valores reais. Nunca use senha em argumento de comando, script versionado, log ou connection string commitada.
+`POSTGRES_DB` deve ser `projeto_bi`. `POSTGRES_PSQL_PATH` é opcional e pode apontar para `psql.exe`; sem ela, os scripts procuram `psql` no PATH e depois nos caminhos padrão do PostgreSQL 18. Nunca use senha em argumento de comando, script versionado, log ou connection string commitada. `.env.example` contém somente nomes com valores vazios.
 
 ## Conectividade e aplicação
 
@@ -43,7 +41,7 @@ Para reproduzir em ambiente descartável, use uma database vazia e execute o mes
 - `database/tests/001_structure.sql` confere database, schemas, quarenta tabelas, ausência de tabelas extras nos schemas aprovados, PKs, FKs, constraints, índices e colunas críticas.
 - `database/tests/002_smoke_rollback.sql` é um smoke test mínimo em transação que termina em `ROLLBACK`; execute por `Invoke-SmokeTest.ps1` apenas em `projeto_bi` depois da migration.
 
-A conexão e aplicação continuam pendentes nesta cópia porque não há `POSTGRES_*` configuradas e `psql` não está instalado/disponível no PATH. Configure as cinco variáveis e disponibilize `psql` antes de aplicar. A validação SQL informa erro se a base alvo não for `projeto_bi`.
+A conexão e aplicação continuam pendentes até que os cinco campos de conexão sejam configurados e o cliente `psql` PostgreSQL 18 esteja disponível. Nenhuma conexão é feita apenas ao carregar o `.env`; ela ocorre quando `Test-PostgresConnection.ps1` é executado. A validação SQL informa erro se a base alvo não for `projeto_bi`.
 
 ## Pendência de domínio
 
@@ -51,8 +49,8 @@ A conexão e aplicação continuam pendentes nesta cópia porque não há `POSTG
 
 ## Erros comuns
 
-- **Variável ausente:** configure `POSTGRES_HOST`, `POSTGRES_PORT`, `POSTGRES_DB`, `POSTGRES_USER` e `POSTGRES_PASSWORD` no processo PowerShell atual.
+- **Variável ausente:** configure `POSTGRES_HOST`, `POSTGRES_PORT`, `POSTGRES_DB`, `POSTGRES_USER` e `POSTGRES_PASSWORD` no processo PowerShell atual ou no arquivo local `.env`.
 - **Versão diferente:** a automação exige PostgreSQL 18 e para antes de criar ou aplicar objetos.
-- **`psql` ausente:** instale ou adicione o cliente PostgreSQL 18 ao `PATH`; nenhum cliente foi instalado nesta fase.
+- **`psql` ausente:** configure `POSTGRES_PSQL_PATH`, adicione o cliente PostgreSQL 18 ao `PATH` ou disponibilize-o em `C:\Program Files\PostgreSQL\18\`; nenhum cliente é instalado automaticamente.
 - **Database existente com objetos inesperados:** não remova objetos; revise-os manualmente antes de autorizar qualquer procedimento.
 - **Falha de permissão:** solicite ao administrador a permissão necessária fora dos arquivos versionados; não embuta credenciais em scripts.

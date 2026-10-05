@@ -2,9 +2,11 @@ param()
 
 $ErrorActionPreference = 'Stop'
 $root = Split-Path -Parent $PSScriptRoot
+. (Join-Path $PSScriptRoot 'ProjectBI.Environment.ps1')
+Import-ProjectBIEnvironment
 & (Join-Path $PSScriptRoot 'Test-SchemaDefinition.ps1')
 & (Join-Path $PSScriptRoot 'Test-PostgresConnection.ps1')
-$psql = (Get-Command psql).Source
+$psql = Resolve-ProjectBIPsql
 $migrationFiles = @(Get-ChildItem (Join-Path $root 'database/migrations') -Filter '*.sql' -File | Sort-Object Name)
 if ($migrationFiles.Count -eq 0) { throw 'Nenhuma migration encontrada.' }
 $oldPgPassword = $env:PGPASSWORD

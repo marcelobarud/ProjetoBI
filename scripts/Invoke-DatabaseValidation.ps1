@@ -2,8 +2,10 @@ param()
 
 $ErrorActionPreference = 'Stop'
 $root = Split-Path -Parent $PSScriptRoot
+. (Join-Path $PSScriptRoot 'ProjectBI.Environment.ps1')
+Import-ProjectBIEnvironment
 & (Join-Path $PSScriptRoot 'Test-PostgresConnection.ps1')
-$psql = (Get-Command psql).Source
+$psql = Resolve-ProjectBIPsql
 $testFiles = @(Get-ChildItem (Join-Path $root 'database/tests') -Filter '*.sql' -File | Sort-Object Name | Where-Object { $_.Name -eq '001_structure.sql' })
 if ($testFiles.Count -ne 1) { throw 'A validação estrutural database/tests/001_structure.sql não foi encontrada.' }
 $oldPgPassword = $env:PGPASSWORD

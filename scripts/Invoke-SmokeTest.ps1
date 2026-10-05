@@ -2,9 +2,11 @@ param()
 
 $ErrorActionPreference = 'Stop'
 $root = Split-Path -Parent $PSScriptRoot
+. (Join-Path $PSScriptRoot 'ProjectBI.Environment.ps1')
+Import-ProjectBIEnvironment
 & (Join-Path $PSScriptRoot 'Test-PostgresConnection.ps1')
 & (Join-Path $PSScriptRoot 'Invoke-DatabaseValidation.ps1')
-$psql = (Get-Command psql).Source
+$psql = Resolve-ProjectBIPsql
 $oldPgPassword = $env:PGPASSWORD
 $env:PGPASSWORD = $env:POSTGRES_PASSWORD
 try {
