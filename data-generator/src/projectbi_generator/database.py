@@ -277,3 +277,48 @@ def validate_loaded_master(connection: psycopg.Connection, config) -> dict[str, 
     if connection.execute("SELECT count(*) FROM catalog.product_suppliers WHERE is_preferred AND is_active GROUP BY product_id HAVING count(*) > 1").fetchall():
         raise DatabaseGuardError("Há mais de um fornecedor preferencial ativo para algum produto.")
     return counts
+
+
+def run_rollback_transaction_smoke(settings: ConnectionSettings, config):
+    """Load master plus the phase-3C transactional flow, validate it, and explicitly roll back."""
+    from projectbi_generator.generators.master import generate_master_data
+    from projectbi_generator.generators.transactions import generate_transactions
+    from projectbi_generator.repositories.master_data import load_master_data
+    from projectbi_generator.repositories.transactions import load_transaction_data
+    from projectbi_generator.validation.database_transactions import validate_loaded_transactions
+    from projectbi_generator.validation.master_data import validate_master_data
+    from projectbi_generator.validation.transactions import validate_transactional_data
+
+    if config.profile != "smoke":
+        raise ValueError("A integração transacional aceita somente o profile smoke.")
+    master = generate_master_data(config)
+    validate_master_data(master, config)
+    data = generate_transactions(config, master)
+    validate_transactional_data(data, master, config)
+
+    connection = connect(settings)
+    try:
+        connection.execute("BEGIN")
+        version, _ = guard_empty_target(connection)
+        ids = load_master_data(connection, master)
+        transaction_ids = load_transaction_data(connection, master, data, ids)
+        validate_loaded_master(connection, config)
+        sql_counts = validate_loaded_transactions(connection, config, master, data)
+        connection.execute("ROLLBACK")
+    except Exception:
+        connection.rollback()
+        raise
+    finally:
+        connection.close()
+
+    remaining = confirm_empty_after_rollback(settings)
+    if any(remaining.values()):
+        raise DatabaseGuardError("Após ROLLBACK, foram encontradas linhas nas 40 tabelas operacionais.")
+    return {
+        "server_version": version,
+        "summary": data.summary(),
+        "sql_counts": sql_counts,
+        "id_map_tables": len(ids),
+        "transaction_id_maps": len(transaction_ids),
+        "remaining": remaining,
+    }

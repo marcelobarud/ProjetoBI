@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "projectbi-generator"
 version = "0.1.0"
-description = "Deterministic synthetic master data generator for ProjetoBI"
+description = "Deterministic synthetic master and transactional data generator for ProjetoBI"
 requires-python = ">=3.11"
 dependencies = [
     "psycopg[binary]>=3.2,<4",

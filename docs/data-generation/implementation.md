@@ -1,4 +1,4 @@
-# Implementação do gerador — Fase 3B
+# Implementação do gerador — Fases 3B e 3C
 
 ## Escopo entregue
 
@@ -43,6 +43,16 @@ $env:PROJECTBI_RUN_INTEGRATION = '1'
 
 O teste de integração requer a database local aprovada, `.env` configurado e vazia. Ele só executa o smoke com rollback. Para verificar novamente o conjunto completo de testes, use `python -m pytest` com `PROJECTBI_RUN_INTEGRATION=1` definido e diretório atual `data-generator`.
 
-## Limites desta fase
+## Núcleo transacional — Fase 3C
 
-Não existe geração nem persistência de fatos transacionais, algoritmo de estado de estoque, rotina de reset, carga portfolio/large ou integração com Power BI. O teste PostgreSQL desta fase não deixa linhas de negócio persistidas. O próximo escopo recomendado é a Fase 3C, para engine operacional de compras, recebimentos, vendas e estoque, com autorização específica.
+A Fase 3C acrescenta uma engine determinística orientada a eventos para compras, recebimentos, reposição, pedidos de venda, descontos, reservas, cancelamentos, fulfillment, movimentos e posições de estoque. Eventos usam instante, prioridade e chave lógica estável para preservar causalidade e reprodutibilidade. Quantias monetárias usam `Decimal`; rateios de desconto preservam centavos, e custo de estoque usa média móvel com escala de oito casas.
+
+O profile smoke gera 300 pedidos e 630 linhas, cobre os quatro canais existentes, pedidos físicos anônimos, pedidos cancelados, descontos e fulfillment dividido. O fluxo inclui recebimentos parciais e quantidades rejeitadas, reabastecimento durante a janela comercial e reserva/liberação/consumo do estoque. O custo realizado é calculado pelos movimentos de saída; a posição final reconcilia unidades recebidas, unidades expedidas e saldo. Preços e fornecedores são validados contra as dimensões mestre e suas vigências/associações.
+
+A persistência escreve somente as 13 tabelas transacionais existentes e resolve IDs técnicos retornados pelo banco. Cada evento de estoque bloqueia a posição com `SELECT FOR UPDATE`; movimentos de recebimento e expedição mantêm vínculo com suas linhas de origem. A integração completa carrega os dados mestre e transacionais dentro de uma única transação, executa validações Python e SQL, faz `ROLLBACK` explícito e confirma por uma nova conexão zero linhas nas 40 tabelas. Não requer migration.
+
+O escopo não inclui pagamentos ou parcelas, reembolsos, eventos de fulfillment, transferências de estoque, devoluções, execução dos perfis `portfolio`/`large`, persistência permanente nem Power BI.
+
+## Limites da Fase 3B
+
+Rotina de reset, carga portfolio/large, persistência permanente e integração com Power BI continuam fora do escopo. Nenhuma linha de negócio smoke permanece persistida. O próximo escopo recomendado é planejar a Fase 3D.

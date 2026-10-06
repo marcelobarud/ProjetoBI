@@ -9,7 +9,7 @@ Criar um ambiente coerente para praticar integração de dados, transformação,
 ## Visão geral da arquitetura
 
 - **PostgreSQL** será a fonte de dados e representará o ecossistema operacional da empresa.
-- **Python** implementa a fundação determinística do gerador sintético; nesta fase, somente dados mestres smoke são gerados e validados.
+- **Python** implementa o gerador sintético determinístico de dados mestres e do núcleo transacional no profile smoke.
 - **Power BI** será a camada analítica, incluindo Power Query, modelo semântico, DAX e relatórios.
 - **Git/GitHub** será usado para versionar o código, a documentação e os arquivos de projeto apropriados. A configuração de um remoto ocorrerá em uma fase futura, se necessário.
 
@@ -36,13 +36,13 @@ O banco operacional deverá representar um ecossistema empresarial coerente, e n
 
 ## Estado atual
 
-**Fase 3B — fundação do gerador e dados mestres smoke implementados e validados.** A database `projeto_bi` no PostgreSQL 18.6 mantém 9 schemas e 40 tabelas. A geração smoke determinística foi validada em transação revertida; confirmação posterior encontrou zero linhas em todas as 40 tabelas. Os perfis `portfolio` e `large` estão configurados, mas não executados. A engine transacional e a carga persistente ainda não foram implementadas. Consulte [`docs/data-generation/implementation.md`](docs/data-generation/implementation.md), [`docs/data-generation/validation-report.md`](docs/data-generation/validation-report.md) e [`docs/database/validation-report.md`](docs/database/validation-report.md).
+**Fase 3C — núcleo transacional smoke implementado e validado.** A database `projeto_bi` no PostgreSQL 18.6 mantém 9 schemas e 40 tabelas. Geração de dados mestres e fluxo transacional foram validados em smoke com `ROLLBACK`; confirmação posterior encontrou zero linhas nas 40 tabelas. Foram gerados 300 pedidos e 630 itens, com compras, recebimentos, estoque, descontos e fulfillment. Os perfis `portfolio` e `large` estão configurados, mas não executados. Consulte [`docs/data-generation/implementation.md`](docs/data-generation/implementation.md), [`docs/data-generation/validation-report.md`](docs/data-generation/validation-report.md) e [`docs/database/validation-report.md`](docs/database/validation-report.md).
 
 ## Fases previstas
 
 1. Revisar e aprovar o domínio conceitual (concluído) e consolidar a proposta relacional operacional (Fases 2A e 2A.1 concluídas).
 2. Implementar e validar o esquema operacional no PostgreSQL 18 (Fases 2B, 2B.1 e 2B.2 concluídas; sem dados de negócio persistidos).
-3. Planejar e desenvolver a geração de dados sintéticos consistentes em Python. Fases 3A e 3B concluídas: o pacote gera e valida apenas dados mestres do profile smoke e tem integração PostgreSQL estritamente com rollback. Próximo escopo recomendado: implementar a engine transacional na Fase 3C.
+3. Planejar e desenvolver a geração de dados sintéticos consistentes em Python. Fases 3A, 3B e 3C concluídas: o pacote gera e valida dados mestres e núcleo transacional do profile smoke, com integração PostgreSQL estritamente com rollback. Próximo escopo recomendado: planejar a Fase 3D.
 4. Explorar e selecionar os dados que farão parte da camada analítica.
 5. Construir as transformações, o modelo semântico e as medidas no Power BI.
 6. Desenvolver e revisar os relatórios, mantendo documentação e versionamento alinhados.
