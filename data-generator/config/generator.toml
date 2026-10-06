@@ -1,0 +1,9 @@
+schema_version = 1
+generator_version = "0.1.0"
+root_seed = 20261005
+default_profile = "smoke"
+start_date = "2023-01-01"
+end_date = "2026-09-30"
+bootstrap_start_date = "2022-11-01"
+bootstrap_end_date = "2022-12-31"
+timezone = "America/Sao_Paulo"

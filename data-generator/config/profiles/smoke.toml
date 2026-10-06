@@ -1,0 +1,54 @@
+profile = "smoke"
+
+[volumes]
+stores = 2
+employees = 12
+employee_roles = 5
+employee_assignments = 16
+customers = 20
+individual_profiles = 18
+business_profiles = 2
+customer_contacts = 24
+customer_addresses = 24
+categories = 15
+brands = 12
+products = 30
+product_suppliers = 36
+product_prices = 120
+stock_locations = 4
+payment_methods = 4
+carriers = 3
+sales_channels = 4
+suppliers = 8
+
+[composition]
+individual_customers = 18
+business_customers = 2
+
+[[stores]]
+code = "ST-SM-001"
+name = "Unidade Sintética Horizonte"
+city = "São Paulo"
+state_code = "SP"
+postal_code = "99999001"
+street = "Rua das Acácias Sintéticas"
+street_number = "120"
+district = "Centro"
+opened_on = "2022-11-01"
+
+[[stores]]
+code = "ST-SM-002"
+name = "Unidade Sintética Pinhal"
+city = "Curitiba"
+state_code = "PR"
+postal_code = "99999002"
+street = "Avenida dos Ipês Fictícios"
+street_number = "48"
+district = "Centro"
+opened_on = "2023-03-01"
+
+[generation]
+extra_contacts = 4
+extra_addresses = 4
+secondary_supplier_products = 6
+price_periods_per_product_channel = 1

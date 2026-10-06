@@ -1,0 +1,133 @@
+# Perfil preparado para configuração futura. Não carregado nem executado na Fase 3B.
+profile = "large"
+
+[volumes]
+stores = 10
+employees = 120
+employee_roles = 7
+employee_assignments = 155
+customers = 90000
+individual_profiles = 81000
+business_profiles = 9000
+customer_contacts = 120000
+customer_addresses = 104000
+categories = 50
+brands = 75
+products = 1500
+product_suppliers = 2500
+product_prices = 22000
+stock_locations = 14
+payment_methods = 5
+carriers = 15
+sales_channels = 4
+suppliers = 50
+
+[[stores]]
+code = "ST-LG-001"
+name = "Unidade Sintética Horizonte Paulista"
+city = "São Paulo"
+state_code = "SP"
+postal_code = "99999201"
+street = "Rua do Horizonte Sintético"
+street_number = "101"
+district = "Centro"
+opened_on = "2022-11-01"
+
+[[stores]]
+code = "ST-LG-002"
+name = "Unidade Sintética Pinhal"
+city = "Curitiba"
+state_code = "PR"
+postal_code = "99999202"
+street = "Avenida do Pinhal Fictício"
+street_number = "202"
+district = "Centro"
+opened_on = "2022-12-01"
+
+[[stores]]
+code = "ST-LG-003"
+name = "Unidade Sintética Pampa"
+city = "Porto Alegre"
+state_code = "RS"
+postal_code = "99999203"
+street = "Rua das Estações Inventadas"
+street_number = "303"
+district = "Centro"
+opened_on = "2023-01-15"
+
+[[stores]]
+code = "ST-LG-004"
+name = "Unidade Sintética Serra"
+city = "Belo Horizonte"
+state_code = "MG"
+postal_code = "99999204"
+street = "Alameda da Serra Sintética"
+street_number = "404"
+district = "Centro"
+opened_on = "2023-02-01"
+
+[[stores]]
+code = "ST-LG-005"
+name = "Unidade Sintética Guanabara"
+city = "Rio de Janeiro"
+state_code = "RJ"
+postal_code = "99999205"
+street = "Rua da Enseada Fictícia"
+street_number = "505"
+district = "Centro"
+opened_on = "2023-03-01"
+
+[[stores]]
+code = "ST-LG-006"
+name = "Unidade Sintética Campinas"
+city = "Campinas"
+state_code = "SP"
+postal_code = "99999206"
+street = "Avenida das Oficinas Sintéticas"
+street_number = "606"
+district = "Centro"
+opened_on = "2023-04-01"
+
+[[stores]]
+code = "ST-LG-007"
+name = "Unidade Sintética Ilha"
+city = "Florianópolis"
+state_code = "SC"
+postal_code = "99999207"
+street = "Rua da Ilha Imaginada"
+street_number = "707"
+district = "Centro"
+opened_on = "2023-05-01"
+
+[[stores]]
+code = "ST-LG-008"
+name = "Unidade Sintética Cerrado"
+city = "Goiânia"
+state_code = "GO"
+postal_code = "99999208"
+street = "Alameda do Cerrado Fictício"
+street_number = "808"
+district = "Centro"
+opened_on = "2023-06-01"
+
+[[stores]]
+code = "ST-LG-009"
+name = "Unidade Sintética Capibaribe"
+city = "Recife"
+state_code = "PE"
+postal_code = "99999209"
+street = "Rua das Marés Sintéticas"
+street_number = "909"
+district = "Centro"
+opened_on = "2023-07-01"
+
+[[stores]]
+code = "ST-LG-010"
+name = "Unidade Sintética Equatorial"
+city = "Manaus"
+state_code = "AM"
+postal_code = "99999210"
+street = "Avenida das Águas Inventadas"
+street_number = "110"
+district = "Centro"
+opened_on = "2023-08-01"

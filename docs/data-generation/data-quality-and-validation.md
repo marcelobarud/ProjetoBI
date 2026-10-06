@@ -1,6 +1,6 @@
-# Qualidade e validação futura — Fase 3A
+# Plano de qualidade e validação — Fase 3A / 3B
 
-Este plano será implementado junto ao gerador/carga nas fases futuras. Não há SQL ou validação executada neste documento. A migration atual mantém PK/FK/CHECK/UNIQUE ativos; a validação da geração deverá exercitar o schema real.
+Este documento mantém as regras de qualidade planejadas na Fase 3A. Na Fase 3B, validadores Python cobrem os dados mestres smoke e a integração SQL foi executada apenas dentro de transação revertida; resultados estão em [validation-report.md](validation-report.md). As verificações de fatos operacionais, conciliação, carga portfolio e baselines abaixo continuam para fases futuras. A migration mantém PK/FK/CHECK/UNIQUE ativos.
 
 ## 1. Integridade estrutural
 

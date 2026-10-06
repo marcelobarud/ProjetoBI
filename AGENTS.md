@@ -14,7 +14,9 @@
 - A database alvo aprovada é `projeto_bi`, em PostgreSQL 18. O modelo relacional operacional aprovado em `docs/database/` é a fonte de verdade; mantenha migrations SQL versionadas e não o converta em modelo estrela nesta fase.
 - Nunca use `DROP DATABASE` ou recrie uma database preexistente automaticamente. Inspecione e pare diante de objetos inesperados; credenciais ficam em variáveis locais e nunca no Git.
 - Regras de concorrência, custo médio, movimentos e devoluções devem seguir `docs/database/operational-transactions.md` quando a camada operacional for implementada.
-- Python será usado futuramente para geração de dados sintéticos. Prefira dependências e ambientes isolados quando esse trabalho começar.
+- Python implementa o gerador sintético em `data-generator/`; use o `.venv/` local e mantenha dependências isoladas. Configuração não sensível fica em TOML versionado e credenciais somente em `.env` local.
+- Derive sub-seeds estáveis por domínio; não compartilhe estado aleatório entre domínios. Use `Decimal` para dinheiro e timestamps com fuso explícito.
+- Smoke PostgreSQL autorizado para o gerador deve validar alvo/schema/vazio antes de escrever, usar transação com `ROLLBACK` explícito e verificar em conexão nova que todos os dados foram revertidos. Nunca persista dados sem autorização de fase.
 - Dados de estudo devem ser 100% sintéticos, determinísticos por seed/configuração e sem defeitos intencionais. Respeite o cutoff comercial aprovado para cada conjunto; nunca desabilite constraints de integridade para facilitar cargas.
 - Power BI será a camada analítica, com Power Query, modelo semântico, DAX e relatórios. O Power BI Project (`.pbip`) deverá ser usado quando a fase do Power BI for autorizada; seus arquivos de definição necessários devem ser versionados.
 

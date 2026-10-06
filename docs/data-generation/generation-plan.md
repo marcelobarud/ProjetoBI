@@ -2,7 +2,7 @@
 
 ## Estado e objetivo
 
-Este documento especifica a geração futura para a empresa fictícia brasileira de informática e eletrônicos. É planejamento: não há código de gerador, seed executada, carga, dado sintético persistido ou alteração do schema nesta fase. Os dados devem ser plausíveis, relacionais, reproduzíveis e temporalmente coerentes, sem erros fabricados para testar limpeza.
+Este documento registra as decisões de planejamento da Fase 3A para a empresa fictícia brasileira de informática e eletrônicos. A fundação e o subconjunto de dados mestres smoke foram implementados na Fase 3B; consulte [implementation.md](implementation.md) e [validation-report.md](validation-report.md). Nenhum dado sintético ficou persistido e o schema não foi alterado na Fase 3B. As seções abaixo continuam sendo especificação para as fases transacionais futuras; dados devem ser plausíveis, relacionais, reproduzíveis e temporalmente coerentes, sem erros fabricados para testar limpeza.
 
 O schema operacional aplicado e validado tem 9 schemas e 40 tabelas. A geografia estruturada de `core.stores` foi adicionada e validada na Fase 2B.2. A revisão de adequação conclui **READY FOR GENERATOR**; não há blocker de schema para iniciar futuramente a Fase 3B. A melhoria opcional de data de descontinuação de SKU permanece fora do gate.
 
@@ -16,7 +16,7 @@ O schema operacional aplicado e validado tem 9 schemas e 40 tabelas. A geografia
 
 ## Escala e perfis
 
-Os perfis são configurações conceituais, não implementados nesta fase. Faixas completas, derivação e as 40 tabelas estão em [entity-volumes.md](entity-volumes.md).
+Os volumes completos e derivações estão em [entity-volumes.md](entity-volumes.md). `smoke` tem geração apenas para as 19 tabelas mestre; `portfolio` e `large` estão configurados, mas nenhum deles foi gerado. Fatos operacionais permanecem planejados.
 
 | Perfil | Intenção | Escala principal |
 |---|---|---|
@@ -146,4 +146,4 @@ As verificações executáveis ficam para fases de implementação/carga, defini
 - **3D — pagamentos, fulfillment, logística, devoluções e reembolsos:** eventos relacionados e conciliações por operação.
 - **3E — carga portfolio, qualidade e baselines:** volume principal, validação integral e resultados SQL de referência.
 
-Este documento encerra o planejamento da Fase 3A e foi revisado após a Fase 2B.2. A próxima fase de implementação continua dependente de solicitação do usuário.
+Este documento preserva o planejamento da Fase 3A, revisado após a Fase 2B.2. A Fase 3B está concluída; a próxima implementação sugerida é a Fase 3C e depende de solicitação do usuário.
