@@ -319,6 +319,82 @@ def run_rollback_transaction_smoke(settings: ConnectionSettings, config):
         "summary": data.summary(),
         "sql_counts": sql_counts,
         "id_map_tables": len(ids),
-        "transaction_id_maps": len(transaction_ids),
+        "transaction_id_maps": sum(bool(value) for value in transaction_ids.values()),
+        "remaining": remaining,
+    }
+
+
+def run_rollback_full_smoke(settings: ConnectionSettings, config):
+    """Load and validate all applicable operational domains, then prove complete rollback."""
+    from projectbi_generator.generators.completion import extend_transactions
+    from projectbi_generator.generators.master import generate_master_data
+    from projectbi_generator.generators.transactions import generate_transactions
+    from projectbi_generator.repositories.master_data import load_master_data
+    from projectbi_generator.repositories.transactions import load_transaction_data
+    from projectbi_generator.validation.completion import validate_completed_data
+    from projectbi_generator.validation.database_transactions import validate_loaded_transactions
+    from projectbi_generator.validation.master_data import validate_master_data
+    from projectbi_generator.validation.transactions import validate_transactional_data
+
+    if config.profile != "smoke":
+        raise ValueError("A integração full aceita somente o profile smoke.")
+    master = generate_master_data(config)
+    validate_master_data(master, config)
+    data = generate_transactions(config, master)
+    validate_transactional_data(data, master, config)
+    extend_transactions(config, master, data)
+    validate_completed_data(data, master, config)
+
+    connection = connect(settings)
+    try:
+        connection.execute("BEGIN")
+        version, _ = guard_empty_target(connection)
+        ids = load_master_data(connection, master)
+        transaction_ids = load_transaction_data(connection, master, data, ids)
+        validate_loaded_master(connection, config)
+        sql_counts = validate_loaded_transactions(connection, config, master, data, validate_phase3c=False)
+        connection.execute("ROLLBACK")
+    except Exception:
+        connection.rollback()
+        raise
+    finally:
+        connection.close()
+
+    remaining = confirm_empty_after_rollback(settings)
+    if any(remaining.values()):
+        raise DatabaseGuardError("Após ROLLBACK, foram encontradas linhas nas 40 tabelas operacionais.")
+    summary = data.summary()
+    return {
+        "server_version": version,
+        "summary": {
+            "orders": summary["sales_orders"],
+            "payments": summary["payments"],
+            "declined_attempts": summary["declined_attempts"],
+            "retries": summary["payment_retries"],
+            "split_payment_orders": summary["split_payment_orders"],
+            "installments": summary["payment_installments"],
+            "fulfillments": summary["fulfillments"],
+            "fulfillment_events": summary["fulfillment_events"],
+            "delivery_events": sum(row.event_type in {"prepared", "dispatched", "delivery_attempt", "delivered", "exception", "cancelled"} for row in data.fulfillment_events),
+            "pickup_events": sum(row.event_type in {"prepared", "pickup_ready", "picked_up", "exception", "cancelled"} for row in data.fulfillment_events),
+            "transfers": summary["stock_transfers"],
+            "transfer_items": summary["stock_transfer_items"],
+            "transfer_out_movements": sum(row.movement_type == "transfer_out" for row in data.stock_movements),
+            "transfer_in_movements": sum(row.movement_type == "transfer_in" for row in data.stock_movements),
+            "returns": summary["returns"],
+            "return_items": summary["return_items"],
+            "sellable_returns": sum(row.stock_destination == "sellable" and row.quantity_received > 0 for row in data.return_items),
+            "nonsellable_returns": sum(row.stock_destination in {"quarantine", "repair", "discard"} and row.quantity_received > 0 for row in data.return_items),
+            "refunds": summary["refunds"],
+            "stock_movements": summary["stock_movements"],
+            "ending_stock": summary["ending_stock"],
+            "realized_cost": summary["realized_cost"],
+            "captured_amount": summary["captured_amount"],
+            "refund_amount": summary["refund_amount"],
+            "net_financial_amount": summary["net_financial_amount"],
+        },
+        "sql_counts": sql_counts,
+        "master_id_maps": len(ids),
+        "transaction_id_maps": sum(bool(value) for value in transaction_ids.values()),
         "remaining": remaining,
     }

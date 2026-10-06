@@ -1,4 +1,4 @@
-# Relatório de validação do gerador — Fases 3B e 3C
+# Relatório de validação do gerador — Fases 3B a 3D
 
 ## Ambiente
 
@@ -71,4 +71,31 @@ Os pedidos cobriram os quatro canais: físico 161, e-commerce 75, marketplace A 
 
 Não foram executados pagamentos, parcelas, reembolsos, eventos de fulfillment, transferências, devoluções, perfis `portfolio`/`large` ou Power BI. Nenhuma migration foi aplicada e nenhuma linha sintética ficou no banco.
 
-**Fase 3C validada.** Recomenda-se planejar a Fase 3D antes de ampliar os volumes ou iniciar Power BI.
+**Fase 3C validada.** A ampliação do ecossistema foi executada e validada na seção seguinte.
+
+## Fase 3D — ecossistema transacional completo
+
+Profile `smoke`, seed `20261005`, PostgreSQL **18.6**. O fluxo foi ampliado com pagamentos, parcelas, eventos de entrega e retirada, transferências de estoque, devoluções e refunds. Os registros base da Fase 3C (pedidos, itens, descontos, reservas, fulfillments e custo realizado) permaneceram iguais após a extensão.
+
+| Resultado | Valor |
+|---|---:|
+| Pedidos / itens | 300 / 630 |
+| Operações de pagamento / tentativas recusadas ou falhas / retries | 314 / 11 / 11 |
+| Pedidos com split payment / parcelas | 3 / 587 |
+| Fulfillments / itens / eventos | 193 / 227 / 590 |
+| Eventos de entrega / retirada | 454 / 331 |
+| Transferências / itens / movimentos de saída e entrada | 2 / 2 / 2 + 2 |
+| Devoluções / itens / recebimentos vendáveis / não vendáveis | 8 / 8 / 3 / 4 |
+| Refunds concluídos | 6 |
+| Movimentos de estoque / posições finais / saldo final | 284 / 35 / 222 |
+| Unidades aceitas / expedidas / retornadas ao estoque vendável | 457 / 238 / 3 |
+| Custo realizado | BRL 369830.61051434 |
+| Capturado / refunds / valor líquido | BRL 2791128.94 / 18420.97 / 2772707.97 |
+
+As validações em memória conferiram conciliação integral das capturas por pedido, retries, parcelamento, sequências e cutoff de eventos, pares de transferência com custo igual, origem física das devoluções, custo histórico de retorno, destino de estoque e limite de refunds. O dry-run `full --profile smoke --dry-run` terminou com `database_connected=false`.
+
+A integração `full --profile smoke --load-smoke` conectou ao PostgreSQL 18.6, encontrou a estrutura aprovada vazia, inseriu e validou 19 conjuntos de IDs mestres e 16 conjuntos transacionais em uma transação, validou as 21 tabelas transacionais e executou `ROLLBACK`. Uma nova conexão confirmou zero linhas em cada uma das 40 tabelas. O teste de integração completo da Fase 3D também passou. Não houve migration, persistência de dados ou alteração estrutural.
+
+A suíte total com integrações habilitadas terminou com **56 passed**. Isso inclui os testes de unidade e os três testes PostgreSQL de rollback (dados mestres, Fase 3C e Fase 3D). O comando CLI `full --profile smoke --load-smoke` reportou zero linhas restantes.
+
+**Fase 3D validada.** Recomenda-se planejar a Fase 3E antes de executar perfis maiores, persistir dados ou iniciar Power BI.

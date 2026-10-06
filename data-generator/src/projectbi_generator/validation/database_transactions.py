@@ -26,14 +26,32 @@ TRANSACTION_TABLES = {
     "applied_discounts": ("sales", "applied_discounts"),
     "fulfillments": ("logistics", "fulfillments"),
     "fulfillment_items": ("logistics", "fulfillment_items"),
+    "payments": ("payments", "payments"),
+    "payment_installments": ("payments", "payment_installments"),
+    "refunds": ("payments", "refunds"),
+    "fulfillment_events": ("logistics", "fulfillment_events"),
+    "stock_transfers": ("inventory", "stock_transfers"),
+    "stock_transfer_items": ("inventory", "stock_transfer_items"),
+    "returns": ("after_sales", "returns"),
+    "return_items": ("after_sales", "return_items"),
+}
+PHASE3C_TABLES = {
+    "purchase_orders", "purchase_order_items", "goods_receipts", "goods_receipt_items",
+    "stock_positions", "stock_movements", "stock_reservations", "sales_orders",
+    "sales_order_items", "order_status_history", "applied_discounts", "fulfillments",
+    "fulfillment_items",
 }
 
 
-def validate_loaded_transactions(connection: Connection, config: GeneratorConfig, master, data: TransactionData) -> dict[str, int | Decimal]:
+def validate_loaded_transactions(connection: Connection, config: GeneratorConfig, master, data: TransactionData, validate_phase3c: bool = True) -> dict[str, int | Decimal]:
     """Validate relational SQL invariants and recompute cost from the persisted ledger."""
-    validate_transactional_data(data, master, config)
+    if validate_phase3c:
+        validate_transactional_data(data, master, config)
     counts: dict[str, int] = {}
-    for key, (schema, table) in TRANSACTION_TABLES.items():
+    tables = TRANSACTION_TABLES.items() if not validate_phase3c else (
+        (key, pair) for key, pair in TRANSACTION_TABLES.items() if key in PHASE3C_TABLES
+    )
+    for key, (schema, table) in tables:
         count = connection.execute(sql.SQL("SELECT count(*) FROM {}.{}").format(sql.Identifier(schema), sql.Identifier(table))).fetchone()[0]
         aliases = {"applied_discounts": "discounts", "stock_reservations": "reservations"}
         expected_count = data.counts().get(aliases.get(key, key), len(getattr(data, key, ())))
@@ -70,7 +88,10 @@ def validate_loaded_transactions(connection: Connection, config: GeneratorConfig
             WHERE r.product_id <> i.product_id),
           (SELECT count(*) FROM inventory.stock_movements
             WHERE (movement_type='receipt' AND (quantity_delta<=0 OR goods_receipt_item_id IS NULL OR unit_cost IS NULL))
-               OR (movement_type='fulfillment' AND (quantity_delta>=0 OR fulfillment_item_id IS NULL OR unit_cost IS NULL))),
+               OR (movement_type='fulfillment' AND (quantity_delta>=0 OR fulfillment_item_id IS NULL OR unit_cost IS NULL))
+               OR (movement_type='customer_return' AND (quantity_delta<=0 OR return_item_id IS NULL OR unit_cost IS NULL))
+               OR (movement_type='transfer_out' AND (quantity_delta>=0 OR stock_transfer_item_id IS NULL OR unit_cost IS NULL))
+               OR (movement_type='transfer_in' AND (quantity_delta<=0 OR stock_transfer_item_id IS NULL OR unit_cost IS NULL))),
           (SELECT count(*) FROM sales.sales_orders o
             WHERE o.total_amount <> o.subtotal_amount-o.discount_amount+o.shipping_amount),
           (SELECT count(*) FROM (
@@ -100,6 +121,75 @@ def validate_loaded_transactions(connection: Connection, config: GeneratorConfig
         failed = [label for label, count in zip(labels, violations) if count]
         raise RuntimeError("Invariantes SQL falharam: " + ", ".join(failed))
 
+    extended_violations = connection.execute("""
+        SELECT
+          (SELECT CASE WHEN EXISTS(SELECT 1 FROM payments.payments) THEN count(*) ELSE 0 END FROM (
+             SELECT o.sales_order_id,o.order_status,o.total_amount,
+                    coalesce(sum(p.amount) FILTER (WHERE p.status IN ('captured','settled')),0) captured
+               FROM sales.sales_orders o LEFT JOIN payments.payments p USING (sales_order_id)
+              GROUP BY o.sales_order_id,o.order_status,o.total_amount
+             HAVING (o.order_status='cancelled' AND coalesce(sum(p.amount) FILTER (WHERE p.status IN ('captured','settled')),0)<>0)
+                 OR (o.order_status<>'cancelled' AND coalesce(sum(p.amount) FILTER (WHERE p.status IN ('captured','settled')),0)<>o.total_amount)
+          ) q),
+          (SELECT count(*) FROM payments.payments WHERE status IN ('declined','failed','cancelled') AND (authorized_at IS NOT NULL OR settled_at IS NOT NULL)),
+          (SELECT count(*) FROM (
+             SELECT p.payment_id,p.amount,coalesce(sum(i.amount),0) installments
+               FROM payments.payments p LEFT JOIN payments.payment_installments i USING (payment_id)
+              GROUP BY p.payment_id,p.amount
+             HAVING count(i.payment_installment_id)>0 AND coalesce(sum(i.amount),0)<>p.amount
+          ) q),
+          (SELECT count(*) FROM payments.payment_installments i JOIN payments.payments p USING (payment_id)
+             JOIN payments.payment_methods m USING (payment_method_id)
+            WHERE m.is_installment_capable IS FALSE OR m.method_type IN ('cash','instant')),
+          (SELECT count(*) FROM (
+             SELECT payment_id,sum(amount) refunded
+               FROM payments.refunds WHERE status='completed' GROUP BY payment_id
+          ) r JOIN payments.payments p USING (payment_id) WHERE r.refunded>p.amount),
+          (SELECT count(*) FROM (
+             SELECT stock_transfer_item_id,
+                    count(*) FILTER (WHERE movement_type='transfer_out') outs,
+                    count(*) FILTER (WHERE movement_type='transfer_in') ins,
+                    sum(quantity_delta) qty,
+                    min(unit_cost) min_cost,max(unit_cost) max_cost,
+                    count(DISTINCT stock_location_id) locations
+               FROM inventory.stock_movements WHERE movement_type IN ('transfer_out','transfer_in')
+              GROUP BY stock_transfer_item_id
+             HAVING count(*) FILTER (WHERE movement_type='transfer_out')<>1
+                 OR count(*) FILTER (WHERE movement_type='transfer_in')<>1
+                 OR sum(quantity_delta)<>0 OR min(unit_cost)<>max(unit_cost) OR count(DISTINCT stock_location_id)<>2
+          ) q),
+          (SELECT count(*) FROM after_sales.return_items ri
+             JOIN logistics.fulfillment_items fi ON fi.fulfillment_item_id=ri.source_fulfillment_item_id
+            WHERE fi.sales_order_id<>ri.sales_order_id OR fi.sales_order_item_id<>ri.sales_order_item_id
+               OR ri.quantity_received>fi.fulfilled_quantity),
+          (SELECT count(*) FROM (
+             SELECT source_fulfillment_item_id,sum(quantity_received) returned
+               FROM after_sales.return_items WHERE source_fulfillment_item_id IS NOT NULL GROUP BY source_fulfillment_item_id
+          ) r JOIN logistics.fulfillment_items fi ON fi.fulfillment_item_id=r.source_fulfillment_item_id
+            WHERE r.returned>fi.fulfilled_quantity),
+          (SELECT count(*) FROM after_sales.return_items ri
+             LEFT JOIN inventory.stock_movements m ON m.return_item_id=ri.return_item_id AND m.movement_type='customer_return'
+            WHERE (ri.stock_destination='sellable' AND ri.quantity_received>0 AND (m.stock_movement_id IS NULL OR m.quantity_delta<>ri.quantity_received))
+               OR (ri.stock_destination<>'sellable' AND m.stock_movement_id IS NOT NULL)),
+          (SELECT count(*) FROM logistics.fulfillment_events e JOIN logistics.fulfillments f USING (fulfillment_id)
+            WHERE e.occurred_at > %s OR (f.status='cancelled' AND e.event_type IN ('delivered','picked_up'))),
+          (SELECT count(*) FROM payments.refunds r JOIN payments.payments p USING (payment_id)
+            WHERE r.sales_order_id<>p.sales_order_id OR r.requested_at<p.settled_at OR r.processed_at<r.requested_at)
+    """, (datetime.combine(config.end_date, time(23, 59, 59), tzinfo=config.timezone),)).fetchone()
+    if any(extended_violations):
+        names = ("captured/order reconciliation", "declined timestamps", "installment totals", "installment method",
+                 "refund cap", "transfer movement pairs", "return source/quantity", "return cumulative quantity",
+                 "return inventory destination", "logistics event cutoff/state", "refund relation/time")
+        failed = [name for name, count in zip(names, extended_violations) if count]
+        raise RuntimeError("Invariantes SQL Fase 3D falharam: " + ", ".join(failed))
+
+    if connection.execute("""
+        SELECT count(*) FROM inventory.stock_positions p
+         WHERE p.reserved_quantity<>(SELECT coalesce(sum(r.quantity),0) FROM inventory.stock_reservations r
+                                     WHERE r.product_id=p.product_id AND r.stock_location_id=p.stock_location_id AND r.status='active')
+    """).fetchone()[0]:
+        raise RuntimeError("reserved_quantity diverge das reservas ativas.")
+
     # Replay persisted receipt/fulfillment movements with Decimal and NUMERIC(20,8) rounding.
     balances: dict[tuple[int, int], int] = defaultdict(int)
     averages: dict[tuple[int, int], Decimal] = defaultdict(lambda: Decimal("0.00000000"))
@@ -108,16 +198,16 @@ def validate_loaded_transactions(connection: Connection, config: GeneratorConfig
              FROM inventory.stock_movements ORDER BY occurred_at,stock_movement_id"""
     ).fetchall():
         key = (product_id, location_id)
-        if kind == "receipt":
+        if kind in {"receipt", "transfer_in", "customer_return"}:
             qty = delta
             if balances[key] == 0:
                 averages[key] = unit_cost.quantize(Decimal("0.00000001"))
             else:
                 averages[key] = ((Decimal(balances[key])*averages[key]+Decimal(qty)*unit_cost)/Decimal(balances[key]+qty)).quantize(Decimal("0.00000001"))
             balances[key] += qty
-        elif kind == "fulfillment":
+        elif kind in {"fulfillment", "transfer_out"}:
             if unit_cost != averages[key]:
-                raise RuntimeError("Custo de fulfillment no banco difere da média móvel reconstruída.")
+                raise RuntimeError("Custo de saída no banco difere da média móvel reconstruída.")
             balances[key] += delta
     persisted_positions = connection.execute(
         "SELECT product_id,stock_location_id,on_hand_quantity,reserved_quantity,available_quantity,average_unit_cost FROM inventory.stock_positions"

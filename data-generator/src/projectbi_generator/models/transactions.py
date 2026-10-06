@@ -151,9 +151,11 @@ class StockMovement:
     occurred_at: datetime
     receipt_item_key: str | None = None
     fulfillment_item_key: str | None = None
+    return_item_key: str | None = None
+    transfer_item_key: str | None = None
 
 
-@dataclass(frozen=True)
+@dataclass
 class StockStateEvent:
     key: str
     occurred_at: datetime
@@ -165,6 +167,104 @@ class StockStateEvent:
     unit_cost: Decimal | None = None
     movement_key: str | None = None
     reservation_key: str | None = None
+    return_item_key: str | None = None
+    transfer_item_key: str | None = None
+
+
+@dataclass
+class Payment:
+    key: str
+    order_key: str
+    method_code: str
+    reference: str
+    status: str
+    amount: Decimal
+    attempted_at: datetime
+    authorized_at: datetime | None = None
+    settled_at: datetime | None = None
+
+
+@dataclass
+class PaymentInstallment:
+    key: str
+    payment_key: str
+    number: int
+    due_on: date
+    amount: Decimal
+    status: str
+    paid_at: datetime | None
+
+
+@dataclass
+class FulfillmentEvent:
+    fulfillment_key: str
+    event_type: str
+    occurred_at: datetime
+    recorded_by_employee_code: str | None = None
+    description: str | None = None
+
+
+@dataclass
+class StockTransfer:
+    key: str
+    number: str
+    source_location_code: str
+    destination_location_code: str
+    status: str
+    requested_at: datetime
+    dispatched_at: datetime
+    received_at: datetime
+
+
+@dataclass
+class StockTransferItem:
+    key: str
+    transfer_key: str
+    product_sku: str
+    line_number: int
+    quantity_planned: int
+    quantity_dispatched: int
+    quantity_received: int
+
+
+@dataclass
+class Return:
+    key: str
+    order_key: str
+    number: str
+    status: str
+    reason_code: str
+    requested_at: datetime
+    decided_at: datetime | None
+
+
+@dataclass
+class ReturnItem:
+    key: str
+    return_key: str
+    order_key: str
+    sale_item_key: str
+    source_fulfillment_item_key: str
+    quantity_requested: int
+    quantity_approved: int
+    quantity_received: int
+    item_condition: str | None
+    stock_destination: str | None
+    received_at: datetime | None
+    destination_location_code: str | None = None
+
+
+@dataclass
+class Refund:
+    key: str
+    order_key: str
+    payment_key: str
+    return_key: str | None
+    status: str
+    amount: Decimal
+    reason_code: str
+    requested_at: datetime
+    processed_at: datetime | None
 
 
 @dataclass
@@ -197,6 +297,14 @@ class TransactionData:
     stock_positions: dict[tuple[str, str], StockPosition] = field(default_factory=dict)
     event_trace: list[tuple[datetime, str, str]] = field(default_factory=list)
     stock_state_events: list[StockStateEvent] = field(default_factory=list)
+    payments: list[Payment] = field(default_factory=list)
+    payment_installments: list[PaymentInstallment] = field(default_factory=list)
+    fulfillment_events: list[FulfillmentEvent] = field(default_factory=list)
+    stock_transfers: list[StockTransfer] = field(default_factory=list)
+    stock_transfer_items: list[StockTransferItem] = field(default_factory=list)
+    returns: list[Return] = field(default_factory=list)
+    return_items: list[ReturnItem] = field(default_factory=list)
+    refunds: list[Refund] = field(default_factory=list)
 
     def counts(self) -> dict[str, int]:
         return {
@@ -212,6 +320,14 @@ class TransactionData:
             "fulfillment_items": len(self.fulfillment_items),
             "stock_movements": len(self.stock_movements),
             "stock_positions": len(self.stock_positions),
+            "payments": len(self.payments),
+            "payment_installments": len(self.payment_installments),
+            "fulfillment_events": len(self.fulfillment_events),
+            "stock_transfers": len(self.stock_transfers),
+            "stock_transfer_items": len(self.stock_transfer_items),
+            "returns": len(self.returns),
+            "return_items": len(self.return_items),
+            "refunds": len(self.refunds),
         }
 
     def summary(self) -> dict[str, Any]:
@@ -222,6 +338,12 @@ class TransactionData:
             "ending_stock": sum(row.on_hand_quantity for row in self.stock_positions.values()),
             "active_reserved": sum(row.reserved_quantity for row in self.stock_positions.values()),
             "realized_cost": sum((Decimal(-row.quantity_delta) * row.unit_cost for row in self.stock_movements if row.movement_type == "fulfillment"), Decimal("0.00")),
+            "refund_amount": sum((row.amount for row in self.refunds if row.status == "completed"), Decimal("0.00")),
+            "captured_amount": sum((row.amount for row in self.payments if row.status in {"captured", "settled"}), Decimal("0.00")),
+            "net_financial_amount": sum((row.amount for row in self.payments if row.status in {"captured", "settled"}), Decimal("0.00")) - sum((row.amount for row in self.refunds if row.status == "completed"), Decimal("0.00")),
+            "declined_attempts": sum(row.status in {"declined", "failed"} for row in self.payments),
+            "payment_retries": sum(row.reference.endswith("-RETRY") for row in self.payments),
+            "split_payment_orders": self._split_order_count(),
             "orders_by_channel": {
                 code: sum(order.channel_code == code for order in self.sales_orders)
                 for code in sorted({order.channel_code for order in self.sales_orders})
@@ -237,3 +359,10 @@ class TransactionData:
         for row in self.fulfillments:
             result[row.order_key] = result.get(row.order_key, 0) + 1
         return result
+
+    def _split_order_count(self) -> int:
+        by_order: dict[str, list[Payment]] = {}
+        for row in self.payments:
+            if row.status in {"captured", "settled"}:
+                by_order.setdefault(row.order_key, []).append(row)
+        return sum(len(rows) > 1 for rows in by_order.values())

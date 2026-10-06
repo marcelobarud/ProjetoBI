@@ -11,12 +11,14 @@ import psycopg
 
 from projectbi_generator import __version__
 from projectbi_generator.config import load_config
-from projectbi_generator.database import connection_settings, run_rollback_smoke, run_rollback_transaction_smoke
+from projectbi_generator.database import connection_settings, run_rollback_full_smoke, run_rollback_smoke, run_rollback_transaction_smoke
+from projectbi_generator.generators.completion import extend_transactions
 from projectbi_generator.generators.master import generate_master_data
 from projectbi_generator.generators.transactions import generate_transactions
 from projectbi_generator.seeds import DOMAINS, derive_subseed
 from projectbi_generator.validation.master_data import validate_master_data
 from projectbi_generator.validation.transactions import validate_transactional_data
+from projectbi_generator.validation.completion import validate_completed_data
 
 PROJECT_ROOT = Path(__file__).resolve().parents[3]
 
@@ -34,6 +36,11 @@ def _parser() -> argparse.ArgumentParser:
     transaction_mode = transactions.add_mutually_exclusive_group(required=True)
     transaction_mode.add_argument("--dry-run", action="store_true")
     transaction_mode.add_argument("--load-smoke", action="store_true", help="Executa a integração completa e sempre termina em ROLLBACK")
+    full = commands.add_parser("full", help="Gera, valida e exercita todos os domínios operacionais smoke")
+    full.add_argument("--profile", choices=("smoke",), default="smoke")
+    full_mode = full.add_mutually_exclusive_group(required=True)
+    full_mode.add_argument("--dry-run", action="store_true")
+    full_mode.add_argument("--load-smoke", action="store_true", help="Carrega os domínios aplicáveis em uma transação que termina em ROLLBACK")
     return parser
 
 
@@ -41,6 +48,36 @@ def main(argv: list[str] | None = None) -> int:
     args = _parser().parse_args(argv)
     try:
         config = load_config(args.profile)
+        if args.command == "full":
+            master = generate_master_data(config)
+            validate_master_data(master, config)
+            data = generate_transactions(config, master)
+            validate_transactional_data(data, master, config)
+            extend_transactions(config, master, data)
+            validate_completed_data(data, master, config)
+            if args.dry_run:
+                summary = data.summary()
+                result = {
+                    "profile": "smoke", "root_seed": config.root_seed, "database_connected": False,
+                    "orders": summary["sales_orders"], "payments": summary["payments"],
+                    "declined_attempts": summary["declined_attempts"], "retries": summary["payment_retries"],
+                    "split_payment_orders": summary["split_payment_orders"],
+                    "installments": summary["payment_installments"], "fulfillments": summary["fulfillments"],
+                    "fulfillment_events": summary["fulfillment_events"], "transfers": summary["stock_transfers"],
+                    "return_items": summary["return_items"], "returns": summary["returns"], "refunds": summary["refunds"],
+                    "stock_movements": summary["stock_movements"], "final_stock": summary["ending_stock"],
+                    "realized_cost": summary["realized_cost"], "refund_amount": summary["refund_amount"],
+                    "captured_amount": summary["captured_amount"], "net_financial_amount": summary["net_financial_amount"],
+                }
+                print(json.dumps(result, ensure_ascii=False, sort_keys=True, default=str))
+                return 0
+            result = run_rollback_full_smoke(connection_settings(PROJECT_ROOT), config)
+            print(json.dumps({"database": "projeto_bi", "server_version": result["server_version"],
+                              "transaction": "ROLLBACK", "remaining_rows_all_40_tables": sum(result["remaining"].values()),
+                              "master_id_maps": result["master_id_maps"], "transaction_id_maps": result["transaction_id_maps"],
+                              "summary": result["summary"], "validated_table_counts": result["sql_counts"]},
+                             ensure_ascii=False, sort_keys=True, default=str))
+            return 0
         if args.command == "transactions":
             master = generate_master_data(config)
             validate_master_data(master, config)
