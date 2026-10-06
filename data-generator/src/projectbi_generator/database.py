@@ -4,7 +4,9 @@ from __future__ import annotations
 
 import os
 from dataclasses import dataclass
+from decimal import Decimal
 from pathlib import Path
+from time import perf_counter
 
 import psycopg
 from psycopg import sql
@@ -301,7 +303,7 @@ def run_rollback_transaction_smoke(settings: ConnectionSettings, config):
         connection.execute("BEGIN")
         version, _ = guard_empty_target(connection)
         ids = load_master_data(connection, master)
-        transaction_ids = load_transaction_data(connection, master, data, ids)
+        transaction_ids = load_transaction_data(connection, master, data, ids, config.batch_size)
         validate_loaded_master(connection, config)
         sql_counts = validate_loaded_transactions(connection, config, master, data)
         connection.execute("ROLLBACK")
@@ -350,7 +352,7 @@ def run_rollback_full_smoke(settings: ConnectionSettings, config):
         connection.execute("BEGIN")
         version, _ = guard_empty_target(connection)
         ids = load_master_data(connection, master)
-        transaction_ids = load_transaction_data(connection, master, data, ids)
+        transaction_ids = load_transaction_data(connection, master, data, ids, config.batch_size)
         validate_loaded_master(connection, config)
         sql_counts = validate_loaded_transactions(connection, config, master, data, validate_phase3c=False)
         connection.execute("ROLLBACK")
@@ -396,5 +398,84 @@ def run_rollback_full_smoke(settings: ConnectionSettings, config):
         "sql_counts": sql_counts,
         "master_id_maps": len(ids),
         "transaction_id_maps": sum(bool(value) for value in transaction_ids.values()),
+        "remaining": remaining,
+    }
+
+
+def run_rollback_incremental_full_smoke(settings: ConnectionSettings, config, *, include_completion: bool = True):
+    """Run incremental 3C or full 3C+3D through the PostgreSQL sink and roll back."""
+    from projectbi_generator.generators.completion import generate_full_transactions_incremental
+    from projectbi_generator.generators.master import generate_master_data
+    from projectbi_generator.generators.transactions import generate_transactions_incremental
+    from projectbi_generator.repositories.master_data import load_master_data
+    from projectbi_generator.repositories.postgres_sink import PostgreSQLTransactionSink
+    from projectbi_generator.validation.master_data import validate_master_data
+    from projectbi_generator.validation.database_transactions import validate_loaded_transactions
+
+    if config.profile not in {"smoke", "portfolio"}:
+        raise ValueError("A integração PostgreSQL aceita smoke ou fixture interna portfolio.")
+    started = perf_counter()
+    master = generate_master_data(config)
+    validate_master_data(master, config)
+    connection = connect(settings)
+    try:
+        connection.execute("BEGIN")
+        version, _ = guard_empty_target(connection)
+        master_ids = load_master_data(connection, master)
+        validate_loaded_master(connection, config)
+        sink = PostgreSQLTransactionSink(connection, master, master_ids, config.batch_size)
+        if include_completion:
+            result = generate_full_transactions_incremental(config, master, sink, batch_size=config.batch_size)
+        else:
+            result = generate_transactions_incremental(config, master, sink, batch_size=config.batch_size)
+        if sink._pending_state_events or sink._pending_movements:
+            raise DatabaseGuardError("Sink encerrou com movimentos/estados causais sem par.")
+
+        class _StreamSummary:
+            def counts(self):
+                counts = result.counts()
+                counts["discounts"] = counts.pop("applied_discounts", 0)
+                counts["reservations"] = counts.pop("stock_reservations", 0)
+                return counts
+
+            def summary(self):
+                return {"realized_cost": result.aggregates["realized_cost"]}
+
+        sql_counts = validate_loaded_transactions(connection, config, master, _StreamSummary(), validate_phase3c=False)
+        aggregates = result.aggregates
+        relational_rows = sum(value for table, value in result.counts().items() if table != "stock_state_events")
+        if sink.metrics.rows_inserted != relational_rows:
+            raise DatabaseGuardError("Métrica de inserts do sink diverge das linhas relacionais validadas no SQL.")
+        if include_completion:
+            expected_financials = (Decimal("2791128.94"), Decimal("18420.97"), Decimal("2772707.97"), Decimal("369830.61051434"))
+            actual_financials = (aggregates["captured_amount"], aggregates["refund_amount"], aggregates["net_financial_amount"], aggregates["realized_cost"])
+            if config.profile == "smoke" and actual_financials != expected_financials:
+                raise DatabaseGuardError("Totais financeiros/custo do full smoke incremental divergiram do oracle.")
+        connection.execute("ROLLBACK")
+    except Exception:
+        connection.rollback()
+        raise
+    finally:
+        connection.close()
+
+    remaining = confirm_empty_after_rollback(settings)
+    if any(remaining.values()):
+        raise DatabaseGuardError("Após ROLLBACK, foram encontradas linhas nas 40 tabelas operacionais.")
+    return {
+        "server_version": version,
+        "duration_seconds": perf_counter() - started,
+        "includes_completion": include_completion,
+        "counts": result.counts(),
+        "transaction_rows": relational_rows,
+        "aggregates": dict(aggregates),
+        "sql_counts": sql_counts,
+        "master_id_maps": len(master_ids),
+        "sink_metrics": vars(sink.metrics),
+        "id_metrics": {
+            "current_transaction_id_entries": sink.ids.current_entries,
+            "max_transaction_id_entries": sink.ids.max_entries,
+            "max_by_type": dict(sink.ids.max_by_type),
+        },
+        "emitter_metrics": dict(result.runtime_metrics),
         "remaining": remaining,
     }

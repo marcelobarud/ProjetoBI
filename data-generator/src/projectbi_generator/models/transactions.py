@@ -305,6 +305,7 @@ class TransactionData:
     returns: list[Return] = field(default_factory=list)
     return_items: list[ReturnItem] = field(default_factory=list)
     refunds: list[Refund] = field(default_factory=list)
+    runtime_metrics: dict[str, int] = field(default_factory=dict)
 
     def counts(self) -> dict[str, int]:
         return {

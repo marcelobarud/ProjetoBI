@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 from collections import defaultdict
+from collections.abc import Iterable
+from itertools import pairwise
 from datetime import datetime
 from decimal import Decimal
 
@@ -12,15 +14,16 @@ from projectbi_generator.models.entities import MasterData
 from projectbi_generator.models.transactions import StockPosition, TransactionData
 
 
-def _unique(label: str, values: list[str]) -> None:
-    if len(values) != len(set(values)):
-        raise ValueError(f"Chave lógica duplicada em {label}.")
+def _unique(label: str, values: Iterable[str]) -> None:
+    seen: set[str] = set()
+    for value in values:
+        if value in seen:
+            raise ValueError(f"Chave lógica duplicada em {label}.")
+        seen.add(value)
 
 
 def validate_transactional_data(data: TransactionData, master: MasterData, config: GeneratorConfig) -> None:
     """Raise ValueError when event-derived rows violate the approved operational rules."""
-    if config.profile != "smoke":
-        raise ValueError("A validação transacional desta fase aceita somente smoke.")
     cutoff = datetime.combine(config.end_date, datetime.max.time(), tzinfo=config.timezone)
     earliest = datetime.combine(config.bootstrap_start_date, datetime.min.time(), tzinfo=config.timezone)
     latest_bootstrap = datetime.combine(config.bootstrap_end_date, datetime.max.time(), tzinfo=config.timezone)
@@ -36,20 +39,24 @@ def validate_transactional_data(data: TransactionData, master: MasterData, confi
     for link in master.product_suppliers:
         if link.is_active:
             suppliers_by_product[link.product_sku].add(link.supplier_code)
-    prices = {(row.product_sku, row.channel_code): row for row in master.product_prices}
+    prices: dict[tuple[str, str], list] = defaultdict(list)
+    for row in master.product_prices:
+        prices[(row.product_sku, row.channel_code)].append(row)
+    for rows in prices.values():
+        rows.sort(key=lambda row: row.valid_from)
 
-    _unique("purchase orders", [row.key for row in data.purchase_orders])
-    _unique("purchase order numbers", [row.number for row in data.purchase_orders])
-    _unique("purchase items", [row.key for row in data.purchase_order_items])
-    _unique("receipts", [row.key for row in data.goods_receipts])
-    _unique("receipt items", [row.key for row in data.goods_receipt_items])
-    _unique("sales orders", [row.key for row in data.sales_orders])
-    _unique("order numbers", [row.number for row in data.sales_orders])
-    _unique("sales items", [row.key for row in data.sales_order_items])
-    _unique("reservations", [row.key for row in data.stock_reservations])
-    _unique("fulfillments", [row.key for row in data.fulfillments])
-    _unique("fulfillment items", [row.key for row in data.fulfillment_items])
-    _unique("stock movements", [row.key for row in data.stock_movements])
+    _unique("purchase orders", (row.key for row in data.purchase_orders))
+    _unique("purchase order numbers", (row.number for row in data.purchase_orders))
+    _unique("purchase items", (row.key for row in data.purchase_order_items))
+    _unique("receipts", (row.key for row in data.goods_receipts))
+    _unique("receipt items", (row.key for row in data.goods_receipt_items))
+    _unique("sales orders", (row.key for row in data.sales_orders))
+    _unique("order numbers", (row.number for row in data.sales_orders))
+    _unique("sales items", (row.key for row in data.sales_order_items))
+    _unique("reservations", (row.key for row in data.stock_reservations))
+    _unique("fulfillments", (row.key for row in data.fulfillments))
+    _unique("fulfillment items", (row.key for row in data.fulfillment_items))
+    _unique("stock movements", (row.key for row in data.stock_movements))
 
     pos = {row.key: row for row in data.purchase_orders}
     poi = {row.key: row for row in data.purchase_order_items}
@@ -61,6 +68,13 @@ def validate_transactional_data(data: TransactionData, master: MasterData, confi
     fulfillment_items = {row.key: row for row in data.fulfillment_items}
     reservations = {row.key: row for row in data.stock_reservations}
     movements = {row.key: row for row in data.stock_movements}
+    movements_by_receipt_item: dict[str, list] = defaultdict(list)
+    movements_by_fulfillment_item: dict[str, list] = defaultdict(list)
+    for movement in data.stock_movements:
+        if movement.receipt_item_key:
+            movements_by_receipt_item[movement.receipt_item_key].append(movement)
+        if movement.fulfillment_item_key:
+            movements_by_fulfillment_item[movement.fulfillment_item_key].append(movement)
 
     received_by_item: dict[str, int] = defaultdict(int)
     for row in data.purchase_order_items:
@@ -100,7 +114,7 @@ def validate_transactional_data(data: TransactionData, master: MasterData, confi
         if not isinstance(row.unit_acquisition_cost, Decimal):
             raise ValueError("Custo de aquisição deve ser Decimal.")
         received_by_item[row.order_item_key] += row.quantity_received
-        matches = [m for m in data.stock_movements if m.receipt_item_key == row.key]
+        matches = movements_by_receipt_item.get(row.key, ())
         if row.accepted_quantity:
             if len(matches) != 1 or matches[0].quantity_delta != row.accepted_quantity:
                 raise ValueError("Entrada aceita sem movimento receipt correspondente.")
@@ -167,13 +181,13 @@ def validate_transactional_data(data: TransactionData, master: MasterData, confi
         for item in items_by_order[order.key]:
             if item.product_sku not in products or item.quantity <= 0 or not isinstance(item.unit_sale_price, Decimal):
                 raise ValueError("Linha de venda com SKU, quantidade ou preço inválido.")
-            price = prices.get((item.product_sku, order.channel_code))
-            if price is None:
-                raise ValueError("Preço do produto/canal não existe.")
-            product_price = next(row for row in master.product_prices if row.product_sku == item.product_sku and row.channel_code == order.channel_code)
-            if not (product_price.valid_from <= order.placed_at and (product_price.valid_to is None or order.placed_at < product_price.valid_to)):
+            candidates = prices.get((item.product_sku, order.channel_code), ())
+            product_price = next((row for row in reversed(candidates)
+                                  if row.valid_from <= order.placed_at
+                                  and (row.valid_to is None or order.placed_at < row.valid_to)), None)
+            if product_price is None:
                 raise ValueError("Preço fora da vigência na hora da venda.")
-            if item.unit_sale_price != price.amount:
+            if item.unit_sale_price != product_price.amount:
                 raise ValueError("Snapshot de preço da linha diverge da vigência aplicada.")
             gross = (item.unit_sale_price * item.quantity).quantize(Decimal("0.01"))
             gross_by_item[item.key] = gross
@@ -196,6 +210,7 @@ def validate_transactional_data(data: TransactionData, master: MasterData, confi
     reservation_by_item_location: dict[tuple[str, str], int] = defaultdict(int)
     reservations_by_key = {row.key: row for row in data.stock_reservations}
     state_by_reservation: dict[str, list] = defaultdict(list)
+    orders_with_fulfillment = {row.order_key for row in data.fulfillments}
     for state in data.stock_state_events:
         if state.occurred_at > cutoff or state.occurred_at.tzinfo is None:
             raise ValueError("Evento de estoque fora do cutoff ou sem fuso horário.")
@@ -210,7 +225,7 @@ def validate_transactional_data(data: TransactionData, master: MasterData, confi
             raise ValueError("Reserva possui quantidade/status inválido.")
         if reservation.status == "released" and order.status != "cancelled":
             raise ValueError("Reserva liberada sem cancelamento.")
-        if order.status == "cancelled" and any(fi.order_key == order.key for fi in data.fulfillment_items):
+        if order.status == "cancelled" and order.key in orders_with_fulfillment:
             raise ValueError("Pedido cancelado tem fulfillment associado.")
         reservation_by_item_location[(item.key, reservation.location_code)] += reservation.quantity
         states = state_by_reservation[reservation.key]
@@ -244,7 +259,7 @@ def validate_transactional_data(data: TransactionData, master: MasterData, confi
         fulfilled_by_item[sale_item.key] += item.fulfilled_quantity
         allocated_by_item[sale_item.key] += item.quantity_allocated
         if item.fulfilled_quantity:
-            matches = [movement for movement in data.stock_movements if movement.fulfillment_item_key == item.key]
+            matches = movements_by_fulfillment_item.get(item.key, ())
             if len(matches) != 1 or matches[0].quantity_delta != -item.fulfilled_quantity:
                 raise ValueError("Saída fulfillment diverge da quantidade atendida.")
             movement = matches[0]
@@ -298,6 +313,23 @@ def validate_transactional_data(data: TransactionData, master: MasterData, confi
                 raise ValueError("Custo da saída não usa a média vigente no instante.")
             position.on_hand_quantity -= event.quantity
             position.reserved_quantity -= event.quantity
+        elif event.event_type == "transfer_out":
+            movement = movements_by_key.get(event.movement_key or "")
+            if (movement is None or movement.movement_type != "transfer_out"
+                    or movement.quantity_delta != -event.quantity or position.available_quantity < event.quantity
+                    or movement.unit_cost != position.average_unit_cost):
+                raise ValueError("Transferência excede disponibilidade ou custo médio de origem inválido.")
+            position.on_hand_quantity -= event.quantity
+        elif event.event_type in {"transfer_in", "customer_return"}:
+            movement = movements_by_key.get(event.movement_key or "")
+            expected_type = event.event_type
+            if (movement is None or movement.movement_type != expected_type
+                    or movement.quantity_delta != event.quantity or movement.unit_cost != event.unit_cost):
+                raise ValueError("Entrada de transferência/retorno sem movimento correspondente.")
+            position.average_unit_cost = weighted_moving_average(
+                position.on_hand_quantity, position.average_unit_cost, event.quantity, event.unit_cost,
+            )
+            position.on_hand_quantity += event.quantity
         else:
             raise ValueError("Stock event possui tipo desconhecido.")
         if position.on_hand_quantity < 0 or position.reserved_quantity < 0 or position.reserved_quantity > position.on_hand_quantity:
@@ -319,7 +351,11 @@ def validate_transactional_data(data: TransactionData, master: MasterData, confi
             raise ValueError("Movimento receipt deve ser positivo.")
         if movement.movement_type == "fulfillment" and movement.quantity_delta >= 0:
             raise ValueError("Movimento fulfillment deve ser negativo.")
-        if movement.movement_type not in {"receipt", "fulfillment"}:
+        if movement.movement_type in {"transfer_in", "customer_return"} and movement.quantity_delta <= 0:
+            raise ValueError("Movimento de entrada deve ser positivo.")
+        if movement.movement_type == "transfer_out" and movement.quantity_delta >= 0:
+            raise ValueError("Movimento transfer_out deve ser negativo.")
+        if movement.movement_type not in {"receipt", "fulfillment", "transfer_out", "transfer_in", "customer_return"}:
             raise ValueError("Fora de escopo: tipo de movimento inesperado.")
         if not isinstance(movement.unit_cost, Decimal) or movement.unit_cost < 0:
             raise ValueError("Custo de movimento obrigatório deve ser Decimal não negativo.")
@@ -328,9 +364,9 @@ def validate_transactional_data(data: TransactionData, master: MasterData, confi
     for key, position in data.stock_positions.items():
         if physical_by_position[key] != position.on_hand_quantity:
             raise ValueError("Saldo físico não concilia com a soma dos movimentos.")
-    if [event.occurred_at for event in data.stock_state_events] != sorted(event.occurred_at for event in data.stock_state_events):
+    if any(left.occurred_at > right.occurred_at for left, right in pairwise(data.stock_state_events)):
         raise ValueError("Eventos de estado de estoque não estão cronológicos.")
-    if [event[0] for event in data.event_trace] != sorted(event[0] for event in data.event_trace):
+    if any(left[0] > right[0] for left, right in pairwise(data.event_trace)):
         raise ValueError("Fila de eventos não foi processada em ordem cronológica.")
 
     expected_realized_cost = sum(

@@ -5,8 +5,9 @@ from decimal import Decimal
 
 import pytest
 
-from projectbi_generator.generators.transactions import EventQueue, ScheduledEvent, allocate_cents, generate_transactions, weighted_moving_average
+from projectbi_generator.generators.transactions import EventQueue, ScheduledEvent, allocate_cents, generate_transactions, generate_transactions_incremental, weighted_moving_average
 from projectbi_generator.models.transactions import StockStateEvent
+from projectbi_generator.sinks import CollectingSink, CountingDiscardingSink
 from projectbi_generator.validation.transactions import validate_transactional_data
 
 
@@ -20,6 +21,9 @@ def test_event_queue_orders_by_time_priority_then_stable_key(config):
     queue.push(ScheduledEvent(stamp, 10, "b", "receipt", {}))
     queue.push(ScheduledEvent(stamp, 10, "a", "receipt", {}))
     assert [queue.pop().logical_key for _ in range(3)] == ["a", "b", "z"]
+    assert queue.pending_events == 0
+    assert queue.max_pending_events == 3
+    assert queue.total_pushed == queue.total_popped == 3
 
 
 def test_weighted_average_first_and_second_receipts_rounds_to_eight_places():
@@ -57,6 +61,12 @@ def test_transactions_are_deterministic_and_domain_state_is_independent(master_d
     assert first == second
     assert [row.number for row in first.purchase_orders] == [row.number for row in second.purchase_orders]
     assert [row.number for row in first.sales_orders] == [row.number for row in second.sales_orders]
+
+
+def test_order_volume_comes_from_profile_configuration(master_data, config):
+    configured = replace(config, generation={**config.generation, "sales_orders": 420})
+    data = generate_transactions(configured, master_data)
+    assert data.counts()["sales_orders"] == 420
 
 
 def test_smoke_has_all_channels_anonymous_cancelled_discounted_and_split_orders(transaction_data):
@@ -171,3 +181,47 @@ def test_no_transaction_event_exceeds_cutoff(transaction_data, config):
     assert all(event.occurred_at.date() <= config.end_date for event in transaction_data.stock_state_events)
     assert all(order.placed_at.date() <= config.end_date for order in transaction_data.sales_orders)
     assert transaction_data.summary()["active_reserved"] == 0
+
+
+def test_incremental_core_smoke_matches_legacy_and_releases_batches(master_data, transaction_data, config):
+    sink = CollectingSink()
+    streamed = generate_transactions_incremental(config, master_data, sink, batch_size=37)
+    table_fields = (
+        "purchase_orders", "purchase_order_items", "goods_receipts", "goods_receipt_items",
+        "sales_orders", "sales_order_items", "order_status_history", "applied_discounts",
+        "stock_reservations", "fulfillments", "fulfillment_items", "stock_movements",
+        "stock_state_events",
+    )
+    for table in table_fields:
+        assert sorted(sink.rows_by_table[table], key=repr) == sorted(getattr(transaction_data, table), key=repr), table
+    assert sorted(sink.rows_by_table["stock_positions"], key=repr) == sorted(transaction_data.stock_positions.values(), key=repr)
+    assert streamed.counts()["sales_orders"] == 300
+    assert streamed.counts()["sales_order_items"] == 630
+    assert streamed.aggregates["purchase_orders"] == 49
+    assert streamed.aggregates["receipts"] == 50
+    assert streamed.aggregates["fulfillments"] == 193
+    assert streamed.aggregates["fulfilled_items"] == 227
+    assert streamed.aggregates["units_received"] == 457
+    assert streamed.aggregates["units_fulfilled"] == 238
+    assert streamed.aggregates["ending_stock"] == 219
+    assert streamed.aggregates["realized_cost"] == Decimal("369830.61051434")
+    assert streamed.aggregates["cancelled_orders"] == 8
+    assert streamed.aggregates["split_fulfillments"] == 23
+    assert streamed.runtime_metrics["max_buffered_rows"] <= 37
+    assert streamed.runtime_metrics["flush_count"] > 1
+    assert streamed.runtime_metrics["current_active_orders"] == 0
+    assert streamed.runtime_metrics["current_future_events_3c"] == 0
+
+
+def test_incremental_core_digest_is_independent_of_batch_size(master_data, config):
+    digests = []
+    counts = []
+    for batch_size in (31, 127):
+        sink = CountingDiscardingSink()
+        result = generate_transactions_incremental(config, master_data, sink, batch_size=batch_size)
+        digests.append(sink.logical_digest)
+        counts.append(sink.rows_by_table)
+        assert result.runtime_metrics["max_buffered_rows"] <= batch_size
+        assert result.runtime_metrics["total_rows_emitted"] == sink.total_rows_emitted
+    assert digests[0] == digests[1]
+    assert counts[0] == counts[1]

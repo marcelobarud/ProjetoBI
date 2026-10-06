@@ -20,12 +20,27 @@ def test_smoke_toml_dates_seed_and_exact_volumes(config):
 
 
 @pytest.mark.parametrize("profile", ("portfolio", "large"))
-def test_future_profiles_are_configured_but_generation_is_not_enabled(profile):
+def test_profiles_have_configured_transaction_targets_and_plan_values(profile):
     config = load_config(profile)
     assert config.profile == profile
     assert config.volumes["stores"] == 10
     assert len(config.stores) == 10
     assert all((store.city, store.state_code) in CITY_STATES for store in config.stores)
+    assert config.sales_order_target == {"portfolio": 120000, "large": 240000}[profile]
+    assert config.batch_size == 5000
+
+
+@pytest.mark.parametrize(("profile", "orders", "items"), (("portfolio", 120000, 264000), ("large", 240000, 528000)))
+def test_full_plan_is_configuration_only(profile, orders, items, capsys):
+    from projectbi_generator.cli import main
+
+    assert main(["full", "--profile", profile, "--plan"]) == 0
+    result = __import__("json").loads(capsys.readouterr().out)
+    assert result["sales_orders_target"] == orders
+    assert result["sales_order_items_estimate"] == items
+    assert result["database_connected"] is False
+    assert result["generated"] is False
+    assert result["persistent_write"] is False
 
 
 def test_unknown_profile_is_rejected():

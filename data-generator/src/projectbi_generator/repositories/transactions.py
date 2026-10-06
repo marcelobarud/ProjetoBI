@@ -9,6 +9,13 @@ from psycopg import Connection
 
 from projectbi_generator.models.entities import MasterData
 from projectbi_generator.models.transactions import StockStateEvent, TransactionData
+from projectbi_generator.repositories.batches import iter_batches
+
+
+def _executemany(connection: Connection, statement: str, rows, batch_size: int) -> None:
+    with connection.cursor() as cursor:
+        for batch in iter_batches(rows, batch_size):
+            cursor.executemany(statement, batch)
 
 
 def _lock_position(connection: Connection, product_id: int, location_id: int, at: datetime):
@@ -89,7 +96,7 @@ def _apply_stock_event(
             raise ValueError("Saída excede estoque/reserva bloqueados.")
         if average != event.unit_cost:
             raise ValueError("Custo do movimento diverge da média móvel bloqueada.")
-        movement = next(row for row in ids["movement_values"] if row["key"] == event.movement_key)
+        movement = ids["movement_values"][event.movement_key]
         connection.execute(
             """INSERT INTO inventory.stock_movements
                    (product_id, stock_location_id, movement_type, quantity_delta, unit_cost,
@@ -168,8 +175,18 @@ def _apply_stock_event(
         raise ValueError(f"Evento de estoque desconhecido: {event.event_type}")
 
 
-def load_transaction_data(connection: Connection, master: MasterData, data: TransactionData, ids: dict[str, dict[str, int]]) -> dict:
-    """Load all 13 tables and replay stock events under SELECT FOR UPDATE in one transaction."""
+def load_transaction_data(connection: Connection, master: MasterData, data: TransactionData, ids: dict[str, dict[str, int]], batch_size: int = 1000) -> dict:
+    """Load transactional rows and replay stock events in one caller-owned transaction."""
+    po_by_key = {row.key: row for row in data.purchase_orders}
+    receipt_by_key = {row.key: row for row in data.goods_receipts}
+    order_by_key = {row.key: row for row in data.sales_orders}
+    product_by_sku = {row.sku: row for row in master.products}
+    fulfillment_by_key = {row.key: row for row in data.fulfillments}
+    payment_by_key = {row.key: row for row in data.payments}
+    transfer_by_key = {row.key: row for row in data.stock_transfers}
+    return_by_key = {row.key: row for row in data.returns}
+    movement_by_key = {row.key: row for row in data.stock_movements}
+    movement_by_fulfillment_item = {row.fulfillment_item_key: row for row in data.stock_movements if row.fulfillment_item_key}
     po_ids: dict[str, int] = {}
     for row in data.purchase_orders:
         result = connection.execute(
@@ -188,7 +205,7 @@ def load_transaction_data(connection: Connection, master: MasterData, data: Tran
                    (purchase_order_id, line_number, product_id, quantity_ordered, unit_cost_ordered, created_at)
                VALUES (%s,%s,%s,%s,%s,%s) RETURNING purchase_order_item_id""",
             (po_ids[row.order_key], row.line_number, ids["products"][row.product_sku], row.quantity_ordered,
-             row.unit_cost_ordered, next(item.ordered_at for item in data.purchase_orders if item.key == row.order_key)),
+             row.unit_cost_ordered, po_by_key[row.order_key].ordered_at),
         ).fetchone()
         poi_ids[row.key] = result[0]
     receipt_ids: dict[str, int] = {}
@@ -204,7 +221,7 @@ def load_transaction_data(connection: Connection, master: MasterData, data: Tran
         receipt_ids[row.key] = result[0]
     receipt_item_ids: dict[str, int] = {}
     for row in data.goods_receipt_items:
-        receipt = next(item for item in data.goods_receipts if item.key == row.receipt_key)
+        receipt = receipt_by_key[row.receipt_key]
         result = connection.execute(
             """INSERT INTO procurement.goods_receipt_items
                    (purchase_order_id, goods_receipt_id, purchase_order_item_id, quantity_received,
@@ -238,8 +255,8 @@ def load_transaction_data(connection: Connection, master: MasterData, data: Tran
         order_ids[row.key] = result[0]
     order_item_ids: dict[str, int] = {}
     for row in data.sales_order_items:
-        product = next(item for item in master.products if item.sku == row.product_sku)
-        order = next(item for item in data.sales_orders if item.key == row.order_key)
+        product = product_by_sku[row.product_sku]
+        order = order_by_key[row.order_key]
         result = connection.execute(
             """INSERT INTO sales.sales_order_items
                    (sales_order_id, line_number, product_id, sku_snapshot, product_name_snapshot, quantity, unit_sale_price, created_at)
@@ -248,22 +265,19 @@ def load_transaction_data(connection: Connection, master: MasterData, data: Tran
              product.name, row.quantity, row.unit_sale_price, order.placed_at),
         ).fetchone()
         order_item_ids[row.key] = result[0]
-    for row in data.order_status_history:
-        connection.execute(
+    _executemany(connection,
             """INSERT INTO sales.order_status_history
                    (sales_order_id, status, occurred_at, changed_by_employee_id, reason, created_at)
                VALUES (%s,%s,%s,%s,%s,%s)""",
-            (order_ids[row.order_key], row.status, row.occurred_at,
-             ids["employees"].get(row.changed_by_employee_code) if row.changed_by_employee_code else None,
-             row.reason, row.occurred_at),
-        )
-    for row in data.applied_discounts:
-        connection.execute(
+            ((order_ids[row.order_key], row.status, row.occurred_at,
+              ids["employees"].get(row.changed_by_employee_code) if row.changed_by_employee_code else None,
+              row.reason, row.occurred_at) for row in data.order_status_history), batch_size)
+    _executemany(connection,
             """INSERT INTO sales.applied_discounts
                    (sales_order_id, sales_order_item_id, discount_scope, discount_code, campaign_reference, description, amount, created_at)
                VALUES (%s,%s,%s,%s,%s,%s,%s,%s)""",
-            (order_ids[row.order_key], order_item_ids[row.item_key], row.scope, row.code, None, row.description, row.amount, row.created_at),
-        )
+            ((order_ids[row.order_key], order_item_ids[row.item_key], row.scope, row.code, None, row.description, row.amount, row.created_at)
+             for row in data.applied_discounts), batch_size)
 
     reservation_ids: dict[str, int] = {}
     for row in data.stock_reservations:
@@ -291,9 +305,9 @@ def load_transaction_data(connection: Connection, master: MasterData, data: Tran
         ).fetchone()
         fulfillment_ids[row.key] = result[0]
     fulfillment_item_ids: dict[str, int] = {}
-    movement_values: list[dict] = []
+    movement_values: dict[str, dict] = {}
     for row in data.fulfillment_items:
-        fulfillment = next(item for item in data.fulfillments if item.key == row.fulfillment_key)
+        fulfillment = fulfillment_by_key[row.fulfillment_key]
         result = connection.execute(
             """INSERT INTO logistics.fulfillment_items
                    (sales_order_id, fulfillment_id, sales_order_item_id, quantity_allocated, fulfilled_quantity, created_at, updated_at)
@@ -302,8 +316,11 @@ def load_transaction_data(connection: Connection, master: MasterData, data: Tran
              row.quantity_allocated, fulfillment.planned_at, fulfillment.planned_at),
         ).fetchone()
         fulfillment_item_ids[row.key] = result[0]
-        movement_values.append({"key": next((m.key for m in data.stock_movements if m.fulfillment_item_key == row.key), ""),
-                                "fulfillment_item_key": row.key, "fulfillment_key": row.fulfillment_key})
+        movement = movement_by_fulfillment_item.get(row.key)
+        if movement is not None:
+            movement_values[movement.key] = {
+                "fulfillment_item_key": row.key, "fulfillment_key": row.fulfillment_key,
+            }
 
     payment_ids: dict[str, int] = {}
     for row in data.payments:
@@ -319,7 +336,7 @@ def load_transaction_data(connection: Connection, master: MasterData, data: Tran
         payment_ids[row.key] = result[0]
     installment_ids: dict[str, int] = {}
     for row in data.payment_installments:
-        payment = next(item for item in data.payments if item.key == row.payment_key)
+        payment = payment_by_key[row.payment_key]
         created_at = payment.settled_at or payment.attempted_at
         result = connection.execute(
             """INSERT INTO payments.payment_installments
@@ -330,15 +347,13 @@ def load_transaction_data(connection: Connection, master: MasterData, data: Tran
         ).fetchone()
         installment_ids[row.key] = result[0]
 
-    for row in data.fulfillment_events:
-        connection.execute(
+    _executemany(connection,
             """INSERT INTO logistics.fulfillment_events
                    (fulfillment_id,event_type,occurred_at,recorded_by_employee_id,description,created_at)
                VALUES (%s,%s,%s,%s,%s,%s)""",
-            (fulfillment_ids[row.fulfillment_key], row.event_type,
-             row.occurred_at, ids["employees"].get(row.recorded_by_employee_code) if row.recorded_by_employee_code else None,
-             row.description, row.occurred_at),
-        )
+            ((fulfillment_ids[row.fulfillment_key], row.event_type,
+              row.occurred_at, ids["employees"].get(row.recorded_by_employee_code) if row.recorded_by_employee_code else None,
+              row.description, row.occurred_at) for row in data.fulfillment_events), batch_size)
 
     transfer_ids: dict[str, int] = {}
     for row in data.stock_transfers:
@@ -354,7 +369,7 @@ def load_transaction_data(connection: Connection, master: MasterData, data: Tran
         transfer_ids[row.key] = result[0]
     transfer_item_ids: dict[str, dict] = {}
     for row in data.stock_transfer_items:
-        transfer = next(item for item in data.stock_transfers if item.key == row.transfer_key)
+        transfer = transfer_by_key[row.transfer_key]
         result = connection.execute(
             """INSERT INTO inventory.stock_transfer_items
                    (stock_transfer_id,product_id,line_number,quantity_planned,quantity_dispatched,quantity_received,created_at)
@@ -370,7 +385,7 @@ def load_transaction_data(connection: Connection, master: MasterData, data: Tran
 
     return_ids: dict[str, int] = {}
     for row in data.returns:
-        order = next(item for item in data.sales_orders if item.key == row.order_key)
+        order = order_by_key[row.order_key]
         result = connection.execute(
             """INSERT INTO after_sales.returns
                    (sales_order_id,return_number,status,reason_code,requested_by_employee_id,approved_by_employee_id,
@@ -382,7 +397,7 @@ def load_transaction_data(connection: Connection, master: MasterData, data: Tran
         return_ids[row.key] = result[0]
     return_item_ids: dict[str, int] = {}
     for row in data.return_items:
-        ret = next(item for item in data.returns if item.key == row.return_key)
+        ret = return_by_key[row.return_key]
         result = connection.execute(
             """INSERT INTO after_sales.return_items
                    (sales_order_id,return_id,sales_order_item_id,source_fulfillment_item_id,
@@ -412,7 +427,7 @@ def load_transaction_data(connection: Connection, master: MasterData, data: Tran
                       "transfer_items": transfer_item_ids, "return_items": return_item_ids}
     for event in sorted(data.stock_state_events, key=lambda row: (row.occurred_at, row.priority, row.key)):
         if event.event_type == "receipt":
-            movement = next(row for row in data.stock_movements if row.key == event.movement_key)
+            movement = movement_by_key[event.movement_key]
             connection.execute(
                 """INSERT INTO inventory.stock_movements
                        (product_id, stock_location_id, movement_type, quantity_delta, unit_cost,
@@ -422,9 +437,8 @@ def load_transaction_data(connection: Connection, master: MasterData, data: Tran
                  event.quantity, event.unit_cost, receipt_item_ids[movement.receipt_item_key], event.occurred_at, event.occurred_at),
             )
         _apply_stock_event(connection, event, ids_for_events)
-    for row in data.sales_orders:
-        connection.execute("UPDATE sales.sales_orders SET order_status=%s, updated_at=%s WHERE sales_order_id=%s",
-                           (row.status, row.placed_at, order_ids[row.key]))
+    _executemany(connection, "UPDATE sales.sales_orders SET order_status=%s, updated_at=%s WHERE sales_order_id=%s",
+                 ((row.status, row.placed_at, order_ids[row.key]) for row in data.sales_orders), batch_size)
     return {
         "purchase_orders": po_ids, "purchase_order_items": poi_ids, "goods_receipts": receipt_ids,
         "goods_receipt_items": receipt_item_ids, "sales_orders": order_ids, "sales_order_items": order_item_ids,

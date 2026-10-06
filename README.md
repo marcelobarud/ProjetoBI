@@ -36,13 +36,13 @@ O banco operacional deverá representar um ecossistema empresarial coerente, e n
 
 ## Estado atual
 
-**Fase 3D — ecossistema transacional smoke implementado e validado.** A database `projeto_bi` no PostgreSQL 18.6 mantém 9 schemas e 40 tabelas. O gerador cobre compras, vendas, pagamentos, parcelas, logística, transferências, devoluções, refunds e estoque; a integração validou 21 tabelas transacionais em uma transação encerrada com `ROLLBACK`, e a verificação posterior encontrou zero linhas nas 40 tabelas. O smoke gera 300 pedidos, 314 operações de pagamento, 587 parcelas, 590 eventos logísticos, 2 transferências e 8 devoluções. Os perfis `portfolio` e `large` continuam configurados, mas não executados. Consulte [`docs/data-generation/implementation.md`](docs/data-generation/implementation.md), [`docs/data-generation/validation-report.md`](docs/data-generation/validation-report.md) e [`docs/database/validation-report.md`](docs/database/validation-report.md).
+**Fase 3E.1 concluída.** O gerador full 3C+3D transmite batches ao `PostgreSQLTransactionSink`, usa lifecycle limitado para IDs identity e passou pelo smoke PostgreSQL e por uma fixture multibatch portfolio de 1.000 pedidos, sempre em uma única transação revertida. Nova conexão confirmou as 40 tabelas vazias. O portfolio completo não foi carregado de forma persistente. A próxima fase planejada é 3E.2; consulte [`docs/data-generation/scalability-review.md`](docs/data-generation/scalability-review.md), [`docs/data-generation/implementation.md`](docs/data-generation/implementation.md) e [`docs/data-generation/validation-report.md`](docs/data-generation/validation-report.md).
 
 ## Fases previstas
 
 1. Revisar e aprovar o domínio conceitual (concluído) e consolidar a proposta relacional operacional (Fases 2A e 2A.1 concluídas).
 2. Implementar e validar o esquema operacional no PostgreSQL 18 (Fases 2B, 2B.1 e 2B.2 concluídas; sem dados de negócio persistidos).
-3. Planejar e desenvolver a geração de dados sintéticos consistentes em Python. Fases 3A, 3B, 3C e 3D concluídas: o pacote gera e valida dados mestres e ecossistema transacional do profile smoke, com integração PostgreSQL estritamente com rollback. Próximo escopo recomendado: planejar a Fase 3E.
+3. Planejar e desenvolver a geração de dados sintéticos consistentes em Python. Fases 3A, 3B, 3C, 3D e 3E.1 concluídas. A Fase 3E.2 planeja a primeira carga portfolio persistente, sua validação e baselines SQL; ainda não iniciada.
 4. Explorar e selecionar os dados que farão parte da camada analítica.
 5. Construir as transformações, o modelo semântico e as medidas no Power BI.
 6. Desenvolver e revisar os relatórios, mantendo documentação e versionamento alinhados.

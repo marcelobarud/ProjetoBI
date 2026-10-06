@@ -247,6 +247,7 @@ def validate_master_data(data: MasterData, config: GeneratorConfig) -> None:
         ("suppliers", [row.code for row in data.suppliers]),
         ("carriers", [row.code for row in data.carriers]),
         ("brands", [row.code for row in data.brands]),
+        ("brand names", [row.name for row in data.brands]),
         ("customers", [row.code for row in data.customers]),
         ("stock_locations", [row.code for row in data.stock_locations]),
     ):

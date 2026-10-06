@@ -22,6 +22,24 @@ carriers = 12
 sales_channels = 4
 suppliers = 45
 
+[composition]
+individual_customers = 40500
+business_customers = 4500
+
+[generation]
+sales_orders = 120000
+estimated_order_items = 264000
+batch_size = 5000
+extra_contacts = 15000
+extra_addresses = 7000
+secondary_supplier_products = 600
+price_periods_per_product_channel = 4
+estimated_transaction_rows = 2200000
+stock_transfers = 12
+minimum_returns = 0
+maximum_returns = 0
+split_payment_rate_percent = 3
+
 [[stores]]
 code = "ST-PO-001"
 name = "Unidade Sintética Horizonte Paulista"

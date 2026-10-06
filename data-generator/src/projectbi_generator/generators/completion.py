@@ -15,6 +15,7 @@ from projectbi_generator.models.transactions import (
     StockMovement, StockPosition, StockStateEvent, StockTransfer, StockTransferItem,
     TransactionData,
 )
+from projectbi_generator.sinks import CollectingSink, CountingDiscardingSink
 from projectbi_generator.seeds import create_domain_randoms
 
 CENT = Decimal("0.01")
@@ -32,21 +33,25 @@ def _schedule_payments(config: GeneratorConfig, master: MasterData, data: Transa
     rng = create_domain_randoms(config.root_seed, config.generator_version)["payments"].rng
     capable = {row.code: row.is_installment_capable for row in master.payment_methods if row.is_active}
     order_customer_type = {row.code: row.customer_type for row in master.customers}
+    method_by_type = {row.method_type: row.code for row in master.payment_methods if row.is_active}
+    split_rate = config.generation["split_payment_rate_percent"]
+    split_indices = ({42, 151, 263} if config.profile == "smoke" else
+                     {index for index in range(1, len(data.sales_orders) + 1) if (index - 1) % 100 < split_rate})
     single_card_index = min(
         (index for index, row in enumerate(data.sales_orders, start=1)
-         if row.status != "cancelled" and index not in {42, 151, 263}
+         if row.status != "cancelled" and index not in split_indices
          and index % 41 != 7 and index % 97 != 43),
         key=lambda index: (data.sales_orders[index - 1].total, index),
     )
 
     def choose(order, index: int) -> str:
         if order.channel_type == "physical" and rng.randrange(100) < 15:
-            return next(row.code for row in master.payment_methods if row.method_type == "cash")
+            return method_by_type["cash"]
         if order.customer_code and order_customer_type[order.customer_code] == "business" and rng.randrange(100) < 8:
-            return next(row.code for row in master.payment_methods if row.method_type == "bank_transfer")
+            return method_by_type["bank_transfer"]
         if rng.randrange(100) < (42 if order.channel_type != "physical" else 28):
-            return next(row.code for row in master.payment_methods if row.method_type == "instant")
-        return next(row.code for row in master.payment_methods if row.method_type == "card")
+            return method_by_type["instant"]
+        return method_by_type["card"]
 
     for index, order in enumerate(data.sales_orders, start=1):
         attempted = order.placed_at + timedelta(minutes=8 + index % 13)
@@ -60,14 +65,14 @@ def _schedule_payments(config: GeneratorConfig, master: MasterData, data: Transa
             }))
             continue
 
-        split = index in {42, 151, 263} and order.total >= Decimal("100.00")
-        method = (next(row.code for row in master.payment_methods if row.method_type == "card")
+        split = index in split_indices and order.total >= Decimal("100.00")
+        method = (method_by_type["card"]
                   if index == single_card_index else choose(order, index))
         if split:
-            method = next(row.code for row in master.payment_methods if row.method_type == "card")
+            method = method_by_type["card"]
             first = _money(order.total * Decimal("0.60"))
             second = order.total - first
-            for part, (part_method, amount) in enumerate(((method, first), (next(row.code for row in master.payment_methods if row.method_type == "instant"), second)), start=1):
+            for part, (part_method, amount) in enumerate(((method, first), (method_by_type["instant"], second)), start=1):
                 at = attempted + timedelta(minutes=part * 2)
                 queue.push(ScheduledEvent(at + timedelta(minutes=7), 5, f"PAYMENT-{index:04d}-SPLIT-{part}", "payment", {
                     "order": order, "method": part_method, "amount": amount, "status": "settled",
@@ -172,6 +177,8 @@ def _add_fulfillment_events(config: GeneratorConfig, master: MasterData, data: T
 
 
 def _plan_transfer_candidates(master: MasterData, data: TransactionData, config: GeneratorConfig) -> list[tuple[str, str, str, int]]:
+    if config.generation["stock_transfers"] == 0:
+        return []
     products = {row.sku: row for row in master.products}
     by_sku: dict[str, list[StockPosition]] = defaultdict(list)
     for position in data.stock_positions.values():
@@ -201,9 +208,9 @@ def _plan_transfer_candidates(master: MasterData, data: TransactionData, config:
         selected.append(row)
         used_skus.add(row[0])
         used_pairs.add((row[1], row[2]))
-        if len(selected) == 2:
+        if len(selected) == config.generation["stock_transfers"]:
             break
-    if not selected:
+    if not selected and config.profile == "smoke":
         raise ValueError("Não foi encontrada necessidade de rebalanceamento para o smoke de transferência.")
     # The destination deficit and donor surplus are derived from completed demand events.
     return selected
@@ -215,12 +222,13 @@ def _plan_return_candidates(config: GeneratorConfig, master: MasterData, data: T
     items = {row.key: row for row in data.sales_order_items}
     customer_types = {row.code: row.customer_type for row in master.customers}
     products = {row.sku: row for row in master.products}
+    fulfillments = {row.key: row for row in data.fulfillments}
     fulfilled = [row for row in data.fulfillment_items if row.fulfilled_quantity > 0]
-    fulfilled.sort(key=lambda row: (next(f.completed_at for f in data.fulfillments if f.key == row.fulfillment_key), row.key))
+    fulfilled.sort(key=lambda row: (fulfillments[row.fulfillment_key].completed_at, row.key))
     latest_request = _stamp(config, config.end_date, 23) - timedelta(days=35)
     eligible = []
     for fi in fulfilled:
-        fulfillment = next(row for row in data.fulfillments if row.key == fi.fulfillment_key)
+        fulfillment = fulfillments[fi.fulfillment_key]
         if fulfillment.completed_at is None or fulfillment.completed_at + timedelta(days=4) > latest_request:
             continue
         order = orders[fi.order_key]
@@ -235,24 +243,31 @@ def _plan_return_candidates(config: GeneratorConfig, master: MasterData, data: T
         if rng.random() < probability:
             eligible.append((fi, fulfillment, order, item))
     # A narrow deterministic minimum keeps all return paths exercised by the small smoke profile.
-    if len(eligible) < 8:
+    if len(eligible) < config.generation["minimum_returns"]:
         chosen = {row[0].key for row in eligible}
         for fi in fulfilled:
             if fi.key in chosen:
                 continue
-            fulfillment = next(row for row in data.fulfillments if row.key == fi.fulfillment_key)
+            fulfillment = fulfillments[fi.fulfillment_key]
             if fulfillment.completed_at and fulfillment.completed_at + timedelta(days=4) <= latest_request:
                 eligible.append((fi, fulfillment, orders[fi.order_key], items[fi.sale_item_key]))
                 chosen.add(fi.key)
-                if len(eligible) == 8:
+                if len(eligible) == config.generation["minimum_returns"]:
                     break
-    return eligible[:12]
+    maximum = config.generation["maximum_returns"]
+    return eligible[:maximum] if maximum else eligible
 
 
 def _replay_extended_stock(data: TransactionData) -> None:
     positions: dict[tuple[str, str], StockPosition] = {}
-    reservations = {row.key: row for row in data.stock_reservations}
-    movements = {row.key: row for row in data.stock_movements}
+    fulfillment_movements = {row.fulfillment_item_key: row for row in data.stock_movements
+                             if row.movement_type == "fulfillment" and row.fulfillment_item_key}
+    fulfillment_item_by_movement = {row.key: row.fulfillment_item_key for row in data.stock_movements
+                                    if row.movement_type == "fulfillment" and row.fulfillment_item_key}
+    return_movements = {row.return_item_key: row for row in data.stock_movements
+                        if row.movement_type == "customer_return" and row.return_item_key}
+    return_sources = {row.key: row.source_fulfillment_item_key for row in data.return_items}
+    fulfilled_cost: dict[str, tuple[int, Decimal]] = {}
     transfer_cost: dict[str, Decimal] = {}
     transfer_movements: list[StockMovement] = []
     for event in sorted(data.stock_state_events, key=lambda row: (row.occurred_at, row.priority, row.key)):
@@ -266,6 +281,20 @@ def _replay_extended_stock(data: TransactionData) -> None:
         elif event.event_type == "release":
             position.reserved_quantity -= event.quantity
         elif event.event_type == "fulfillment":
+            if position.on_hand_quantity < event.quantity or position.reserved_quantity < event.quantity or event.movement_key is None:
+                raise ValueError("Fulfillment excede o disponível no replay cronológico.")
+            fulfillment_item_key = fulfillment_item_by_movement.get(event.movement_key)
+            if fulfillment_item_key is None:
+                raise ValueError("Evento fulfillment não referencia movimento válido.")
+            event.unit_cost = position.average_unit_cost
+            movement = fulfillment_movements.get(fulfillment_item_key)
+            if movement is None:
+                raise ValueError("Fulfillment sem movimento de estoque correspondente.")
+            movement.unit_cost = event.unit_cost
+            quantity, cost_total = fulfilled_cost.get(fulfillment_item_key, (0, Decimal("0")))
+            fulfilled_cost[fulfillment_item_key] = (
+                quantity + event.quantity, cost_total + Decimal(event.quantity) * event.unit_cost,
+            )
             position.on_hand_quantity -= event.quantity
             position.reserved_quantity -= event.quantity
         elif event.event_type == "transfer_out":
@@ -291,8 +320,15 @@ def _replay_extended_stock(data: TransactionData) -> None:
                 transfer_item_key=event.transfer_item_key,
             ))
         elif event.event_type == "customer_return":
-            if event.unit_cost is None:
-                raise ValueError("Retorno sellable sem custo histórico resolvido.")
+            source_key = return_sources.get(event.return_item_key)
+            historical = fulfilled_cost.get(source_key) if source_key else None
+            if not historical or historical[0] <= 0:
+                raise ValueError("Retorno sellable sem custo fulfillment histórico anterior.")
+            event.unit_cost = (historical[1] / historical[0]).quantize(Decimal("0.00000001"))
+            movement = return_movements.get(event.return_item_key)
+            if movement is None:
+                raise ValueError("Retorno vendável sem movimento de estoque correspondente.")
+            movement.unit_cost = event.unit_cost
             position.average_unit_cost = weighted_moving_average(position.on_hand_quantity, position.average_unit_cost, event.quantity, event.unit_cost)
             position.on_hand_quantity += event.quantity
         else:
@@ -307,8 +343,6 @@ def _replay_extended_stock(data: TransactionData) -> None:
 
 def extend_transactions(config: GeneratorConfig, master: MasterData, data: TransactionData) -> TransactionData:
     """Extend the phase-3C output using only events caused by existing orders/fulfillments."""
-    if config.profile != "smoke":
-        raise ValueError("A conclusão transacional aceita somente o profile smoke.")
     queue = EventQueue()
     _schedule_payments(config, master, data, queue)
     _add_fulfillment_events(config, master, data, queue)
@@ -368,14 +402,16 @@ def extend_transactions(config: GeneratorConfig, master: MasterData, data: Trans
 
     return_by_ordinal: dict[int, tuple[Return, ReturnItem]] = {}
     payment_counter = 0
-    movements_by_fulfillment: dict[str, list[StockMovement]] = defaultdict(list)
+    refunded_by_payment: dict[str, Decimal] = defaultdict(lambda: Decimal("0.00"))
+    movement_cost_by_fulfillment: dict[str, tuple[int, Decimal]] = {}
     for movement in data.stock_movements:
         if movement.movement_type == "fulfillment" and movement.fulfillment_item_key:
-            movements_by_fulfillment[movement.fulfillment_item_key].append(movement)
-    queued_events = []
+            quantity, cost = movement_cost_by_fulfillment.get(movement.fulfillment_item_key, (0, Decimal("0")))
+            movement_cost_by_fulfillment[movement.fulfillment_item_key] = (
+                quantity + abs(movement.quantity_delta), cost + Decimal(abs(movement.quantity_delta)) * movement.unit_cost,
+            )
     while queue:
-        queued_events.append(queue.pop())
-    for event in queued_events:
+        event = queue.pop()
         if event.occurred_at > _stamp(config, config.end_date, 23, 59):
             continue
         payload = event.payload
@@ -431,11 +467,11 @@ def extend_transactions(config: GeneratorConfig, master: MasterData, data: Trans
             ret_item.received_at = event.occurred_at
             ret_item.destination_location_code = fulfillment.location_code
             if payload["destination"] == "sellable":
-                source_movements = movements_by_fulfillment[fi.key]
-                if not source_movements:
+                historical = movement_cost_by_fulfillment.get(fi.key)
+                if not historical or not historical[0]:
                     raise ValueError("Retorno vendável sem movimento fulfillment histórico.")
                 returned_qty = ret_item.quantity_received
-                weighted_cost = sum((Decimal(abs(row.quantity_delta)) * row.unit_cost for row in source_movements), Decimal("0")) / sum(abs(row.quantity_delta) for row in source_movements)
+                weighted_cost = historical[1] / historical[0]
                 historical_cost = weighted_cost.quantize(Decimal("0.00000001"))
                 state_key = f"STATE-RETURN-{ordinal:03d}"
                 movement_key = f"MOV-RETURN-{ordinal:03d}"
@@ -452,7 +488,7 @@ def extend_transactions(config: GeneratorConfig, master: MasterData, data: Trans
             order_payments = [row for row in by_order_payments[ret.order_key] if row.status in {"captured", "settled"}]
             remaining = payload["amount"]
             for payment in order_payments:
-                already = sum((row.amount for row in data.refunds if row.payment_key == payment.key and row.status == "completed"), Decimal("0.00"))
+                already = refunded_by_payment.get(payment.key, Decimal("0.00"))
                 available = payment.amount - already
                 part = min(remaining, available)
                 if part <= 0:
@@ -460,6 +496,7 @@ def extend_transactions(config: GeneratorConfig, master: MasterData, data: Trans
                 data.refunds.append(Refund(f"REFUND-{ordinal:03d}-{len(data.refunds)+1:03d}", ret.order_key,
                     payment.key, ret.key, "completed", part, "return", event.occurred_at,
                     event.occurred_at + timedelta(hours=2)))
+                refunded_by_payment[payment.key] = already + part
                 remaining -= part
                 if remaining == 0:
                     break
@@ -482,4 +519,72 @@ def extend_transactions(config: GeneratorConfig, master: MasterData, data: Trans
 
     # The main event heap remains the source of transaction order; new inventory events are replayed together with 3C.
     _replay_extended_stock(data)
+    data.runtime_metrics.update({
+        "completion_events_pushed": queue.total_pushed,
+        "completion_events_processed": queue.total_popped,
+        "completion_max_future_events": queue.max_pending_events,
+        "max_future_events": max(
+            data.runtime_metrics.get("max_future_events", 0), queue.max_pending_events
+        ),
+    })
+    return data
+
+
+def generate_full_transactions_incremental(
+    config: GeneratorConfig,
+    master: MasterData,
+    sink,
+    *,
+    batch_size: int | None = None,
+):
+    """Generate 3C+3D through one chronological event queue and one sink.
+
+    Smoke uses a bounded preflight pass that retains only the legacy payment
+    selector's single winning order index. No transaction collection is kept.
+    The actual full output is then generated once with 3C and 3D events sharing
+    the same queue and emitter.
+    """
+    from projectbi_generator.generators.transactions import generate_transactions_incremental
+    from projectbi_generator.validation.completion import validate_completed_data
+    from projectbi_generator.validation.transactions import validate_transactional_data
+
+    single_card_index = None
+    fallback_ordinals = None
+    if config.profile == "smoke":
+        policy = generate_transactions_incremental(
+            config, master, CountingDiscardingSink(), batch_size=batch_size,
+            incremental_completion=True, policy_preflight=True,
+        ).completion_policy
+        single_card_index = policy["single_card_index"]
+        fallback_ordinals = policy["fallback_ordinals"]
+        if single_card_index is None:
+            raise ValueError("Não foi possível resolver o pagamento smoke de cartão sem estado histórico.")
+    result = generate_transactions_incremental(
+        config, master, sink, batch_size=batch_size, incremental_completion=True,
+        single_card_index=single_card_index, forced_fallback_ordinals=fallback_ordinals,
+    )
+    if isinstance(sink, CollectingSink):
+        data = transaction_data_from_collected_stream(result, sink)
+        validate_transactional_data(data, master, config)
+        validate_completed_data(data, master, config)
+    return result
+
+
+def transaction_data_from_collected_stream(result, sink: CollectingSink) -> TransactionData:
+    """Materialize only an explicitly collecting (smoke-sized) sink for legacy validators."""
+    table_fields = (
+        "purchase_orders", "purchase_order_items", "goods_receipts", "goods_receipt_items",
+        "sales_orders", "sales_order_items", "order_status_history", "applied_discounts",
+        "stock_reservations", "fulfillments", "fulfillment_items", "stock_movements",
+        "stock_state_events", "payments", "payment_installments", "fulfillment_events",
+        "stock_transfers", "stock_transfer_items", "returns", "return_items", "refunds",
+    )
+    data = TransactionData()
+    for name in table_fields:
+        setattr(data, name, list(sink.rows_by_table.get(name, ())))
+    data.stock_positions = {
+        (row.product_sku, row.location_code): row
+        for row in sink.rows_by_table.get("stock_positions", ())
+    }
+    data.runtime_metrics = dict(result.runtime_metrics)
     return data

@@ -38,6 +38,14 @@ class GeneratorConfig:
     generation: dict[str, int]
     stores: tuple[StoreConfig, ...]
 
+    @property
+    def sales_order_target(self) -> int:
+        return self.generation["sales_orders"]
+
+    @property
+    def batch_size(self) -> int:
+        return self.generation["batch_size"]
+
 
 class ConfigurationError(ValueError):
     """Raised for an invalid TOML configuration."""
@@ -92,6 +100,20 @@ def load_config(profile: str | None = None, config_dir: Path | None = None) -> G
         "stock_locations", "payment_methods", "carriers", "sales_channels", "suppliers",
     } or any(not isinstance(value, int) or value < 0 for value in volumes.values()):
         raise ConfigurationError("Volumes devem declarar exatamente as 19 tabelas master com inteiros não negativos.")
+    generation = profile_data.get("generation", {})
+    if not isinstance(generation, dict) or any(
+        not isinstance(value, int) or isinstance(value, bool) or value < 0
+        for value in generation.values()
+    ):
+        raise ConfigurationError("Configurações de geração devem ser inteiros não negativos.")
+    if not generation.get("sales_orders") or not generation.get("batch_size"):
+        raise ConfigurationError("O profile deve declarar sales_orders e batch_size positivos.")
+    composition = profile_data.get("composition", {})
+    if composition:
+        if any(not isinstance(value, int) or value < 0 for value in composition.values()):
+            raise ConfigurationError("A composição de clientes deve conter inteiros não negativos.")
+        if composition.get("individual_customers", 0) + composition.get("business_customers", 0) != volumes.get("customers"):
+            raise ConfigurationError("A composição PF/PJ deve totalizar o volume de clientes.")
 
     stores = tuple(
         StoreConfig(
@@ -121,7 +143,7 @@ def load_config(profile: str | None = None, config_dir: Path | None = None) -> G
         bootstrap_end_date=bootstrap_end,
         timezone=timezone,
         volumes=volumes,
-        composition=profile_data.get("composition", {}),
-        generation=profile_data.get("generation", {}),
+        composition=composition,
+        generation=generation,
         stores=stores,
     )

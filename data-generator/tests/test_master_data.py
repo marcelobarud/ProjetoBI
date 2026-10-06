@@ -4,6 +4,7 @@ from datetime import date
 import pytest
 
 from projectbi_generator.config import GeneratorConfig
+from projectbi_generator.config import load_config
 from projectbi_generator.generators.master import generate_master_data
 from projectbi_generator.validation.master_data import validate_master_data
 from projectbi_generator.validation.tax_ids import valid_cnpj, valid_cpf
@@ -15,6 +16,14 @@ def test_smoke_exact_table_volumes_and_customer_mix(master_data, config):
     assert sum(row.customer_type == "business" for row in master_data.customers) == 2
     assert len(master_data.individual_profiles) == 18
     assert len(master_data.business_profiles) == 2
+
+
+def test_portfolio_brand_names_satisfy_database_unique_constraint():
+    config = load_config("portfolio")
+    master = generate_master_data(config)
+    validate_master_data(master, config)
+    names = [row.name for row in master.brands]
+    assert len(names) == len(set(names))
 
 
 def test_all_synthetic_documents_have_checksums_and_are_unique(master_data):
@@ -114,8 +123,11 @@ def test_invalid_uf_is_rejected(master_data, config):
         validate_master_data(replace(master_data, stores=stores), config)
 
 
-def test_non_smoke_generation_is_not_implemented():
+@pytest.mark.parametrize("profile", ("portfolio", "large"))
+def test_configured_profiles_generate_valid_master_volumes(profile):
     from projectbi_generator.config import load_config
 
-    with pytest.raises(ValueError, match="Somente o profile smoke"):
-        generate_master_data(load_config("portfolio"))
+    config = load_config(profile)
+    data = generate_master_data(config)
+    validate_master_data(data, config)
+    assert data.counts() == config.volumes

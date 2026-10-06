@@ -18,12 +18,12 @@ from projectbi_generator.models.transactions import (
     StockMovement, StockPosition, StockReservation, StockStateEvent, TransactionData,
 )
 from projectbi_generator.seeds import create_domain_randoms
+from projectbi_generator.generators.streaming import StreamingCoreResult
+from projectbi_generator.sinks import TransactionBatchEmitter, TransactionSink
 
 CENT = Decimal("0.01")
 COST_SCALE = Decimal("0.00000001")
 CUTOFF_TIME = time(23, 59, 59)
-ORDER_COUNT = 300
-PARTIAL_CANCEL_INDICES = frozenset(range(37, ORDER_COUNT, 37))
 FAMILY_COST_FACTORS = {
     "NOTEBOOK": (Decimal("0.67"), Decimal("0.81")),
     "DESKTOP": (Decimal("0.66"), Decimal("0.80")),
@@ -55,15 +55,33 @@ class EventQueue:
     def __init__(self) -> None:
         self._items: list[ScheduledEvent] = []
         self._keys: set[str] = set()
+        self.max_pending_events = 0
+        self.total_pushed = 0
+        self.total_popped = 0
 
     def push(self, event: ScheduledEvent) -> None:
         if event.logical_key in self._keys:
             raise ValueError("Chave lógica de evento duplicada.")
         self._keys.add(event.logical_key)
         heapq.heappush(self._items, event)
+        self.total_pushed += 1
+        self.max_pending_events = max(self.max_pending_events, len(self._items))
 
     def pop(self) -> ScheduledEvent:
-        return heapq.heappop(self._items)
+        event = heapq.heappop(self._items)
+        self._keys.discard(event.logical_key)
+        self.total_popped += 1
+        return event
+
+    def peek(self) -> ScheduledEvent:
+        return self._items[0]
+
+    @property
+    def pending_events(self) -> int:
+        return len(self._items)
+
+    def has_event_type(self, event_types: set[str]) -> bool:
+        return any(row.event_type in event_types for row in self._items)
 
     def __bool__(self) -> bool:
         return bool(self._items)
@@ -132,6 +150,20 @@ def _price_map(master: MasterData) -> dict[tuple[str, str], Decimal]:
     return {(row.product_sku, row.channel_code): row.amount for row in master.product_prices}
 
 
+def _price_period_index(master: MasterData) -> dict[tuple[str, str], tuple]:
+    grouped: dict[tuple[str, str], list] = {}
+    for row in master.product_prices:
+        grouped.setdefault((row.product_sku, row.channel_code), []).append(row)
+    return {key: tuple(sorted(rows, key=lambda row: row.valid_from)) for key, rows in grouped.items()}
+
+
+def _price_at(periods: dict[tuple[str, str], tuple], sku: str, channel: str, at: datetime) -> Decimal:
+    for row in reversed(periods[(sku, channel)]):
+        if row.valid_from <= at and (row.valid_to is None or at < row.valid_to):
+            return row.amount
+    raise ValueError("Não existe preço vigente para produto/canal no instante do pedido.")
+
+
 def _cost_for(
     master: MasterData,
     sku: str,
@@ -139,8 +171,9 @@ def _cost_for(
     supplier_ordinal: int,
     period_ordinal: int,
     prices: dict[tuple[str, str], Decimal],
+    products_by_sku: dict | None = None,
 ) -> Decimal:
-    product = next(row for row in master.products if row.sku == sku)
+    product = products_by_sku[sku] if products_by_sku is not None else next(row for row in master.products if row.sku == sku)
     family = FAMILIES[product.category_code][1]
     low, high = FAMILY_COST_FACTORS[family]
     retail = min(prices[(sku, channel.code)] for channel in master.sales_channels)
@@ -154,20 +187,31 @@ def _cost_for(
 def generate_transactions(
     config: GeneratorConfig,
     master: MasterData | None = None,
-) -> TransactionData:
-    """Generate smoke operations through a deterministic, causal chronological queue."""
-    if config.profile != "smoke":
-        raise ValueError("A engine transacional desta fase aceita somente o profile smoke.")
+    *,
+    sink: TransactionSink | None = None,
+    batch_size: int | None = None,
+    incremental_completion: bool = False,
+    single_card_index: int | None = None,
+    policy_preflight: bool = False,
+    forced_fallback_ordinals: dict[str, int] | None = None,
+) -> TransactionData | StreamingCoreResult:
+    """Generate causal 3C facts; an optional sink selects non-collecting streaming output."""
     master = master or generate_master_data(config)
     prices = _price_map(master)
+    price_periods = _price_period_index(master)
     randoms = create_domain_randoms(config.root_seed, config.generator_version)
     procurement_rng = randoms["procurement"].rng
     sales_rng = randoms["sales"].rng
+    sales_intent_rng = randoms["sales_intents"].rng
     inventory_rng = randoms["inventory"].rng
     queue = EventQueue()
-    result = TransactionData()
+    emitter = TransactionBatchEmitter(sink, batch_size or config.batch_size) if sink is not None else None
+    result = StreamingCoreResult(emitter) if emitter is not None else TransactionData()
+    if incremental_completion and not isinstance(result, StreamingCoreResult):
+        raise ValueError("A extensão incremental exige TransactionSink.")
     cutoff = _aware(config, config.end_date, CUTOFF_TIME.hour, CUTOFF_TIME.minute)
     products = {row.sku: row for row in master.products}
+    product_skus = tuple(sorted(products))
     channels = {row.code: row for row in master.sales_channels}
     customers = {row.code: row for row in master.customers}
     addresses = {row.customer_code: row for row in master.customer_addresses if row.is_default and row.is_active}
@@ -186,16 +230,21 @@ def generate_transactions(
     positions: dict[tuple[str, str], StockPosition] = {}
     pending_restock: set[tuple[str, str]] = set()
     result_by_order: dict[str, SaleOrder] = {}
-    items_by_order: dict[str, list[SaleOrderItem]] = {}
     reservations_by_order: dict[str, list[StockReservation]] = {}
     fulfillments_by_key: dict[str, Fulfillment] = {}
     fulfillment_items_by_key: dict[str, FulfillmentItem] = {}
-    fulfilled_by_item: dict[str, int] = {}
-    item_product: dict[str, str] = {}
-    item_order: dict[str, str] = {}
+    sale_item_by_key: dict[str, SaleOrderItem] = {}
+    sale_item_keys_by_order: dict[str, list[str]] = {}
+    fulfillment_keys_by_order: dict[str, list[str]] = {}
+    pending_fulfillments_by_order: dict[str, int] = {}
+    fulfillment_count_by_order: dict[str, int] = {}
+    ordered_quantity_by_order: dict[str, int] = {}
+    fulfilled_quantity_by_order: dict[str, int] = {}
     po_by_key: dict[str, PurchaseOrder] = {}
     po_item_by_key: dict[str, PurchaseOrderItem] = {}
     received_by_po_item: dict[str, int] = {}
+    state_counter = 0
+    max_active_purchase_orders = 0
     movement_counter = 0
     purchase_counter = 0
     receipt_counter = 0
@@ -204,11 +253,33 @@ def generate_transactions(
     fulfillment_counter = 0
     fulfillment_item_counter = 0
     discount_counter = 0
+    discount_by_item: dict[str, Decimal] = {}
+    completion_state = None
 
     def push(at: datetime, priority: int, key: str, event_type: str, payload: dict[str, Any]) -> None:
         if at > cutoff:
             return
         queue.push(ScheduledEvent(at, priority, key, event_type, payload))
+
+    if incremental_completion:
+        from projectbi_generator.generators.completion_stream import IncrementalCompletionState
+        completion_state = IncrementalCompletionState(
+            config, master, result, push, single_card_index,
+            policy_preflight=policy_preflight,
+            forced_fallback_ordinals=forced_fallback_ordinals,
+        )
+
+    def append_stock_state(row: StockStateEvent) -> None:
+        result.stock_state_events.append(row)
+        if completion_state is not None:
+            completion_state.on_core_state(row)
+
+    def publish(table: str, key: str) -> None:
+        collection = getattr(result, table)
+        if hasattr(collection, "publish"):
+            collection.publish(key)
+            if table in {"purchase_orders", "purchase_order_items"} and isinstance(result, StreamingCoreResult):
+                result.release_transaction_id(table, key)
 
     def add_movement(
         sku: str,
@@ -221,17 +292,21 @@ def generate_transactions(
         fulfillment_item_key: str | None = None,
         reservation_key: str | None = None,
     ) -> str:
-        nonlocal movement_counter
+        nonlocal movement_counter, state_counter
         movement_counter += 1
         key = f"MOV-SM-{movement_counter:06d}"
-        result.stock_movements.append(StockMovement(key, sku, location, kind, qty_delta, unit_cost, at, receipt_item_key, fulfillment_item_key))
-        state_key = f"STATE-{len(result.stock_state_events) + 1:06d}"
+        movement = StockMovement(key, sku, location, kind, qty_delta, unit_cost, at, receipt_item_key, fulfillment_item_key)
+        result.stock_movements.append(movement)
+        if completion_state is not None and kind in {"receipt", "fulfillment"}:
+            completion_state.on_core_movement(movement)
+        state_counter += 1
+        state_key = f"STATE-{state_counter:06d}"
         priority = 0 if kind == "receipt" else 30
-        result.stock_state_events.append(StockStateEvent(state_key, at, kind, sku, location, abs(qty_delta), priority, unit_cost, key, reservation_key))
+        append_stock_state(StockStateEvent(state_key, at, kind, sku, location, abs(qty_delta), priority, unit_cost, key, reservation_key))
         return key
 
     def create_purchase(payload: dict[str, Any], at: datetime) -> tuple[str, str]:
-        nonlocal purchase_counter
+        nonlocal purchase_counter, max_active_purchase_orders
         purchase_counter += 1
         po_key = f"PO-KEY-{purchase_counter:04d}"
         number = f"PO-SM-{purchase_counter:04d}"
@@ -243,6 +318,7 @@ def generate_transactions(
         result.purchase_order_items.append(line)
         po_item_by_key[item_key] = line
         received_by_po_item[item_key] = 0
+        max_active_purchase_orders = max(max_active_purchase_orders, len(po_by_key))
         return po_key, item_key
 
     def schedule_receipt(
@@ -294,7 +370,7 @@ def generate_transactions(
                 if index == 0:
                     first_arrival = ordered_at + timedelta(days=5 + part)
                     final_arrival = first_arrival
-                cost = _cost_for(master, sku, procurement_rng, part + index, index + part, price_rng)
+                cost = _cost_for(master, sku, procurement_rng, part + index, index + part, price_rng, products)
                 payload = {
                     "sku": sku, "location": location, "quantity": quantity,
                     "supplier_code": link.supplier_code,
@@ -312,7 +388,7 @@ def generate_transactions(
             ordered_at = _aware(config, order_day, 11, index * 7)
             arrival = ordered_at + timedelta(days=7 + index)
             location = warehouse_codes[index % len(warehouse_codes)]
-            cost = _cost_for(master, sku, procurement_rng, index + 3, index + 2, price_rng)
+            cost = _cost_for(master, sku, procurement_rng, index + 3, index + 2, price_rng, products)
             payload = {"sku": sku, "location": location, "quantity": 3 + index, "supplier_code": link.supplier_code,
                        "employee_code": None, "expected_on": arrival.date(), "unit_cost": cost,
                        "partial": False, "arrival": arrival, "second_arrival": None}
@@ -330,8 +406,8 @@ def generate_transactions(
         position = positions[key]
         target = 7 if FAMILIES[products[sku].category_code][1] in {"NOTEBOOK", "DESKTOP", "GRAPHICS"} else 10
         quantity = max(3, target - position.on_hand_quantity)
-        purchase_counter_hint = len(result.purchase_orders) + 1
-        cost = _cost_for(master, sku, procurement_rng, purchase_counter_hint, at.month, prices)
+        purchase_counter_hint = purchase_counter + 1
+        cost = _cost_for(master, sku, procurement_rng, purchase_counter_hint, at.month, prices, products)
         payload = {"sku": sku, "location": location, "quantity": quantity, "supplier_code": link.supplier_code,
                    "employee_code": None, "expected_on": arrival.date(), "unit_cost": cost,
                    "partial": False, "arrival": arrival, "second_arrival": None,
@@ -349,9 +425,13 @@ def generate_transactions(
         receipt = GoodsReceipt(receipt_key, po.key, payload["location"], None, receipt_number, "completed", at)
         result.goods_receipts.append(receipt)
         receipt_item_key = f"GRI-KEY-{receipt_counter:04d}-01"
+        if payload["accepted"] + payload["rejected"] != payload["received"]:
+            raise ValueError("Quantidade aceita e rejeitada deve totalizar o recebimento.")
         row = GoodsReceiptItem(receipt_item_key, item.key, receipt_key, payload["received"], payload["accepted"], payload["rejected"], payload["cost"])
         result.goods_receipt_items.append(row)
         received_by_po_item[item.key] += payload["received"]
+        if received_by_po_item[item.key] > item.quantity_ordered:
+            raise ValueError("Recebimento supera a quantidade do item de compra.")
         position_key = (item.product_sku, payload["location"])
         position = positions.setdefault(position_key, StockPosition(*position_key))
         if payload["accepted"]:
@@ -360,6 +440,11 @@ def generate_transactions(
             add_movement(item.product_sku, payload["location"], "receipt", payload["accepted"], payload["cost"], at, receipt_item_key=receipt_item_key)
         if received_by_po_item[item.key] == item.quantity_ordered:
             po.status = "received"
+            publish("purchase_orders", po.key)
+            publish("purchase_order_items", item.key)
+            po_by_key.pop(po.key, None)
+            po_item_by_key.pop(item.key, None)
+            received_by_po_item.pop(item.key, None)
         elif received_by_po_item[item.key] > 0:
             po.status = "partially_received"
         result.event_trace.append((at, "receipt", receipt_key))
@@ -406,6 +491,7 @@ def generate_transactions(
             scope = "order_allocation"
             code = "SM-ORDER-ALLOC"
         for item, allocation in zip(items, allocations):
+            discount_by_item[item.key] = allocation
             if allocation > 0:
                 discount_counter += 1
                 result.applied_discounts.append(AppliedDiscount(
@@ -414,8 +500,28 @@ def generate_transactions(
                 ))
         return amount
 
+    def finalize_order_3c(order_key: str) -> None:
+        order = result_by_order.pop(order_key, None)
+        if order is None:
+            return
+        publish("sales_orders", order_key)
+        if completion_state is None and isinstance(result, StreamingCoreResult):
+            result.release_transaction_id("sales_orders", order_key)
+        for reservation in reservations_by_order.pop(order_key, []):
+            publish("stock_reservations", reservation.key)
+        for item_key in sale_item_keys_by_order.pop(order_key, []):
+            sale_item_by_key.pop(item_key, None)
+        for fulfillment_key in fulfillment_keys_by_order.pop(order_key, []):
+            fulfillments_by_key.pop(fulfillment_key, None)
+        ordered_quantity_by_order.pop(order_key, None)
+        fulfilled_quantity_by_order.pop(order_key, None)
+        pending_fulfillments_by_order.pop(order_key, None)
+        fulfillment_count_by_order.pop(order_key, None)
+        if isinstance(result, StreamingCoreResult):
+            result.runtime_metrics["current_active_orders"] = len(result_by_order)
+
     def create_sale(event: ScheduledEvent) -> None:
-        nonlocal order_counter, reservation_counter, fulfillment_counter, fulfillment_item_counter
+        nonlocal order_counter, reservation_counter, fulfillment_counter, fulfillment_item_counter, state_counter
         idx = event.payload["index"]
         at = event.occurred_at
         order_counter += 1
@@ -433,9 +539,9 @@ def generate_transactions(
         )
         salesperson = suitable_salesperson(store_code, at) if channel_type == "physical" and store_code else None
         count = _line_count(idx)
-        selected_skus = ["SKU-NOT-001"] if idx == 0 else []
+        selected_skus = [master.products[0].sku] if idx == 0 else []
         while len(selected_skus) < count:
-            candidate = sorted(products)[sales_rng.randrange(len(products))]
+            candidate = product_skus[sales_rng.randrange(len(product_skus))]
             if candidate not in selected_skus:
                 selected_skus.append(candidate)
         sale_items: list[SaleOrderItem] = []
@@ -443,25 +549,34 @@ def generate_transactions(
         for line_no, sku in enumerate(selected_skus, start=1):
             item_key = f"{order_key}-LINE-{line_no:02d}"
             quantity = 5 if idx == 0 and line_no == 1 else (2 if customers.get(customer_code) and customers[customer_code].customer_type == "business" and sales_rng.random() < 0.35 else 1)
-            price = prices[(sku, channel_code)]
+            price = _price_at(price_periods, sku, channel_code, at)
             sale_item = SaleOrderItem(item_key, order_key, line_no, sku, quantity, price)
             sale_items.append(sale_item)
             gross.append(_money(price * quantity))
-            item_product[item_key] = sku
-            item_order[item_key] = order_key
+            sale_item_by_key[item_key] = sale_item
         subtotal = sum(gross, Decimal("0.00"))
         discount = Decimal("0.00")
         if idx in {1, 2, 3} or (idx % 100 != 0 and sales_rng.random() < Decimal("0.38")):
             discount = allocate_order_discount(order_key, sale_items, at, gross, idx)
-        is_cancelled = idx in PARTIAL_CANCEL_INDICES
+        is_cancelled = idx in cancelled_indices
         fulfillment_type = "store_pickup" if channel_type == "physical" or (idx % 13 == 0 and channel_type == "ecommerce") else "delivery"
         shipping = Decimal("0.00") if fulfillment_type == "store_pickup" else Decimal("14.90")
         total = _money(subtotal - discount + shipping)
         order = SaleOrder(order_key, order_number, channel_code, channel_type, customer_code, store_code,
                           salesperson, address_key, "placed", at, subtotal, discount, shipping, total, snapshot)
         result.sales_orders.append(order)
+        ordered_quantity_by_order[order_key] = sum(row.quantity for row in sale_items)
+        fulfilled_quantity_by_order[order_key] = 0
         result_by_order[order_key] = order
-        items_by_order[order_key] = sale_items
+        sale_item_keys_by_order[order_key] = [row.key for row in sale_items]
+        fulfillment_keys_by_order[order_key] = []
+        pending_fulfillments_by_order[order_key] = 0
+        fulfillment_count_by_order[order_key] = 0
+        if isinstance(result, StreamingCoreResult):
+            result.runtime_metrics["current_active_orders"] = len(result_by_order)
+            result.runtime_metrics["max_active_orders"] = max(
+                result.runtime_metrics.get("max_active_orders", 0), len(result_by_order)
+            )
         result.sales_order_items.extend(sale_items)
         result.order_status_history.extend((
             OrderStatusEvent(order_key, "draft", at - timedelta(minutes=5), salesperson),
@@ -487,8 +602,8 @@ def generate_transactions(
                                                location, take, "active", at + timedelta(minutes=2))
                 result.stock_reservations.append(reservation)
                 reservations_by_order.setdefault(order_key, []).append(reservation)
-                state_counter_local = len(result.stock_state_events) + 1
-                result.stock_state_events.append(StockStateEvent(f"STATE-{state_counter_local:06d}", at + timedelta(minutes=2),
+                state_counter += 1
+                append_stock_state(StockStateEvent(f"STATE-{state_counter:06d}", at + timedelta(minutes=2),
                     "reserve", sale_item.product_sku, location, take, 10, reservation_key=reservation_key))
                 allocations_by_location.setdefault(location, []).append((sale_item, take))
                 if position.available_quantity <= 2:
@@ -509,13 +624,20 @@ def generate_transactions(
                 at + timedelta(hours=2), delivery_at - timedelta(hours=1) if not store_pickup else None, delivery_at,
             )
             result.fulfillments.append(fulfillment)
+            if completion_state is not None:
+                completion_state.on_fulfillment_created(fulfillment)
             fulfillments_by_key[fulfillment_key] = fulfillment
+            fulfillment_keys_by_order[order_key].append(fulfillment_key)
+            fulfillment_count_by_order[order_key] += 1
+            if fulfillment_count_by_order[order_key] == 2 and isinstance(result, StreamingCoreResult):
+                result.aggregates["split_fulfillments"] += 1
             for sale_item, quantity in line_allocations:
                 fulfillment_item_counter += 1
                 fi_key = f"FULI-KEY-{fulfillment_item_counter:05d}"
                 fulfillment_item = FulfillmentItem(fi_key, order_key, fulfillment_key, sale_item.key, quantity, 0)
                 result.fulfillment_items.append(fulfillment_item)
                 fulfillment_items_by_key[fi_key] = fulfillment_item
+                pending_fulfillments_by_order[order_key] += 1
                 push(delivery_at, 30, f"FULFILL-{fi_key}", "fulfill", {"fulfillment_item_key": fi_key})
 
         if is_cancelled:
@@ -527,9 +649,14 @@ def generate_transactions(
         else:
             result.order_status_history.append(OrderStatusEvent(order_key, "confirmed", at + timedelta(minutes=3), salesperson))
             order.status = "confirmed"
+        if completion_state is not None:
+            completion_state.on_sale(order, order_counter, is_cancelled, pending_fulfillments_by_order[order_key])
         result.event_trace.append((at, "sale", order_key))
+        if not is_cancelled and pending_fulfillments_by_order[order_key] == 0:
+            finalize_order_3c(order_key)
 
     def cancel_order(order_key: str, at: datetime) -> None:
+        nonlocal state_counter
         order = result_by_order[order_key]
         for reservation in reservations_by_order.get(order_key, []):
             if reservation.status != "active":
@@ -538,17 +665,19 @@ def generate_transactions(
             reservation.released_at = at
             position = positions[(reservation.product_sku, reservation.location_code)]
             position.reserved_quantity -= reservation.quantity
-            state_key = f"STATE-{len(result.stock_state_events) + 1:06d}"
-            result.stock_state_events.append(StockStateEvent(state_key, at, "release", reservation.product_sku,
+            state_counter += 1
+            state_key = f"STATE-{state_counter:06d}"
+            append_stock_state(StockStateEvent(state_key, at, "release", reservation.product_sku,
                 reservation.location_code, reservation.quantity, 20, reservation_key=reservation.key))
         order.status = "cancelled"
         result.order_status_history.append(OrderStatusEvent(order_key, "cancelled", at, order.salesperson_code, "Cancelamento anterior ao fulfillment"))
         result.event_trace.append((at, "cancel", order_key))
+        finalize_order_3c(order_key)
 
     def fulfill(fulfillment_item_key: str, at: datetime) -> None:
         fi = fulfillment_items_by_key[fulfillment_item_key]
         fulfillment = fulfillments_by_key[fi.fulfillment_key]
-        sale_item = next(row for row in items_by_order[fi.order_key] if row.key == fi.sale_item_key)
+        sale_item = sale_item_by_key[fi.sale_item_key]
         reservations = [row for row in reservations_by_order[fi.order_key]
                        if row.item_key == sale_item.key and row.location_code == fulfillment.location_code and row.status == "active"]
         quantity = fi.quantity_allocated
@@ -564,16 +693,25 @@ def generate_transactions(
         position.on_hand_quantity -= quantity
         position.reserved_quantity -= quantity
         fi.fulfilled_quantity = quantity
+        fulfilled_quantity_by_order[fi.order_key] += quantity
         add_movement(sale_item.product_sku, fulfillment.location_code, "fulfillment", -quantity, cost, at,
                      fulfillment_item_key=fi.key, reservation_key=reservations[0].key)
-        result.event_trace.append((at, "fulfillment", fi.key))
         order = result_by_order[fi.order_key]
-        fulfilled = sum(row.fulfilled_quantity for row in result.fulfillment_items if row.order_key == fi.order_key)
-        ordered = sum(row.quantity for row in items_by_order[fi.order_key])
+        if completion_state is not None:
+            completion_state.on_fulfilled(
+                fi, fulfillment, order, sale_item, discount_by_item.get(sale_item.key, Decimal("0.00")), cost, at,
+            )
+        result.event_trace.append((at, "fulfillment", fi.key))
+        fulfilled = fulfilled_quantity_by_order[fi.order_key]
+        ordered = ordered_quantity_by_order[fi.order_key]
         if fulfilled == ordered and order.status not in {"cancelled", "completed"}:
             order.status = "completed"
-            if not any(row.status == "completed" for row in result.order_status_history if row.order_key == order.key):
-                result.order_status_history.append(OrderStatusEvent(order.key, "completed", at, order.salesperson_code))
+            result.order_status_history.append(OrderStatusEvent(order.key, "completed", at, order.salesperson_code))
+        publish("fulfillment_items", fi.key)
+        fulfillment_items_by_key.pop(fi.key, None)
+        pending_fulfillments_by_order[fi.order_key] -= 1
+        if pending_fulfillments_by_order[fi.order_key] == 0:
+            finalize_order_3c(fi.order_key)
 
     # Bootstrap procurement is represented as purchase-order and receipt events.
     bootstrap_plan()
@@ -582,15 +720,16 @@ def generate_transactions(
     sales_last = config.end_date - timedelta(days=1)
     span = (sales_last - sales_start).days
     channel_codes = {"physical": "CH-PHYSICAL", "ecommerce": "CH-ECOM", "marketplace_a": "CH-MARKET-A", "marketplace_b": "CH-MARKET-B"}
-    for index in range(ORDER_COUNT):
-        # Uniformly spread intents across the full commercial horizon, with stable within-day times.
-        day = sales_start + timedelta(days=(span * index // (ORDER_COUNT - 1)))
+    order_count = config.sales_order_target
+    cancelled_indices = set(range(37, order_count, 37))
+    def create_sale_intent(index: int, rng: random.Random) -> ScheduledEvent:
+        day = sales_start + timedelta(days=(span * index // max(1, order_count - 1)))
         hour = 9 + (index * 7) % 10
         minute = (index * 17) % 60
         if index == 0:
             channel_code = "CH-ECOM"
         else:
-            roll = sales_rng.randrange(100)
+            roll = rng.randrange(100)
             channel_code = channel_codes["physical"] if roll < 52 else channel_codes["ecommerce"] if roll < 80 else channel_codes["marketplace_a"] if roll < 90 else channel_codes["marketplace_b"]
         channel_type = channels[channel_code].channel_type
         open_stores = sorted((row for row in master.stores if row.opened_on <= day), key=lambda row: row.code)
@@ -598,14 +737,51 @@ def generate_transactions(
         if channel_type == "physical" and index % 10 < 3:
             customer_code = None
         else:
-            customer_code = master.customers[sales_rng.randrange(len(master.customers))].code
-        push(_aware(config, day, hour, minute), 10, f"SALE-INTENT-{index + 1:04d}", "sale", {
+            customer_code = master.customers[rng.randrange(len(master.customers))].code
+        return ScheduledEvent(_aware(config, day, hour, minute), 10,
+                              f"SALE-INTENT-{index + 1:04d}", "sale", {
             "index": index, "channel_code": channel_code, "store_code": store_code,
             "customer_code": customer_code,
         })
 
-    while queue:
-        event = queue.pop()
+    def iter_sale_intents_by_day():
+        """Plan and emit one day's sale intents at a time for non-smoke profiles."""
+        current_day = None
+        day_events: list[ScheduledEvent] = []
+        for index in range(order_count):
+            event = create_sale_intent(index, sales_intent_rng)
+            event_day = event.occurred_at.date()
+            if current_day is not None and event_day != current_day:
+                yield from sorted(day_events)
+                day_events.clear()
+            current_day = event_day
+            day_events.append(event)
+        if day_events:
+            yield from sorted(day_events)
+
+    next_sale_intent = None
+    sale_intent_iter = None
+    if config.profile == "smoke":
+        # Preserve the historical smoke random-call order and therefore its exact regression output.
+        for index in range(order_count):
+            event = create_sale_intent(index, sales_rng)
+            push(event.occurred_at, event.priority, event.logical_key, event.event_type, event.payload)
+    else:
+        sale_intent_iter = iter(iter_sale_intents_by_day())
+        next_sale_intent = next(sale_intent_iter, None)
+
+    last_event_day = None
+    core_completion_scheduled = False
+    while queue or next_sale_intent is not None:
+        if next_sale_intent is not None and (not queue or next_sale_intent < queue.peek()):
+            event = next_sale_intent
+            next_sale_intent = next(sale_intent_iter, None)
+        else:
+            event = queue.pop()
+        event_day = event.occurred_at.date()
+        if emitter is not None and last_event_day is not None and event_day != last_event_day:
+            emitter.flush()
+        last_event_day = event_day
         if event.occurred_at > cutoff:
             raise ValueError("Evento ultrapassa o cutoff comercial.")
         result.event_trace.append((event.occurred_at, event.event_type, event.logical_key))
@@ -637,10 +813,69 @@ def generate_transactions(
             cancel_order(event.payload["order_key"], event.occurred_at)
         elif event.event_type == "fulfill":
             fulfill(event.payload["fulfillment_item_key"], event.occurred_at)
+        elif completion_state is not None and completion_state.process_event(event, positions, append_stock_state):
+            pass
         else:
             raise ValueError(f"Tipo de evento não suportado: {event.event_type}")
+        if (completion_state is not None and not core_completion_scheduled
+                and order_counter == config.sales_order_target
+                and not result_by_order
+                and not queue.has_event_type({"purchase_order", "receipt", "sale", "cancel", "fulfill"})):
+            completion_state.on_core_complete(positions)
+            core_completion_scheduled = True
 
     result.stock_positions = positions
     result.stock_state_events.sort(key=lambda row: (row.occurred_at, row.priority, row.key))
     result.event_trace.sort(key=lambda row: (row[0], row[1], row[2]))
+    result.runtime_metrics.update({
+        "transaction_events_pushed": queue.total_pushed,
+        "transaction_events_processed": queue.total_popped,
+        "transaction_events_max_pending": queue.max_pending_events,
+        "total_events_scheduled": queue.total_pushed,
+        "total_events_processed": queue.total_popped,
+        "current_future_events_3c": queue.pending_events,
+        "max_future_events": queue.max_pending_events,
+        "max_active_purchase_orders": max_active_purchase_orders,
+    })
+    if isinstance(result, StreamingCoreResult):
+        if completion_state is not None:
+            completion_state.finish()
+        result.emit_final_positions()
+        result.close()
+        if result_by_order:
+            raise ValueError(f"Pedidos 3C ainda ativos no fim do horizonte: {len(result_by_order)}.")
+        result.runtime_metrics.update({
+            "max_buffered_rows": emitter.max_buffered_rows,
+            "flush_count": emitter.flush_count,
+            "total_rows_emitted": emitter.total_rows_emitted,
+            "max_active_purchase_orders": max_active_purchase_orders,
+            "max_future_events_3c": queue.max_pending_events,
+            "current_active_orders": len(result_by_order),
+            "current_active_purchase_orders": len(po_by_key),
+            "current_future_events_3c": queue.pending_events,
+        })
+    return result
+
+
+def generate_transactions_incremental(
+    config: GeneratorConfig,
+    master: MasterData,
+    sink: TransactionSink,
+    *,
+    batch_size: int | None = None,
+    incremental_completion: bool = False,
+    single_card_index: int | None = None,
+    policy_preflight: bool = False,
+    forced_fallback_ordinals: dict[str, int] | None = None,
+) -> StreamingCoreResult:
+    """Run the shared 3C causal engine without retaining historical transaction rows."""
+    result = generate_transactions(
+        config, master, sink=sink, batch_size=batch_size,
+        incremental_completion=incremental_completion,
+        single_card_index=single_card_index,
+        policy_preflight=policy_preflight,
+        forced_fallback_ordinals=forced_fallback_ordinals,
+    )
+    if not isinstance(result, StreamingCoreResult):
+        raise RuntimeError("O caminho incremental não inicializou o resultado de streaming.")
     return result

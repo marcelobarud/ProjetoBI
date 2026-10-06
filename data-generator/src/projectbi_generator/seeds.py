@@ -11,6 +11,7 @@ DOMAINS = (
     "customers",
     "employees",
     "sales",
+    "sales_intents",
     "procurement",
     "inventory",
     "payments",

@@ -1,9 +1,15 @@
 from copy import deepcopy
 from dataclasses import replace
+from collections import Counter
+from decimal import Decimal
+import hashlib
+import json
 
 import pytest
 
-from projectbi_generator.generators.completion import extend_transactions
+from projectbi_generator.generators.completion import extend_transactions, generate_full_transactions_incremental
+from projectbi_generator.sinks import CollectingSink, CountingDiscardingSink
+from projectbi_generator.sinks import _canonical
 from projectbi_generator.validation.completion import validate_completed_data
 
 
@@ -136,3 +142,105 @@ def test_completion_all_transactional_dates_respect_cutoff(completed_data, confi
         assert row.requested_at.date() <= config.end_date
     for row in completed_data.refunds:
         assert row.requested_at.date() <= config.end_date
+
+
+def test_incremental_full_smoke_matches_legacy_all_21_tables(completed_data, master_data, config):
+    sink = CollectingSink()
+    result = generate_full_transactions_incremental(config, master_data, sink, batch_size=37)
+    fields = (
+        "purchase_orders", "purchase_order_items", "goods_receipts", "goods_receipt_items",
+        "sales_orders", "sales_order_items", "order_status_history", "applied_discounts",
+        "stock_reservations", "fulfillments", "fulfillment_items", "stock_movements",
+        "payments", "payment_installments", "fulfillment_events", "stock_transfers",
+        "stock_transfer_items", "returns", "return_items", "refunds",
+    )
+    for field in fields:
+        assert Counter(map(repr, getattr(completed_data, field))) == Counter(map(repr, sink.rows_by_table[field])), field
+    assert Counter(map(repr, completed_data.stock_positions.values())) == Counter(map(repr, sink.rows_by_table["stock_positions"]))
+    def canonical_digest(rows_by_table):
+        digest = hashlib.sha256()
+        for table in sorted(rows_by_table):
+            digest.update(table.encode("utf-8"))
+            encoded = sorted(json.dumps(_canonical(row), ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode("utf-8") for row in rows_by_table[table])
+            for row in encoded:
+                digest.update(len(row).to_bytes(8, "big"))
+                digest.update(row)
+        return digest.hexdigest()
+    legacy_tables = {field: getattr(completed_data, field) for field in fields}
+    legacy_tables["stock_positions"] = list(completed_data.stock_positions.values())
+    streamed_tables = {name: sink.rows_by_table[name] for name in legacy_tables}
+    assert canonical_digest(legacy_tables) == canonical_digest(streamed_tables)
+    actual = {"orders": 300, "items": 630, "payments": 314, "installments": 587,
+              "fulfillments": 193, "fulfillment_items": 227, "fulfillment_events": 590,
+              "transfers": 2, "returns": 8, "refunds": 6}
+    assert result.counts()["sales_orders"] == actual["orders"]
+    assert result.counts()["sales_order_items"] == actual["items"]
+    assert result.counts()["payments"] == actual["payments"]
+    assert result.counts()["payment_installments"] == actual["installments"]
+    assert result.counts()["fulfillment_events"] == actual["fulfillment_events"]
+    assert result.counts()["stock_transfers"] == actual["transfers"]
+    assert result.counts()["returns"] == actual["returns"]
+    assert result.counts()["refunds"] == actual["refunds"]
+    assert result.aggregates["captured_amount"] == Decimal("2791128.94")
+    assert result.aggregates["refund_amount"] == Decimal("18420.97")
+    assert result.aggregates["net_financial_amount"] == Decimal("2772707.97")
+    assert result.aggregates["ending_stock"] == 222
+    assert result.aggregates["realized_cost"] == Decimal("369830.61051434")
+    assert result.runtime_metrics["current_active_orders"] == 0
+    assert result.runtime_metrics["current_active_payments"] == 0
+    assert result.runtime_metrics["current_active_transfers"] == 0
+    assert result.runtime_metrics["current_return_eligibility"] == 0
+    assert result.runtime_metrics["max_buffered_rows"] <= 37
+
+
+def test_incremental_full_digest_and_bounded_state_ignore_batch_size(master_data, config):
+    results = []
+    for batch_size in (31, 127):
+        sink = CountingDiscardingSink()
+        result = generate_full_transactions_incremental(config, master_data, sink, batch_size=batch_size)
+        results.append((sink.logical_digest, sink.rows_by_table))
+        assert result.runtime_metrics["max_buffered_rows"] <= batch_size
+        assert result.runtime_metrics["current_active_payments"] == 0
+        assert result.runtime_metrics["current_active_transfers"] == 0
+        assert result.runtime_metrics["current_return_eligibility"] == 0
+        assert result.runtime_metrics["max_active_payments"] > 0
+        assert result.runtime_metrics["max_active_transfers"] > 0
+    assert results[0] == results[1]
+
+
+def test_sellable_return_updates_average_before_later_fulfillment(completed_data):
+    events = sorted(completed_data.stock_state_events, key=lambda row: (row.occurred_at, row.priority, row.key))
+    movements = {row.key: row for row in completed_data.stock_movements}
+    for index, returned in enumerate(events):
+        if returned.event_type != "customer_return":
+            continue
+        later = next((row for row in events[index + 1:]
+                      if row.event_type == "fulfillment"
+                      and (row.product_sku, row.location_code) == (returned.product_sku, returned.location_code)), None)
+        if later is None:
+            continue
+        movement = movements[later.movement_key]
+        assert later.occurred_at > returned.occurred_at
+        assert movement.unit_cost == returned.unit_cost
+        return
+    pytest.fail("Smoke não exercitou fulfillment posterior a retorno vendável no mesmo produto/local.")
+
+
+def test_distant_return_and_refund_keep_only_bounded_active_state(master_data, config):
+    sink = CollectingSink()
+    result = generate_full_transactions_incremental(config, master_data, sink, batch_size=37)
+    refund = sink.rows_by_table["refunds"][0]
+    return_row = next(row for row in sink.rows_by_table["returns"] if row.key == refund.return_key)
+    return_item = next(row for row in sink.rows_by_table["return_items"] if row.return_key == return_row.key)
+    source = next(row for row in sink.rows_by_table["fulfillment_items"] if row.key == return_item.source_fulfillment_item_key)
+    fulfillment = next(row for row in sink.rows_by_table["fulfillments"] if row.key == source.fulfillment_key)
+    assert (return_row.requested_at - fulfillment.completed_at).days >= 5
+    assert (refund.requested_at - return_row.requested_at).days >= 4
+    assert result.runtime_metrics["current_active_orders"] == 0
+    assert result.runtime_metrics["current_active_payments"] == 0
+    assert result.runtime_metrics["current_active_transfers"] == 0
+    assert result.runtime_metrics["current_return_eligibility"] == 0
+    assert not result.sales_orders.pending
+    assert not result.fulfillment_items.pending
+    assert not result.stock_transfers.pending
+    assert not result.returns.pending

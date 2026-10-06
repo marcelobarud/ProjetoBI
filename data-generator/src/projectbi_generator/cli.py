@@ -11,7 +11,7 @@ import psycopg
 
 from projectbi_generator import __version__
 from projectbi_generator.config import load_config
-from projectbi_generator.database import connection_settings, run_rollback_full_smoke, run_rollback_smoke, run_rollback_transaction_smoke
+from projectbi_generator.database import connection_settings, run_rollback_smoke, run_rollback_incremental_full_smoke
 from projectbi_generator.generators.completion import extend_transactions
 from projectbi_generator.generators.master import generate_master_data
 from projectbi_generator.generators.transactions import generate_transactions
@@ -37,11 +37,37 @@ def _parser() -> argparse.ArgumentParser:
     transaction_mode.add_argument("--dry-run", action="store_true")
     transaction_mode.add_argument("--load-smoke", action="store_true", help="Executa a integração completa e sempre termina em ROLLBACK")
     full = commands.add_parser("full", help="Gera, valida e exercita todos os domínios operacionais smoke")
-    full.add_argument("--profile", choices=("smoke",), default="smoke")
+    full.add_argument("--profile", choices=("smoke", "portfolio", "large"), default=None)
     full_mode = full.add_mutually_exclusive_group(required=True)
     full_mode.add_argument("--dry-run", action="store_true")
     full_mode.add_argument("--load-smoke", action="store_true", help="Carrega os domínios aplicáveis em uma transação que termina em ROLLBACK")
+    full_mode.add_argument("--plan", action="store_true", help="Valida configuração/volumes sem gerar dados nem conectar")
     return parser
+
+
+def _build_plan(config) -> dict:
+    master_rows = sum(config.volumes.values())
+    return {
+        "profile": config.profile,
+        "generator_version": config.generator_version,
+        "config_version": config.schema_version,
+        "root_seed": config.root_seed,
+        "period": {
+            "bootstrap_start": config.bootstrap_start_date.isoformat(),
+            "bootstrap_end": config.bootstrap_end_date.isoformat(),
+            "commercial_start": config.start_date.isoformat(),
+            "commercial_end": config.end_date.isoformat(),
+        },
+        "master_rows_target": master_rows,
+        "master_volumes": config.volumes,
+        "sales_orders_target": config.sales_order_target,
+        "sales_order_items_estimate": config.generation.get("estimated_order_items"),
+        "estimated_transaction_rows": config.generation.get("estimated_transaction_rows"),
+        "batch_size": config.batch_size,
+        "database_connected": False,
+        "generated": False,
+        "persistent_write": False,
+    }
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -49,6 +75,20 @@ def main(argv: list[str] | None = None) -> int:
     try:
         config = load_config(args.profile)
         if args.command == "full":
+            if args.plan:
+                print(json.dumps(_build_plan(config), ensure_ascii=False, sort_keys=True))
+                return 0
+            if config.profile != "smoke":
+                raise ValueError("Geração e integração ainda estão limitadas a smoke; portfolio/large podem usar --plan.")
+            if args.load_smoke:
+                result = run_rollback_incremental_full_smoke(connection_settings(PROJECT_ROOT), config)
+                print(json.dumps({"database": "projeto_bi", "server_version": result["server_version"],
+                                  "transaction": "ROLLBACK", "remaining_rows_all_40_tables": sum(result["remaining"].values()),
+                                  "master_id_maps": result["master_id_maps"], "id_metrics": result["id_metrics"],
+                                  "sink_metrics": result["sink_metrics"], "counts": result["counts"],
+                                  "aggregates": result["aggregates"], "validated_table_counts": result["sql_counts"]},
+                                 ensure_ascii=False, sort_keys=True, default=str))
+                return 0
             master = generate_master_data(config)
             validate_master_data(master, config)
             data = generate_transactions(config, master)
@@ -58,7 +98,7 @@ def main(argv: list[str] | None = None) -> int:
             if args.dry_run:
                 summary = data.summary()
                 result = {
-                    "profile": "smoke", "root_seed": config.root_seed, "database_connected": False,
+                    "profile": config.profile, "root_seed": config.root_seed, "database_connected": False,
                     "orders": summary["sales_orders"], "payments": summary["payments"],
                     "declined_attempts": summary["declined_attempts"], "retries": summary["payment_retries"],
                     "split_payment_orders": summary["split_payment_orders"],
@@ -71,14 +111,16 @@ def main(argv: list[str] | None = None) -> int:
                 }
                 print(json.dumps(result, ensure_ascii=False, sort_keys=True, default=str))
                 return 0
-            result = run_rollback_full_smoke(connection_settings(PROJECT_ROOT), config)
-            print(json.dumps({"database": "projeto_bi", "server_version": result["server_version"],
-                              "transaction": "ROLLBACK", "remaining_rows_all_40_tables": sum(result["remaining"].values()),
-                              "master_id_maps": result["master_id_maps"], "transaction_id_maps": result["transaction_id_maps"],
-                              "summary": result["summary"], "validated_table_counts": result["sql_counts"]},
-                             ensure_ascii=False, sort_keys=True, default=str))
-            return 0
         if args.command == "transactions":
+            if args.load_smoke:
+                result = run_rollback_incremental_full_smoke(connection_settings(PROJECT_ROOT), config, include_completion=False)
+                print(json.dumps({"database": "projeto_bi", "server_version": result["server_version"],
+                                  "transaction": "ROLLBACK", "remaining_rows_all_40_tables": sum(result["remaining"].values()),
+                                  "master_id_maps": result["master_id_maps"], "id_metrics": result["id_metrics"],
+                                  "sink_metrics": result["sink_metrics"], "counts": result["counts"],
+                                  "aggregates": result["aggregates"], "validated_table_counts": result["sql_counts"]},
+                                 ensure_ascii=False, sort_keys=True, default=str))
+                return 0
             master = generate_master_data(config)
             validate_master_data(master, config)
             data = generate_transactions(config, master)
@@ -88,16 +130,9 @@ def main(argv: list[str] | None = None) -> int:
                                   "database_connected": False, **data.summary()}, ensure_ascii=False,
                                  sort_keys=True, default=str))
                 return 0
-            result = run_rollback_transaction_smoke(connection_settings(PROJECT_ROOT), config)
-            print(json.dumps({"database": "projeto_bi", "server_version": result["server_version"],
-                              "transaction": "ROLLBACK", "remaining_rows_all_40_tables": sum(result["remaining"].values()),
-                              "master_id_maps": result["id_map_tables"], "transaction_id_maps": result["transaction_id_maps"],
-                              "summary": result["summary"], "validated_table_counts": result["sql_counts"]},
-                             ensure_ascii=False, sort_keys=True, default=str))
-            return 0
 
-        if config.profile != "smoke":
-            raise ValueError("Nesta fase, somente o profile smoke pode ser gerado ou carregado.")
+        if args.load_smoke and config.profile != "smoke":
+            raise ValueError("--load-smoke aceita somente profile smoke; profiles maiores não são persistidos nesta fase.")
         data = generate_master_data(config)
         validate_master_data(data, config)
         if args.dry_run:

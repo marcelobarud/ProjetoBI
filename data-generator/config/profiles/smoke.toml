@@ -48,7 +48,14 @@ district = "Centro"
 opened_on = "2023-03-01"
 
 [generation]
+sales_orders = 300
+estimated_order_items = 630
+batch_size = 1000
 extra_contacts = 4
 extra_addresses = 4
 secondary_supplier_products = 6
 price_periods_per_product_channel = 1
+stock_transfers = 2
+minimum_returns = 8
+maximum_returns = 12
+split_payment_rate_percent = 0
