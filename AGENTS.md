@@ -28,9 +28,24 @@
 - Mantenha a documentação sincronizada com mudanças arquiteturais relevantes.
 - Não gere dados, não modele o negócio e não avance etapas sem que o usuário solicite ou aprove o escopo correspondente.
 
+## Fontes de verdade
+
+- Regras e decisões de negócio aprovadas definem o comportamento esperado; modelos, contratos e documentos arquiteturais aprovados definem a estrutura autorizada.
+- Código e testes demonstram o comportamento implementado. Documentação histórica fornece contexto e deve ser revalidada.
+- Ao encontrar divergências relevantes entre essas fontes, investigue e comunique evidências e incertezas; não escolha uma versão por suposição.
+
+## Delegação, revisão e encerramento
+
+- O agente principal permanece responsável pelo resultado. Delegue somente quando houver benefício concreto em investigação independente, revisão crítica ou análise arquitetural; tarefas pequenas não exigem subagentes.
+- Considere primeiro o planner para diagnóstico incerto e o reviewer para revisão independente de mudanças com risco. Use architect somente para decisões estruturais reais e implementer para escopos compreendidos e delimitados. Não imponha uma sequência fixa nem paralelismo desnecessário.
+- Priorize revisão de persistência, estoque, pedidos, pagamentos, migrations, integridade e cálculos monetários. Registre achados concretos com arquivo, evidência, impacto e recomendação.
+- Valide proporcionalmente ao escopo. Mudanças apenas documentais ou de configuração não exigem a suíte completa; nunca declare uma verificação que não foi executada.
+- Ao concluir, resuma mudanças, verificações, limitações e commit quando autorizado. Todos os subagentes seguem este arquivo; poder editar arquivos não autoriza acesso ou alteração ao banco de dados.
+
 ## Git e credenciais
 
 - Use commits locais pequenos e mensagens no padrão Conventional Commits.
 - Não configure um remoto nem faça push automaticamente. Só publique alterações quando o usuário solicitar explicitamente.
 - Nunca versionar senhas, tokens, chaves, arquivos `.env` reais, connection strings com credenciais ou outros segredos. Use `.env.example` apenas com nomes de variáveis e valores vazios ou fictícios explicitamente seguros.
 - Antes de commitar, confira o conteúdo staged e o `git status` para garantir que não há credenciais ou arquivos locais indevidos.
+- Crie commits somente quando o usuário ou a fase correspondente os autorizar explicitamente. Não faça merge, rebase ou push sem solicitação explícita.
