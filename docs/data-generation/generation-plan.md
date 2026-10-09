@@ -1,5 +1,7 @@
 # Plano de geração de dados sintéticos — Fase 3A
 
+> **Registro histórico da Fase 3A.** Os estados de fase e o número de tabelas citados no texto abaixo descrevem o planejamento daquela época; não representam a execução atual. O schema vigente, após migrations 001–003, tem 9 schemas e 41 tabelas. Consulte o [plano mestre de conclusão](../PROJECT_COMPLETION_PLAN.md) e os relatórios de validação mais recentes para o estado corrente.
+
 ## Estado e objetivo
 
 Este documento registra as decisões de planejamento da Fase 3A para a empresa fictícia brasileira de informática e eletrônicos. A fundação e o subconjunto de dados mestres smoke foram implementados na Fase 3B; consulte [implementation.md](implementation.md) e [validation-report.md](validation-report.md). Nenhum dado sintético ficou persistido e o schema não foi alterado na Fase 3B. As seções abaixo continuam sendo especificação para as fases transacionais futuras; dados devem ser plausíveis, relacionais, reproduzíveis e temporalmente coerentes, sem erros fabricados para testar limpeza.
