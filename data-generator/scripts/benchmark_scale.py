@@ -42,7 +42,10 @@ def main() -> int:
         gc.collect()
         baseline, _ = tracemalloc.get_traced_memory()
         tracemalloc.reset_peak()
-        current_config = replace(config, generation={**config.generation, "sales_orders": orders})
+        current_config = replace(
+            config, generation={**config.generation, "sales_orders": orders},
+            order_plan={"mode": "intentions"},
+        )
         sink = CountingDiscardingSink()
         transaction_started = time.perf_counter()
         result = generate_transactions_incremental(current_config, master, sink, batch_size=batch_size)

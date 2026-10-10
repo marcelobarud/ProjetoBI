@@ -5,19 +5,22 @@ $root = Split-Path -Parent $PSScriptRoot
 $dictionaryPath = Join-Path $root 'docs/database/data-dictionary.md'
 $migrationPath = Join-Path $root 'database/migrations/001_initial_schema.sql'
 $incrementalMigrationPath = Join-Path $root 'database/migrations/002_add_store_address.sql'
+$partialCancellationMigrationPath = Join-Path $root 'database/migrations/003_partial_item_cancellations.sql'
 $dictionaryText = Get-Content -Raw $dictionaryPath
 $migrationText = Get-Content -Raw $migrationPath
 $incrementalMigrationText = Get-Content -Raw $incrementalMigrationPath
+$partialCancellationMigrationText = Get-Content -Raw $partialCancellationMigrationPath
 $allMigrationText = $migrationText + "`n" + $incrementalMigrationText
 $expected = @([regex]::Matches($dictionaryText, '(?m)^### ([a-z_]+\.[a-z_]+)$') | ForEach-Object { $_.Groups[1].Value } | Sort-Object -Unique)
-$actual = @([regex]::Matches($migrationText, '(?m)^CREATE TABLE ([a-z_]+\.[a-z_]+)') | ForEach-Object { $_.Groups[1].Value } | Sort-Object -Unique)
+$actual = @((@([regex]::Matches($migrationText, '(?m)^CREATE TABLE ([a-z_]+\.[a-z_]+)') | ForEach-Object { $_.Groups[1].Value }) +
+    @([regex]::Matches($partialCancellationMigrationText, '(?m)^CREATE TABLE ([a-z_]+\.[a-z_]+)') | ForEach-Object { $_.Groups[1].Value })) | Sort-Object -Unique)
 $expectedSchemas = @('after_sales', 'catalog', 'core', 'crm', 'inventory', 'logistics', 'payments', 'procurement', 'sales') | Sort-Object
 $actualSchemas = @([regex]::Matches($migrationText, '(?m)^CREATE SCHEMA ([a-z_]+);\r?$') | ForEach-Object { $_.Groups[1].Value } | Sort-Object -Unique)
 $missing = @($expected | Where-Object { $_ -notin $actual })
 $unexpected = @($actual | Where-Object { $_ -notin $expected })
 $missingSchemas = @($expectedSchemas | Where-Object { $_ -notin $actualSchemas })
 $unexpectedSchemas = @($actualSchemas | Where-Object { $_ -notin $expectedSchemas })
-if ($expected.Count -ne 40 -or $actual.Count -ne 40 -or $missing.Count -gt 0 -or $unexpected.Count -gt 0) {
+if ($expected.Count -ne 41 -or $actual.Count -ne 41 -or $missing.Count -gt 0 -or $unexpected.Count -gt 0) {
     throw "Tabelas divergentes: dicionário=$($expected.Count), migration=$($actual.Count), ausentes=[$($missing -join ', ')], inesperadas=[$($unexpected -join ', ')]"
 }
 if ($missingSchemas.Count -gt 0 -or $unexpectedSchemas.Count -gt 0) { throw "Schemas divergentes. Ausentes=[$($missingSchemas -join ', ')], inesperados=[$($unexpectedSchemas -join ', ')]" }
@@ -29,8 +32,19 @@ foreach ($section in $sections) {
     $tableName = $section.Groups[1].Value
     $dictionaryColumns[$tableName] = @([regex]::Matches($section.Groups[2].Value, '(?m)^\| ([a-z_]+) \|') | ForEach-Object { $_.Groups[1].Value })
     $tableMatch = [regex]::Match($migrationText, "(?ms)^CREATE TABLE $([regex]::Escape($tableName)) \(\r?\n(.*?)^\);")
+    if (-not $tableMatch.Success) {
+        $tableMatch = [regex]::Match($partialCancellationMigrationText, "(?ms)^CREATE TABLE $([regex]::Escape($tableName)) \(\r?\n(.*?)^\);")
+    }
     if (-not $tableMatch.Success) { continue }
     $tableDefinitions = $tableMatch.Groups[1].Value
+    if ($tableName -in @('sales.sales_order_items','payments.refunds')) {
+        $targetTable = [regex]::Escape($tableName)
+        $additiveColumns = [regex]::Match($partialCancellationMigrationText, "(?ms)^ALTER TABLE $targetTable\s+(.*?);")
+        if (-not $additiveColumns.Success) { throw "Migration 003 não altera as colunas esperadas de $tableName." }
+        foreach ($definition in [regex]::Matches($additiveColumns.Groups[1].Value, '(?m)^\s*ADD COLUMN ([a-z_]+\s+[^,;\r\n]+)')) {
+            $tableDefinitions += "`n    " + $definition.Groups[1].Value.Trim()
+        }
+    }
     if ($tableName -eq 'core.stores') {
         $storeAddressColumns = [regex]::Match($incrementalMigrationText, '(?ms)^ALTER TABLE core\.stores\s+ADD COLUMN (.*?);')
         if (-not $storeAddressColumns.Success) { throw 'Migration 002 não contém as colunas incrementais esperadas de core.stores.' }
@@ -45,6 +59,7 @@ foreach ($section in $sections) {
         if (-not $line) { $columnMismatches.Add("$tableName.$columnName ausente"); continue }
         $definition = $line.Trim().TrimEnd(',')
         $definition = $definition.Substring($columnName.Length).Trim()
+        $definition = $definition -replace '\s+DEFAULT\s+0$', ''
         $actualNotNull = $definition.EndsWith(' NOT NULL')
         if ($actualNotNull) { $definition = $definition.Substring(0, $definition.Length - ' NOT NULL'.Length).TrimEnd() }
         if ($definition -cne $expectedType -or $actualNotNull -ne $expectedNotNull) {
@@ -95,4 +110,18 @@ foreach ($pattern in $expectedDdlCounts.Keys) {
 }
 if (-not $migrationText.TrimEnd().EndsWith('COMMIT;') -or -not $migrationText.StartsWith('-- ProjetoBI') -or $migrationText -notmatch '(?m)^BEGIN;\r?$') { throw 'Migration deve estar envolvida por BEGIN/COMMIT e ser identificada como migration do projeto.' }
 if (-not $incrementalMigrationText.TrimEnd().EndsWith('COMMIT;') -or $incrementalMigrationText -notmatch '(?m)^BEGIN;\r?$') { throw 'Migration 002 deve estar envolvida por BEGIN/COMMIT.' }
-Write-Output "Definição estática conferida: $($actualSchemas.Count) schemas, $($actual.Count) tabelas, colunas/tipos/nulabilidades e 70 FKs com destinos únicos compatíveis nas migrations 001/002."
+if (-not $partialCancellationMigrationText.TrimEnd().EndsWith('COMMIT;') -or $partialCancellationMigrationText -notmatch '(?m)^BEGIN;\r?$') { throw 'Migration 003 deve estar envolvida por BEGIN/COMMIT.' }
+if ($partialCancellationMigrationText -match '(?im)^\s*(DROP|TRUNCATE|DELETE\s+FROM|CREATE\s+(DATABASE|SCHEMA)|CREATE\s+EXTENSION)\b') { throw 'Migration 003 contém operação destrutiva ou objeto fora do escopo.' }
+if ($partialCancellationMigrationText -notmatch '(?m)^CREATE TABLE sales\.sales_order_item_cancellations\s*\(' -or
+    $partialCancellationMigrationText -notmatch 'ADD COLUMN fulfilled_quantity BIGINT NOT NULL DEFAULT 0' -or
+    $partialCancellationMigrationText -notmatch 'ADD COLUMN cancelled_quantity BIGINT NOT NULL DEFAULT 0' -or
+    $partialCancellationMigrationText -notmatch 'ADD COLUMN sales_order_item_cancellation_id BIGINT' -or
+    $partialCancellationMigrationText -notmatch 'ck_sales_order_items_resolution_cap' -or
+    $partialCancellationMigrationText -notmatch 'fk_refunds_item_cancellation' -or
+    $partialCancellationMigrationText -notmatch 'trg_item_cancellations_sync_item_quantity') {
+    throw 'Migration 003 não contém a estrutura/guard de quantidades e rastreabilidade esperados.'
+}
+$partialCheckCount = [regex]::Matches($partialCancellationMigrationText, '(?m)^\s+CONSTRAINT ck_').Count + [regex]::Matches($partialCancellationMigrationText, '(?m)^\s+ADD CONSTRAINT ck_').Count + [regex]::Matches($partialCancellationMigrationText, '(?m)^ALTER TABLE .* ADD CONSTRAINT ck_').Count
+$partialIndexCount = [regex]::Matches($partialCancellationMigrationText, '(?m)^CREATE (?:UNIQUE )?INDEX ').Count
+if ($partialCheckCount -ne 8 -or $partialIndexCount -ne 3) { throw "Contagens DDL divergentes em 003: CHECKs novos/recriados=$partialCheckCount, índices=$partialIndexCount." }
+Write-Output "Definição estática conferida: $($actualSchemas.Count) schemas, $($actual.Count) tabelas nas migrations 001/002/003, colunas/tipos/nulabilidades e 70 FKs nas migrations 001/002; guard de cancelamento parcial da migration 003 conferido."

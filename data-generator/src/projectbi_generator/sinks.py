@@ -40,6 +40,8 @@ def _canonical(value: Any) -> Any:
         return {
             name: _canonical(getattr(value, name))
             for name in value.__dataclass_fields__
+            if not (value.__class__.__name__ == "Refund" and name == "cancellation_key"
+                    and getattr(value, name) is None)
         }
     if isinstance(value, dict):
         return {str(key): _canonical(value[key]) for key in sorted(value, key=str)}

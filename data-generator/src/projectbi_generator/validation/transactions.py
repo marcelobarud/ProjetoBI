@@ -5,13 +5,15 @@ from __future__ import annotations
 from collections import defaultdict
 from collections.abc import Iterable
 from itertools import pairwise
-from datetime import datetime
+from datetime import datetime, timedelta
 from decimal import Decimal
 
 from projectbi_generator.config import GeneratorConfig
+from projectbi_generator.cancellations import discount_slice
 from projectbi_generator.generators.transactions import weighted_moving_average
 from projectbi_generator.models.entities import MasterData
 from projectbi_generator.models.transactions import StockPosition, TransactionData
+from projectbi_generator.validation.order_history import validate_order_history
 
 
 def _unique(label: str, values: Iterable[str]) -> None:
@@ -53,6 +55,7 @@ def validate_transactional_data(data: TransactionData, master: MasterData, confi
     _unique("sales orders", (row.key for row in data.sales_orders))
     _unique("order numbers", (row.number for row in data.sales_orders))
     _unique("sales items", (row.key for row in data.sales_order_items))
+    _unique("sales item cancellations", (row.key for row in data.sales_order_item_cancellations))
     _unique("reservations", (row.key for row in data.stock_reservations))
     _unique("fulfillments", (row.key for row in data.fulfillments))
     _unique("fulfillment items", (row.key for row in data.fulfillment_items))
@@ -155,6 +158,25 @@ def validate_transactional_data(data: TransactionData, master: MasterData, confi
         discounts_by_order[order.key] += discount.amount
         discounts_by_item[item.key] += discount.amount
 
+    cancellations_by_item: dict[str, list] = defaultdict(list)
+    for cancellation in data.sales_order_item_cancellations:
+        order = orders.get(cancellation.order_key)
+        item = items.get(cancellation.item_key)
+        amounts = (cancellation.gross_cancelled_amount, cancellation.discount_cancelled_amount,
+                   cancellation.net_cancelled_amount, cancellation.shipping_cancelled_amount)
+        if (order is None or item is None or item.order_key != order.key
+                or cancellation.cancellation_reason != "stock_timeout"
+                or cancellation.cancelled_at.tzinfo is None
+                or cancellation.cancelled_at < order.placed_at + timedelta(days=config.generation["max_stock_wait_days"])
+                or cancellation.cancelled_at > cutoff
+                or cancellation.cancelled_quantity <= 0
+                or any(not isinstance(value, Decimal) or value < 0 for value in amounts)
+                or cancellation.net_cancelled_amount != cancellation.gross_cancelled_amount - cancellation.discount_cancelled_amount):
+            raise ValueError("Cancelamento de item contém referência, motivo, tempo, quantidade ou valores inválidos.")
+        if cancellation.gross_cancelled_amount != item.unit_sale_price * cancellation.cancelled_quantity:
+            raise ValueError("Valor bruto cancelado diverge do preço e quantidade originais.")
+        cancellations_by_item[item.key].append(cancellation)
+
     gross_by_item: dict[str, Decimal] = {}
     for order in data.sales_orders:
         channel = channels.get(order.channel_code)
@@ -198,11 +220,7 @@ def validate_transactional_data(data: TransactionData, master: MasterData, confi
             raise ValueError("Subtotal ou alocações de desconto não reconciliam com o cabeçalho.")
         if order.total != order.subtotal - order.discount + order.shipping or order.total < 0:
             raise ValueError("Total do pedido incorreto ou negativo.")
-        events = sorted(history_by_order[order.key], key=lambda row: (row.occurred_at, row.status))
-        if not events or events[-1].status != order.status:
-            raise ValueError("Status final do pedido diverge do histórico.")
-        if [event.occurred_at for event in events] != sorted(event.occurred_at for event in events):
-            raise ValueError("Histórico de status fora de ordem cronológica.")
+        validate_order_history(history_by_order[order.key], order.placed_at, order.status)
 
     fulfillments_by_order: dict[str, list] = defaultdict(list)
     fulfilled_by_item: dict[str, int] = defaultdict(int)
@@ -271,8 +289,39 @@ def validate_transactional_data(data: TransactionData, master: MasterData, confi
         if item.fulfilled_quantity != item.quantity_allocated:
             if order.status == "completed":
                 raise ValueError("Pedido completed contém linha parcialmente atendida.")
-    if any(fulfilled_by_item[key] > item.quantity for key, item in items.items()):
-        raise ValueError("Fulfillment acumulado supera a quantidade vendida.")
+    cancelled_by_item: dict[str, int] = defaultdict(int)
+    cancelled_by_order: dict[str, int] = defaultdict(int)
+    cancellation_shipping_by_order: dict[str, Decimal] = defaultdict(lambda: Decimal("0.00"))
+    for item_key, rows in cancellations_by_item.items():
+        item = items[item_key]
+        order = orders[item.order_key]
+        offset = fulfilled_by_item[item_key]
+        original_discount = discounts_by_item[item_key]
+        for cancellation in sorted(rows, key=lambda row: (row.cancelled_at, row.key)):
+            expected_discount = discount_slice(original_discount, item.quantity, offset, cancellation.cancelled_quantity)
+            if cancellation.discount_cancelled_amount != expected_discount:
+                raise ValueError("Desconto cancelado diverge do rateio determinístico por unidade.")
+            offset += cancellation.cancelled_quantity
+            cancelled_by_item[item_key] += cancellation.cancelled_quantity
+            cancelled_by_order[order.key] += cancellation.cancelled_quantity
+            cancellation_shipping_by_order[order.key] += cancellation.shipping_cancelled_amount
+    for item_key, item in items.items():
+        fulfilled = fulfilled_by_item[item_key]
+        cancelled = cancelled_by_item[item_key]
+        if fulfilled + cancelled > item.quantity:
+            raise ValueError("Fulfillment e cancelamento acumulados excedem quantidade original.")
+        if orders[item.order_key].status == "completed" and fulfilled + cancelled != item.quantity:
+            raise ValueError("Pedido completed mantém quantidade pendente em item.")
+        if orders[item.order_key].status == "cancelled" and cancelled and (fulfilled or cancelled != item.quantity):
+            raise ValueError("Pedido integralmente cancelado tem fulfillment ou saldo não cancelado.")
+    for order_key, amount in cancellation_shipping_by_order.items():
+        order = orders[order_key]
+        fulfilled = sum(fulfilled_by_item[row.key] for row in items_by_order[order_key])
+        cancelled = cancelled_by_order[order_key]
+        ordered = sum(row.quantity for row in items_by_order[order_key])
+        expected_shipping = order.shipping if not fulfilled and cancelled == ordered and order.status == "cancelled" else Decimal("0.00")
+        if amount != expected_shipping:
+            raise ValueError("Estorno de frete diverge da regra de cancelamento integral/entrega parcial.")
     if any(allocated_by_item[key] > item.quantity for key, item in items.items()):
         raise ValueError("Quantidade alocada em fulfillments supera o item vendido.")
     if not any(count > 1 for count in (len(rows) for rows in fulfillments_by_order.values())):
@@ -297,7 +346,13 @@ def validate_transactional_data(data: TransactionData, master: MasterData, confi
             position.on_hand_quantity += event.quantity
         elif event.event_type == "reserve":
             if position.available_quantity < event.quantity:
-                raise ValueError("Reserva maior que o disponível no instante do evento.")
+                raise ValueError(
+                    "Reserva maior que o disponível no instante do evento: "
+                    f"state={event.key}, sku={event.product_sku}, location={event.location_code}, "
+                    f"at={event.occurred_at.isoformat()}, quantity={event.quantity}, "
+                    f"available={position.available_quantity}, on_hand={position.on_hand_quantity}, "
+                    f"reserved={position.reserved_quantity}."
+                )
             position.reserved_quantity += event.quantity
         elif event.event_type == "release":
             if position.reserved_quantity < event.quantity:
@@ -337,12 +392,18 @@ def validate_transactional_data(data: TransactionData, master: MasterData, confi
 
     for key, position in data.stock_positions.items():
         calculated = replay.get(key)
-        if calculated is None or (position.on_hand_quantity, position.reserved_quantity, position.average_unit_cost) != (
+        if calculated is None:
+            if (position.on_hand_quantity, position.reserved_quantity, position.average_unit_cost) != (
+                0, 0, Decimal("0.00000000")
+            ):
+                raise ValueError("stock_positions sem movimento/evento deve permanecer vazia.")
+            continue
+        if (position.on_hand_quantity, position.reserved_quantity, position.average_unit_cost) != (
             calculated.on_hand_quantity, calculated.reserved_quantity, calculated.average_unit_cost
         ):
             raise ValueError("stock_positions diverge do replay do ledger.")
-    if set(replay) != set(data.stock_positions):
-        raise ValueError("Posição de estoque não possui movimentos/eventos de origem.")
+    if not set(replay).issubset(data.stock_positions):
+        raise ValueError("Evento de estoque não possui posição final correspondente.")
     physical_by_position: dict[tuple[str, str], int] = defaultdict(int)
     for movement in data.stock_movements:
         key = (movement.product_sku, movement.location_code)

@@ -8,6 +8,7 @@ from decimal import Decimal
 from typing import Callable
 
 from projectbi_generator.config import GeneratorConfig
+from projectbi_generator.cancellations import allocate_refund
 from projectbi_generator.generators.completion import _money, _stamp
 from projectbi_generator.generators.master import FAMILIES
 from projectbi_generator.generators.transactions import ScheduledEvent, weighted_moving_average
@@ -27,8 +28,9 @@ COST_SCALE = Decimal("0.00000001")
 class _PaymentState:
     pending_attempts: int
     pending_fulfillment_items: int
+    pending_stock_items: int = 0
     open_returns: int = 0
-    captured: list[tuple[str, Decimal, Decimal]] = field(default_factory=list)
+    captured: list[tuple[str, Decimal, Decimal, datetime]] = field(default_factory=list)
 
 
 @dataclass
@@ -134,11 +136,17 @@ class IncrementalCompletionState:
         method_by_type = self.methods
 
         def choose() -> str:
-            if order.channel_type == "physical" and rng.randrange(100) < 15:
+            cash_rate = self.config.generation.get("physical_cash_rate_percent", 15)
+            if order.channel_type == "physical" and rng.randrange(100) < cash_rate:
                 return method_by_type["cash"]
-            if order.customer_code and self.customer_types[order.customer_code] == "business" and rng.randrange(100) < 8:
+            bank_transfer_rate = self.config.generation.get("business_bank_transfer_rate_percent", 8)
+            if order.customer_code and self.customer_types[order.customer_code] == "business" and rng.randrange(100) < bank_transfer_rate:
                 return method_by_type["bank_transfer"]
-            return method_by_type["instant"] if rng.randrange(100) < (42 if order.channel_type != "physical" else 28) else method_by_type["card"]
+            instant_rate = self.config.generation.get(
+                "physical_instant_rate_percent" if order.channel_type == "physical" else "digital_instant_rate_percent",
+                28 if order.channel_type == "physical" else 42,
+            )
+            return method_by_type["instant"] if rng.randrange(100) < instant_rate else method_by_type["card"]
 
         attempted = order.placed_at + timedelta(minutes=8 + index % 13)
         if cancelled:
@@ -191,7 +199,8 @@ class IncrementalCompletionState:
             "_event_at": attempted + timedelta(minutes=7),
         }]
 
-    def on_sale(self, order: SaleOrder, index: int, cancelled: bool, pending_fulfillment_items: int) -> None:
+    def on_sale(self, order: SaleOrder, index: int, cancelled: bool, pending_fulfillment_items: int,
+                *, pending_stock_items: int = 0) -> None:
         split_indices = {42, 151, 263} if self.config.profile == "smoke" else set()
         has_retry = index % 41 == 7 or index % 97 == 43
         if not cancelled and index not in split_indices and not has_retry:
@@ -199,7 +208,7 @@ class IncrementalCompletionState:
             if self.policy_single_card is None or candidate < self.policy_single_card:
                 self.policy_single_card = candidate
         attempts = self._payment_attempts(order, index, cancelled)
-        self.active_payments[order.key] = _PaymentState(len(attempts), pending_fulfillment_items)
+        self.active_payments[order.key] = _PaymentState(len(attempts), pending_fulfillment_items, pending_stock_items)
         self._update_active(order.key, "current_active_payments", "max_active_payments", len(self.active_payments))
         split = len(attempts) == 2 and "SPLIT" in attempts[0]["reference"]
         if split:
@@ -271,14 +280,14 @@ class IncrementalCompletionState:
             raise ValueError("Contador de fulfillments ativos ficou negativo.")
         latest_request = _stamp(self.config, self.config.end_date, 23) - timedelta(days=35)
         if fulfillment_item.fulfilled_quantity > 0 and at + timedelta(days=4) <= latest_request:
-            probability = Decimal("0.045")
+            probability = Decimal(str(self.config.generation.get("return_base_probability_percent", 4.5))) / Decimal(100)
             if order.channel_type != "physical":
-                probability += Decimal("0.020")
+                probability += Decimal(str(self.config.generation.get("return_digital_additive_percent", 2.0))) / Decimal(100)
             if order.customer_code and self.customer_types[order.customer_code] == "business":
-                probability -= Decimal("0.015")
+                probability -= Decimal(str(self.config.generation.get("return_business_reduction_percent", 1.5))) / Decimal(100)
             family = FAMILIES[self.products[sale_item.product_sku].category_code][1]
             if family in {"ACCESSORIES", "PRINTING"}:
-                probability += Decimal("0.015")
+                probability += Decimal(str(self.config.generation.get("return_category_additive_percent", 1.5))) / Decimal(100)
             random_selected = self.return_rng.random() < probability
             forced_ordinal = self.forced_fallback_ordinals.get(fulfillment_item.key)
             if random_selected:
@@ -330,15 +339,89 @@ class IncrementalCompletionState:
 
     def _maybe_evict_payment_state(self, order_key: str) -> None:
         state = self.active_payments.get(order_key)
-        if state and not state.pending_attempts and not state.pending_fulfillment_items and not state.open_returns:
+        if state and not state.pending_attempts and not state.pending_fulfillment_items and not state.pending_stock_items and not state.open_returns:
             self.active_payments.pop(order_key, None)
             self.result.release_transaction_id("sales_orders", order_key)
             self.metrics["current_active_payments"] = len(self.active_payments)
+
+    def on_backorder_resolved(self, order_key: str) -> None:
+        state = self.active_payments.get(order_key)
+        if state is None or state.pending_stock_items <= 0:
+            raise ValueError("Estado de pagamento/backorder ausente ou inconsistente.")
+        state.pending_stock_items -= 1
+        self._maybe_evict_payment_state(order_key)
+
+    def on_backorder_fulfillment_scheduled(self, order_key: str) -> None:
+        state = self.active_payments.get(order_key)
+        if state is None:
+            raise ValueError("Estado de pagamento ausente ao programar fulfillment de backorder.")
+        state.pending_fulfillment_items += 1
+
+    def on_stock_wait_closed_at_cutoff(self, order_key: str) -> None:
+        state = self.active_payments.get(order_key)
+        if state is None or state.pending_stock_items <= 0:
+            raise ValueError("Estado de pagamento/backorder ausente no cutoff.")
+        state.pending_stock_items = 0
+        self._maybe_evict_payment_state(order_key)
+
+    def on_stock_timeout_cancellations(self, order_key: str, cancellations, at: datetime) -> Decimal:
+        state = self.active_payments.get(order_key)
+        if state is None:
+            raise ValueError("Cancelamento por prazo de estoque sem estado financeiro ativo.")
+        total_refunded = Decimal("0.00")
+        for cancellation in cancellations:
+            amount = cancellation.net_cancelled_amount + cancellation.shipping_cancelled_amount
+            if amount <= 0:
+                continue
+            for payment_key, part in allocate_refund(amount, state.captured):
+                self.refund_counter += 1
+                self.result.refunds.append(Refund(
+                    f"REFUND-STOCK-{self.refund_counter:06d}", order_key, payment_key, None,
+                    "completed", part, "stock_timeout", at, at, cancellation.key,
+                ))
+                for index, (key, captured_amount, refunded, captured_at) in enumerate(state.captured):
+                    if key == payment_key:
+                        state.captured[index] = (key, captured_amount, refunded + part, captured_at)
+                        break
+                total_refunded += part
+        state.pending_stock_items = 0
+        self._maybe_evict_payment_state(order_key)
+        return total_refunded
+
+    def on_order_cancelled(self, order_key: str) -> None:
+        state = self.active_payments.get(order_key)
+        if state is not None:
+            state.pending_stock_items = 0
+            self._maybe_evict_payment_state(order_key)
+
+    def on_order_cancelled_without_stock(self, order_key: str, at: datetime) -> None:
+        """Refund captured amounts when an order expires with zero units fulfilled."""
+        state = self.active_payments.get(order_key)
+        if state is None:
+            raise ValueError("Cancelamento por falta de estoque sem estado financeiro ativo.")
+        remaining = Decimal("0.00")
+        for index, (payment_key, amount, refunded, captured_at) in enumerate(state.captured):
+            part = amount - refunded
+            if part <= 0:
+                continue
+            self.refund_counter += 1
+            self.result.refunds.append(Refund(
+                f"REFUND-STOCK-{self.refund_counter:06d}", order_key, payment_key, None,
+                "completed", part, "other", at, at,
+            ))
+            state.captured[index] = (payment_key, amount, amount, captured_at)
+            remaining += part
+        if not remaining:
+            raise ValueError("Cancelamento por falta de estoque sem captura elegível para estorno.")
+        state.pending_stock_items = 0
+        self._maybe_evict_payment_state(order_key)
 
     def _schedule_transfers(self, positions: dict[tuple[str, str], StockPosition]) -> None:
         if self.transfers_scheduled:
             return
         self.transfers_scheduled = True
+        if self.config.generation.get("supply_transfer_enabled", 0):
+            return
         count = self.config.generation["stock_transfers"]
         if count <= 0:
             return
@@ -379,6 +462,11 @@ class IncrementalCompletionState:
         base_last = self.last_core_state_at
         if base_last is None:
             raise ValueError("Não há estado 3C para agendar transferências.")
+        if (self.config.profile != "smoke"
+                and base_last + timedelta(minutes=35, hours=6) > _stamp(self.config, self.config.end_date, 23, 59)):
+            # A late receipt/fulfillment cannot justify creating a transfer whose
+            # inbound movement would lie beyond the commercial cutoff.
+            return
         for ordinal, (sku, source, destination, quantity) in enumerate(selected, start=1):
             self.transfer_counter += 1
             number = self.transfer_counter
@@ -398,10 +486,55 @@ class IncrementalCompletionState:
         self.metrics["current_active_transfers"] = len(self.active_transfers)
         self.metrics["max_active_transfers"] = max(self.metrics.get("max_active_transfers", 0), len(self.active_transfers))
 
+    def schedule_supply_transfer(
+        self,
+        *,
+        sku: str,
+        source: str,
+        destination: str,
+        quantity: int,
+        requested_at: datetime,
+        dispatched_at: datetime,
+        received_at: datetime,
+    ) -> str:
+        """Schedule one real, delayed transfer initiated by a causal stock review."""
+        if quantity <= 0 or source == destination or not requested_at < dispatched_at < received_at:
+            raise ValueError("Parâmetros de transferência de abastecimento inválidos.")
+        self.transfer_counter += 1
+        number = self.transfer_counter
+        transfer = StockTransfer(
+            f"TRANSFER-{number:05d}", f"TR-SM-{number:05d}", source, destination,
+            "completed", requested_at, dispatched_at, received_at,
+        )
+        item = StockTransferItem(
+            f"TRANSFER-ITEM-{number:05d}-01", transfer.key, sku, 1,
+            quantity, quantity, quantity,
+        )
+        self.active_transfers[item.key] = _ActiveTransfer(transfer, item)
+        self.result.stock_transfers.append(transfer)
+        self.result.stock_transfer_items.append(item)
+        self._schedule(dispatched_at, 30, f"SUPPLY-TRANSFER-{number:05d}-OUT", "transfer_out", {
+            "item_key": item.key, "sku": sku, "location": source, "quantity": quantity,
+            "supply_policy": True,
+        })
+        self._schedule(received_at, 31, f"SUPPLY-TRANSFER-{number:05d}-IN", "transfer_in", {
+            "item_key": item.key, "sku": sku, "location": destination, "quantity": quantity,
+            "supply_policy": True,
+        })
+        self.metrics["current_active_transfers"] = len(self.active_transfers)
+        self.metrics["max_active_transfers"] = max(self.metrics.get("max_active_transfers", 0), len(self.active_transfers))
+        self.metrics["supply_policy_transfers"] = self.metrics.get("supply_policy_transfers", 0) + 1
+        self.metrics["supply_policy_transfer_units"] = self.metrics.get("supply_policy_transfer_units", 0) + quantity
+        self.metrics["supply_policy_transfer_days_total"] = self.metrics.get("supply_policy_transfer_days_total", 0) + (
+            received_at.date() - requested_at.date()
+        ).days
+        return item.key
+
     def on_core_complete(self, positions: dict[tuple[str, str], StockPosition]) -> None:
         self._schedule_transfers(positions)
 
-    def process_event(self, event: ScheduledEvent, positions: dict[tuple[str, str], StockPosition], append_state: Callable) -> bool:
+    def process_event(self, event: ScheduledEvent, positions: dict[tuple[str, str], StockPosition], append_state: Callable,
+                      stock_available: Callable[[str, str, datetime], None] | None = None) -> bool:
         payload = event.payload
         kind = event.event_type
         self.metrics["total_events_processed"] += 1
@@ -411,7 +544,7 @@ class IncrementalCompletionState:
             self.result.payments.append(row)
             state = self.active_payments[row.order_key]
             if row.status in {"captured", "settled"}:
-                state.captured.append((row.key, row.amount, Decimal("0.00")))
+                state.captured.append((row.key, row.amount, Decimal("0.00"), row.settled_at or row.attempted_at))
             installments = payload["installments"]
             if row.status in {"captured", "settled"} and installments:
                 cents = int((row.amount / CENT).to_integral_exact())
@@ -461,6 +594,8 @@ class IncrementalCompletionState:
             movement = StockMovement(movement_key, payload["sku"], payload["location"], "transfer_in", payload["quantity"], active.unit_cost, event.occurred_at, transfer_item_key=active.item.key)
             self.result.stock_movements.append(movement)
             append_state(StockStateEvent(f"STATE-{event.logical_key}", event.occurred_at, "transfer_in", payload["sku"], payload["location"], payload["quantity"], 0, active.unit_cost, movement_key, transfer_item_key=active.item.key))
+            if stock_available is not None:
+                stock_available(payload["sku"], payload["location"], event.occurred_at)
             self.result.publish("stock_transfers", active.row.key)
             self.result.publish("stock_transfer_items", active.item.key)
             self.result.release_transaction_id("stock_transfer_items", active.item.key)
@@ -509,20 +644,22 @@ class IncrementalCompletionState:
                 movement = StockMovement(movement_key, source.product_sku, source.location_code, "customer_return", 1, unit_cost, event.occurred_at, return_item_key=active.item_row.key)
                 self.result.stock_movements.append(movement)
                 append_state(StockStateEvent(f"STATE-RETURN-{source.ordinal:03d}", event.occurred_at, "customer_return", source.product_sku, source.location_code, 1, 25, unit_cost, movement_key, return_item_key=active.item_row.key))
+                if stock_available is not None:
+                    stock_available(source.product_sku, source.location_code, event.occurred_at)
             if not active.will_refund:
                 self._finish_return(active)
         elif kind == "refund":
             active = self.active_returns[payload["ordinal"]]
             state = self.active_payments[active.source.order_key]
             remaining = payload["amount"]
-            for index, (payment_key, amount, refunded) in enumerate(state.captured):
+            for index, (payment_key, amount, refunded, captured_at) in enumerate(state.captured):
                 available = amount - refunded
                 part = min(remaining, available)
                 if part <= 0:
                     continue
                 self.refund_counter += 1
                 self.result.refunds.append(Refund(f"REFUND-{active.source.ordinal:03d}-{self.refund_counter:03d}", active.source.order_key, payment_key, active.return_row.key, "completed", part, "return", event.occurred_at, event.occurred_at + timedelta(hours=2)))
-                state.captured[index] = (payment_key, amount, refunded + part)
+                state.captured[index] = (payment_key, amount, refunded + part, captured_at)
                 remaining -= part
                 if remaining == 0:
                     break
@@ -565,6 +702,20 @@ class IncrementalCompletionState:
                 < self.config.generation["minimum_returns"]):
             raise ValueError("O fluxo incremental não atingiu o mínimo configurado de devoluções.")
         if self.active_payments or self.active_fulfillments or self.active_transfers or self.active_returns or self.return_eligibility:
-            raise ValueError("Estados ativos 3D permaneceram após o cutoff.")
+            details = {
+                "payments": len(self.active_payments),
+                "fulfillments": len(self.active_fulfillments),
+                "transfers": len(self.active_transfers),
+                "returns": len(self.active_returns),
+                "return_eligibility": len(self.return_eligibility),
+                "payment_orders": sorted(self.active_payments)[:10],
+                "payment_state_counts": {
+                    "pending_attempts": sum(state.pending_attempts > 0 for state in self.active_payments.values()),
+                    "pending_fulfillment_items": sum(state.pending_fulfillment_items > 0 for state in self.active_payments.values()),
+                    "pending_stock_items": sum(state.pending_stock_items > 0 for state in self.active_payments.values()),
+                    "open_returns": sum(state.open_returns > 0 for state in self.active_payments.values()),
+                },
+            }
+            raise ValueError(f"Estados ativos 3D permaneceram após o cutoff: {details}.")
         if self.metrics["total_events_processed"] > self.metrics["total_events_scheduled"]:
             raise ValueError("Contagem de eventos 3D processados excede eventos agendados.")

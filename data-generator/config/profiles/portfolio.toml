@@ -39,6 +39,85 @@ stock_transfers = 12
 minimum_returns = 0
 maximum_returns = 0
 split_payment_rate_percent = 3
+max_stock_wait_days = 14
+bootstrap_location_balance = 65
+coverage_replenishment_enabled = 1
+coverage_safety_units = 3
+supply_transfer_enabled = 0
+physical_anonymous_rate_percent = 30
+physical_cash_rate_percent = 17
+physical_instant_rate_percent = 38
+digital_instant_rate_percent = 55
+business_bank_transfer_rate_percent = 8
+discount_incidence_percent = 38
+black_friday_discount_incidence_percent = 55
+return_base_probability_percent = 2
+return_digital_additive_percent = 2
+return_business_reduction_percent = 1
+return_category_additive_percent = 1
+business_item_double_quantity_percent = 75
+
+[order_plan]
+mode = "accepted_quotas"
+intention_cap = 230000
+
+[order_plan.annual_shares_percent]
+"2023" = 20
+"2024" = 25
+"2025" = 30
+"2026" = 25
+
+[order_plan.channel_shares_percent."2023"]
+physical = 54
+ecommerce = 29
+marketplace = 17
+
+[order_plan.channel_shares_percent."2024"]
+physical = 53
+ecommerce = 29
+marketplace = 18
+
+[order_plan.channel_shares_percent."2025"]
+physical = 52
+ecommerce = 29
+marketplace = 19
+
+[order_plan.channel_shares_percent."2026"]
+physical = 50
+ecommerce = 31
+marketplace = 19
+
+[order_plan.month_weights]
+"1" = 90
+"2" = 100
+"3" = 100
+"4" = 100
+"5" = 100
+"6" = 100
+"7" = 100
+"8" = 100
+"9" = 100
+"10" = 100
+"11" = 140
+"12" = 115
+
+[order_plan.physical_attempt_multiplier_percent]
+"2023" = 220
+"2024" = 220
+"2025" = 260
+"2026" = 300
+
+[order_plan.customer_frequency_shares_percent.individual]
+one = 42
+two_to_four = 38
+five_to_ten = 16
+eleven_plus = 4
+
+[order_plan.customer_frequency_shares_percent.business]
+one = 25
+two_to_four = 45
+five_to_ten = 25
+eleven_plus = 5
 
 [[stores]]
 code = "ST-PO-001"

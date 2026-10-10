@@ -14,6 +14,7 @@ from typing import Any, Iterable
 
 from psycopg import Connection
 
+from projectbi_generator.generators.transactions import weighted_moving_average
 from projectbi_generator.models.entities import MasterData
 from projectbi_generator.models.transactions import StockStateEvent
 from projectbi_generator.sinks import TransactionBatch
@@ -30,6 +31,10 @@ class TransientTransactionIdRegistry:
     @property
     def current_entries(self) -> int:
         return sum(map(len, self._ids.values()))
+
+    @property
+    def current_by_type(self) -> dict[str, int]:
+        return {entity: len(entries) for entity, entries in self._ids.items() if entries}
 
     def retain(self, entity: str, key: str, value: int) -> None:
         registry = self._ids[entity]
@@ -60,6 +65,7 @@ class PostgreSQLSinkMetrics:
     rows_inserted_without_returning: int = 0
     rows_inserted_with_returning: int = 0
     rows_updated: int = 0
+    sales_orders_inserted: int = 0
     max_batch_rows: int = 0
     round_trips_approx: int = 0
 
@@ -131,7 +137,7 @@ class PostgreSQLTransactionSink:
             if table not in {"payment_installments", "stock_reservations", "refunds"}:
                 self.ids.retain(table, key, value)
             order_key = getattr(row, "order_key", None)
-            if order_key and table in {"sales_order_items", "fulfillments", "fulfillment_items", "payments", "returns", "return_items"}:
+            if order_key and table in {"sales_order_items", "fulfillments", "fulfillment_items", "payments", "returns", "return_items", "sales_order_item_cancellations"}:
                 self._order_refs[order_key][table].append(key)
         self.metrics.rows_inserted += len(rows)
         self.metrics.rows_inserted_with_returning += len(rows)
@@ -212,6 +218,7 @@ class PostgreSQLTransactionSink:
               self._master("stores",x.store_code),self._master("employees",x.salesperson_code),self._master("customer_addresses",x.address_key),
               x.status,x.placed_at,x.subtotal,x.discount,x.shipping,x.total,*(x.address_snapshot or (None,)*9),x.placed_at,x.placed_at) for x in initial])
             self._timestamps["sales_orders"].update((x.key,x.placed_at) for x in initial)
+            self.metrics.sales_orders_inserted += len(initial)
             if updates:
                 self._many("UPDATE sales.sales_orders SET order_status=%s,updated_at=%s WHERE sales_order_id=%s",
                            [(x.status,x.placed_at,self._id(table,x.key)) for x in updates])
@@ -271,6 +278,10 @@ class PostgreSQLTransactionSink:
         for x in rows:
             self._release_id("goods_receipts", x.receipt_key)
             self._timestamps["goods_receipts"].pop(x.receipt_key, None)
+            # A fully rejected receipt item creates no stock movement, so its
+            # transient ID has no later consumer in the transaction stream.
+            if x.accepted_quantity == 0:
+                self._release_id("goods_receipt_items", x.key)
 
     def _receipt_order_key(self, row: Any) -> str:
         return self._purchase_item_orders[row.order_item_key]
@@ -374,23 +385,40 @@ class PostgreSQLTransactionSink:
             self.metrics.rows_updated += len(item_updates)
         for x in initial:
             self._timestamps["returns"].pop(x.return_key, None)
+        rows = r.get("sales_order_item_cancellations", ())
+        self._insert_returning("sales_order_item_cancellations", rows, [x.key for x in rows],
+            """INSERT INTO sales.sales_order_item_cancellations
+               (sales_order_id,sales_order_item_id,cancelled_quantity,cancellation_reason,cancelled_at,
+                gross_cancelled_amount,discount_cancelled_amount,net_cancelled_amount,
+                shipping_cancelled_amount,external_reference,created_at)
+               VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
+               RETURNING sales_order_item_cancellation_id""",
+            [(self._id("sales_orders", x.order_key), self._id("sales_order_items", x.item_key),
+              x.cancelled_quantity, x.cancellation_reason, x.cancelled_at, x.gross_cancelled_amount,
+              x.discount_cancelled_amount, x.net_cancelled_amount, x.shipping_cancelled_amount,
+              x.external_reference, x.cancelled_at) for x in rows])
         rows = r.get("refunds", ())
         self._insert_returning("refunds", rows,[x.key for x in rows],
-            """INSERT INTO payments.refunds (sales_order_id,payment_id,return_id,status,amount,reason_code,requested_at,processed_at,external_reference,created_at,updated_at)
-               VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s) RETURNING refund_id""",
-            [(self._id("sales_orders",x.order_key),self._id("payments",x.payment_key),self._id("returns",x.return_key) if x.return_key else None,x.status,x.amount,x.reason_code,x.requested_at,x.processed_at,x.key,x.requested_at,x.processed_at or x.requested_at) for x in rows])
+            """INSERT INTO payments.refunds (sales_order_id,payment_id,return_id,status,amount,reason_code,requested_at,processed_at,external_reference,created_at,updated_at,sales_order_item_cancellation_id)
+               VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s) RETURNING refund_id""",
+            [(self._id("sales_orders",x.order_key),self._id("payments",x.payment_key),self._id("returns",x.return_key) if x.return_key else None,x.status,x.amount,x.reason_code,x.requested_at,x.processed_at,x.key,x.requested_at,x.processed_at or x.requested_at,
+              self._id("sales_order_item_cancellations",x.cancellation_key) if x.cancellation_key else None) for x in rows])
 
     def _position(self, product_id: int, location_id: int, at: Any) -> tuple[int, int, int, Decimal]:
         key = (product_id, location_id)
         if key in self._positions:
             return self._positions[key]
         inserted = self.connection.execute("""INSERT INTO inventory.stock_positions (product_id,stock_location_id,on_hand_quantity,reserved_quantity,average_unit_cost,updated_at)
-            VALUES (%s,%s,0,0,0,%s) ON CONFLICT (product_id,stock_location_id) DO NOTHING RETURNING stock_position_id""", (product_id,location_id,at)).fetchone()
+            VALUES (%s,%s,0,0,0,%s) ON CONFLICT (product_id,stock_location_id) DO NOTHING
+            RETURNING stock_position_id,on_hand_quantity,reserved_quantity,average_unit_cost""", (product_id,location_id,at)).fetchone()
         self.metrics.round_trips_approx += 1
         if inserted is not None:
             self.metrics.rows_inserted += 1
             self.metrics.rows_inserted_with_returning += 1
-        row = self.connection.execute("SELECT stock_position_id,on_hand_quantity,reserved_quantity,average_unit_cost FROM inventory.stock_positions WHERE product_id=%s AND stock_location_id=%s FOR UPDATE",(product_id,location_id)).fetchone()
+            row = inserted
+        else:
+            row = self.connection.execute("SELECT stock_position_id,on_hand_quantity,reserved_quantity,average_unit_cost FROM inventory.stock_positions WHERE product_id=%s AND stock_location_id=%s FOR UPDATE",(product_id,location_id)).fetchone()
+            self.metrics.round_trips_approx += 1
         if row is None:
             raise RuntimeError("Posição de estoque não encontrada após lock.")
         self._positions[key] = (row[0],row[1],row[2],row[3])
@@ -402,6 +430,8 @@ class PostgreSQLTransactionSink:
         movement_by_key.update((x.key, x) for x in r.get("stock_movements", ()))
         events = self._pending_state_events + list(r.get("stock_state_events", ()))
         self._pending_state_events = []
+        movement_rows = []
+        position_updates: dict[int, tuple[int, int, Decimal, Any, int]] = {}
         for index, event in enumerate(events):
             product = self._master("products",event.product_sku)
             location = self._master("stock_locations",event.location_code)
@@ -415,25 +445,27 @@ class PostgreSQLTransactionSink:
                 self._pending_state_events.extend(events[index:])
                 break
             if event.event_type == "receipt":
-                self.connection.execute("INSERT INTO inventory.stock_movements (product_id,stock_location_id,movement_type,quantity_delta,unit_cost,goods_receipt_item_id,occurred_at,created_at) VALUES (%s,%s,'receipt',%s,%s,%s,%s,%s)",(product,location,event.quantity,event.unit_cost,self._id("goods_receipt_items",movement.receipt_item_key),event.occurred_at,event.occurred_at))
-                self.metrics.rows_inserted += 1
-                self.metrics.rows_inserted_without_returning += 1
-                self.metrics.round_trips_approx += 1
-                average = ((Decimal(on_hand)*average + Decimal(event.quantity)*event.unit_cost)/Decimal(on_hand+event.quantity)).quantize(Decimal("0.00000001")) if on_hand else event.unit_cost.quantize(Decimal("0.00000001")); on_hand += event.quantity
+                movement_rows.append((
+                    product, location, "receipt", event.quantity, event.unit_cost,
+                    self._id("goods_receipt_items", movement.receipt_item_key),
+                    None, None, None, event.occurred_at, event.occurred_at,
+                ))
+                average = weighted_moving_average(on_hand, average, event.quantity, event.unit_cost)
+                on_hand += event.quantity
             elif event.event_type in {"fulfillment","transfer_out","transfer_in","customer_return"}:
                 common=(product,location,movement.movement_type,movement.quantity_delta,movement.unit_cost)
                 refs=(self._id("fulfillment_items",movement.fulfillment_item_key) if movement.fulfillment_item_key else None,
                       self._id("return_items",movement.return_item_key) if movement.return_item_key else None,
                       self._id("stock_transfer_items",movement.transfer_item_key) if movement.transfer_item_key else None)
-                self.connection.execute("INSERT INTO inventory.stock_movements (product_id,stock_location_id,movement_type,quantity_delta,unit_cost,fulfillment_item_id,return_item_id,stock_transfer_item_id,occurred_at,created_at) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)",(*common,*refs,event.occurred_at,event.occurred_at))
-                self.metrics.rows_inserted += 1
-                self.metrics.rows_inserted_without_returning += 1
-                self.metrics.round_trips_approx += 1
+                movement_rows.append((
+                    *common, None, *refs, event.occurred_at, event.occurred_at,
+                ))
                 if event.event_type == "fulfillment":
                     on_hand -= event.quantity; reserved -= event.quantity
                 elif event.event_type == "transfer_out": on_hand -= event.quantity
                 else:
-                    average = ((Decimal(on_hand)*average + Decimal(event.quantity)*event.unit_cost)/Decimal(on_hand+event.quantity)).quantize(Decimal("0.00000001")) if on_hand else event.unit_cost.quantize(Decimal("0.00000001")); on_hand += event.quantity
+                    average = weighted_moving_average(on_hand, average, event.quantity, event.unit_cost)
+                    on_hand += event.quantity
             elif event.event_type == "reserve": reserved += event.quantity
             elif event.event_type == "release": reserved -= event.quantity
             if event.movement_key:
@@ -441,20 +473,45 @@ class PostgreSQLTransactionSink:
                 if event.event_type == "receipt" and movement is not None:
                     self._release_id("goods_receipt_items", movement.receipt_item_key)
             if position_id:
-                self.connection.execute("UPDATE inventory.stock_positions SET on_hand_quantity=%s,reserved_quantity=%s,average_unit_cost=%s,updated_at=%s WHERE stock_position_id=%s",(on_hand,reserved,average,event.occurred_at,position_id))
-                self.metrics.rows_updated += 1
-                self.metrics.round_trips_approx += 1
                 self._positions[(product,location)] = (position_id,on_hand,reserved,average)
+                position_updates[position_id] = (on_hand, reserved, average, event.occurred_at, position_id)
+        if movement_rows:
+            self._many(
+                """INSERT INTO inventory.stock_movements
+                   (product_id,stock_location_id,movement_type,quantity_delta,unit_cost,
+                    goods_receipt_item_id,fulfillment_item_id,return_item_id,stock_transfer_item_id,
+                    occurred_at,created_at)
+                   VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)""",
+                movement_rows,
+            )
+            self.metrics.rows_inserted += len(movement_rows)
+            self.metrics.rows_inserted_without_returning += len(movement_rows)
         self._pending_movements = movement_by_key
         # Final positions carry the authoritative engine state. Upsert preserves the computed ledger.
         for row in r.get("stock_positions", ()):
             product=self._master("products",row.product_sku); location=self._master("stock_locations",row.location_code)
-            self.connection.execute("""INSERT INTO inventory.stock_positions (product_id,stock_location_id,on_hand_quantity,reserved_quantity,average_unit_cost,updated_at)
-                VALUES (%s,%s,%s,%s,%s,now()) ON CONFLICT(product_id,stock_location_id) DO UPDATE SET on_hand_quantity=EXCLUDED.on_hand_quantity,reserved_quantity=EXCLUDED.reserved_quantity,average_unit_cost=EXCLUDED.average_unit_cost,updated_at=EXCLUDED.updated_at""",(product,location,row.on_hand_quantity,row.reserved_quantity,row.average_unit_cost))
-            self.metrics.rows_updated += 1
+            key=(product,location)
+            existing=self._positions.get(key)
+            if existing is None:
+                self.connection.execute("""INSERT INTO inventory.stock_positions (product_id,stock_location_id,on_hand_quantity,reserved_quantity,average_unit_cost,updated_at)
+                    VALUES (%s,%s,%s,%s,%s,now())""",(product,location,row.on_hand_quantity,row.reserved_quantity,row.average_unit_cost))
+                self.metrics.rows_inserted += 1
+                self.metrics.rows_inserted_without_returning += 1
+            else:
+                position_updates[existing[0]] = (
+                    row.on_hand_quantity, row.reserved_quantity, row.average_unit_cost, None, existing[0],
+                )
             self.metrics.round_trips_approx += 1
-            existing=self._positions.get((product,location))
-            if existing: self._positions[(product,location)]=(existing[0],row.on_hand_quantity,row.reserved_quantity,row.average_unit_cost)
+            if existing: self._positions[key]=(existing[0],row.on_hand_quantity,row.reserved_quantity,row.average_unit_cost)
             else:
                 got=self.connection.execute("SELECT stock_position_id FROM inventory.stock_positions WHERE product_id=%s AND stock_location_id=%s",(product,location)).fetchone()
                 self._positions[(product,location)]=(got[0],row.on_hand_quantity,row.reserved_quantity,row.average_unit_cost)
+        if position_updates:
+            self._many(
+                """UPDATE inventory.stock_positions
+                      SET on_hand_quantity=%s,reserved_quantity=%s,average_unit_cost=%s,
+                          updated_at=COALESCE(%s,now())
+                    WHERE stock_position_id=%s""",
+                position_updates.values(),
+            )
+            self.metrics.rows_updated += len(position_updates)

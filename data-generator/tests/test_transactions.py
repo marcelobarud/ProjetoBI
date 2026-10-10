@@ -1,14 +1,61 @@
 from copy import deepcopy
 from dataclasses import replace
-from datetime import timedelta
+from datetime import datetime, time, timedelta
 from decimal import Decimal
 
 import pytest
 
-from projectbi_generator.generators.transactions import EventQueue, ScheduledEvent, allocate_cents, generate_transactions, generate_transactions_incremental, weighted_moving_average
-from projectbi_generator.models.transactions import StockStateEvent
+from projectbi_generator.generators.transactions import EventQueue, ScheduledEvent, _location_balanced_bootstrap_plan, allocate_cents, generate_transactions, generate_transactions_incremental, weighted_moving_average
+from projectbi_generator.models.transactions import OrderStatusEvent, StockStateEvent
 from projectbi_generator.sinks import CollectingSink, CountingDiscardingSink
 from projectbi_generator.validation.transactions import validate_transactional_data
+from projectbi_generator.validation.order_history import validate_order_history
+
+
+def test_order_history_allows_draft_five_minutes_before_placed_and_valid_progression(config):
+    placed_at = datetime.combine(config.start_date, time(10), tzinfo=config.timezone)
+    events = [
+        OrderStatusEvent("order", "draft", placed_at - timedelta(minutes=5)),
+        OrderStatusEvent("order", "placed", placed_at),
+        OrderStatusEvent("order", "confirmed", placed_at + timedelta(minutes=3)),
+        OrderStatusEvent("order", "completed", placed_at + timedelta(hours=2)),
+    ]
+    validate_order_history(events, placed_at, "completed")
+
+
+def test_order_history_rejects_non_draft_before_placed(config):
+    placed_at = datetime.combine(config.start_date, time(10), tzinfo=config.timezone)
+    events = [
+        OrderStatusEvent("order", "draft", placed_at - timedelta(minutes=5)),
+        OrderStatusEvent("order", "confirmed", placed_at - timedelta(minutes=4)),
+        OrderStatusEvent("order", "placed", placed_at),
+    ]
+    with pytest.raises(ValueError, match="Status diferente de draft"):
+        validate_order_history(events, placed_at, "placed")
+
+
+def test_order_history_rejects_draft_after_placed(config):
+    placed_at = datetime.combine(config.start_date, time(10), tzinfo=config.timezone)
+    events = [
+        OrderStatusEvent("order", "placed", placed_at),
+        OrderStatusEvent("order", "draft", placed_at + timedelta(minutes=5)),
+    ]
+    with pytest.raises(ValueError, match="draft antes de placed_at"):
+        validate_order_history(events, placed_at, "draft")
+
+
+def test_order_history_rejects_backward_or_unordered_transitions(config):
+    placed_at = datetime.combine(config.start_date, time(10), tzinfo=config.timezone)
+    backwards = [
+        OrderStatusEvent("order", "draft", placed_at - timedelta(minutes=5)),
+        OrderStatusEvent("order", "placed", placed_at),
+        OrderStatusEvent("order", "completed", placed_at + timedelta(hours=2)),
+    ]
+    with pytest.raises(ValueError, match="Transição de status inválida"):
+        validate_order_history(backwards, placed_at, "completed")
+    unordered = [backwards[0], backwards[2], backwards[1]]
+    with pytest.raises(ValueError, match="fora de ordem cronológica"):
+        validate_order_history(unordered, placed_at, "confirmed")
 
 
 def test_event_queue_orders_by_time_priority_then_stable_key(config):
@@ -32,6 +79,27 @@ def test_weighted_average_first_and_second_receipts_rounds_to_eight_places():
     assert first == Decimal("1.00000001")
     assert second == Decimal("1.00000001")
     assert second.as_tuple().exponent == -8
+
+
+@pytest.mark.parametrize("quantity", (9, 12, 15))
+def test_experimental_location_balanced_bootstrap_conserves_units(quantity):
+    stores = [f"STORE-{index:02}" for index in range(10)]
+    warehouses = [f"WH-{index:02}" for index in range(4)]
+
+    first = _location_balanced_bootstrap_plan(quantity, 7, stores, warehouses)
+    second = _location_balanced_bootstrap_plan(quantity, 7, stores, warehouses)
+
+    assert first == second
+    assert sum(units for _location, units in first) == quantity
+    assert all(units > 0 for _location, units in first)
+
+
+def test_weighted_average_uses_half_up_for_exact_eighth_decimal_tie():
+    # Raw result is 529.181918925: PostgreSQL NUMERIC and the engine round the
+    # tie away from zero to .93; Decimal's default HALF_EVEN would produce .92.
+    assert weighted_moving_average(
+        2, Decimal("565.20651660"), 6, Decimal("517.17371970")
+    ) == Decimal("529.18191893")
 
 
 def test_order_discount_cent_remainders_are_stable_and_conserved():

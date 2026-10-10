@@ -575,6 +575,7 @@ def transaction_data_from_collected_stream(result, sink: CollectingSink) -> Tran
     table_fields = (
         "purchase_orders", "purchase_order_items", "goods_receipts", "goods_receipt_items",
         "sales_orders", "sales_order_items", "order_status_history", "applied_discounts",
+        "sales_order_item_cancellations",
         "stock_reservations", "fulfillments", "fulfillment_items", "stock_movements",
         "stock_state_events", "payments", "payment_installments", "fulfillment_events",
         "stock_transfers", "stock_transfer_items", "returns", "return_items", "refunds",
@@ -586,5 +587,6 @@ def transaction_data_from_collected_stream(result, sink: CollectingSink) -> Tran
         (row.product_sku, row.location_code): row
         for row in sink.rows_by_table.get("stock_positions", ())
     }
+    data.stock_state_events.sort(key=lambda row: (row.occurred_at, row.priority, row.key))
     data.runtime_metrics = dict(result.runtime_metrics)
     return data

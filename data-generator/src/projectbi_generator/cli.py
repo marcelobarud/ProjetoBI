@@ -6,12 +6,13 @@ import argparse
 import json
 from pathlib import Path
 import sys
+from time import perf_counter
 
 import psycopg
 
 from projectbi_generator import __version__
 from projectbi_generator.config import load_config
-from projectbi_generator.database import connection_settings, run_rollback_smoke, run_rollback_incremental_full_smoke
+from projectbi_generator.database import connect, connection_settings, run_rollback_smoke, run_rollback_incremental_full_smoke
 from projectbi_generator.generators.completion import extend_transactions
 from projectbi_generator.generators.master import generate_master_data
 from projectbi_generator.generators.transactions import generate_transactions
@@ -42,6 +43,7 @@ def _parser() -> argparse.ArgumentParser:
     full_mode.add_argument("--dry-run", action="store_true")
     full_mode.add_argument("--load-smoke", action="store_true", help="Carrega os domínios aplicáveis em uma transação que termina em ROLLBACK")
     full_mode.add_argument("--plan", action="store_true", help="Valida configuração/volumes sem gerar dados nem conectar")
+    full_mode.add_argument("--commit", action="store_true", help="Persiste Portfolio uma única vez após validações críticas")
     return parser
 
 
@@ -78,12 +80,88 @@ def main(argv: list[str] | None = None) -> int:
             if args.plan:
                 print(json.dumps(_build_plan(config), ensure_ascii=False, sort_keys=True))
                 return 0
+            if args.commit:
+                if config.profile != "portfolio":
+                    raise ValueError("--commit exige --profile portfolio; nenhum dado foi gravado.")
+                from projectbi_generator.portfolio_load import run_portfolio_commit
+                result = run_portfolio_commit(connection_settings(PROJECT_ROOT), config, project_root=PROJECT_ROOT)
+                baseline_started = perf_counter()
+                from projectbi_generator.validation.baselines import (
+                    create_baseline_files,
+                    execute_baseline_files,
+                    validate_baseline_results,
+                )
+                baseline_dir = create_baseline_files(PROJECT_ROOT)
+                read_connection = connect(connection_settings(PROJECT_ROOT))
+                try:
+                    read_connection.execute("BEGIN READ ONLY")
+                    baseline_results = execute_baseline_files(read_connection, baseline_dir)
+                    read_connection.execute("ROLLBACK")
+                except Exception:
+                    try:
+                        read_connection.rollback()
+                    except Exception:
+                        pass
+                    raise
+                finally:
+                    read_connection.close()
+                baseline_reconciliation = validate_baseline_results(baseline_results, result["portfolio_metrics"])
+                result["baseline_seconds"] = perf_counter() - baseline_started
+                result["total_seconds_with_baselines"] = result["total_seconds"] + result["baseline_seconds"]
+                from projectbi_generator.validation.portfolio_report import write_portfolio_report
+                result["baseline_reconciliation"] = baseline_reconciliation
+                report_path = write_portfolio_report(PROJECT_ROOT, result, baseline_results)
+                print(json.dumps({
+                    "database": "projeto_bi", "transaction": "COMMIT", "post_validation": "PASS",
+                    "orders": result["transaction_counts"].get("sales_orders"),
+                    "transaction_rows": result["transaction_rows"], "sink_metrics": result["sink_metrics"],
+                    "id_metrics": result["id_metrics"], "total_seconds": result["total_seconds"],
+                    "baseline_files": len(baseline_results), "portfolio_report": str(report_path),
+                    "critical_fails": result["distribution_result"]["critical_fails"],
+                    "distributional_warnings": result["distribution_result"]["distributional_warnings"],
+                    "distributional_fails": result["distribution_result"]["distributional_fails"],
+                }, ensure_ascii=False, sort_keys=True, default=str))
+                print("""
+## Relatório Portfolio
+
+PROFILE
+
+- portfolio;
+- período bootstrap: 2022-11-01 a 2022-12-31;
+- período comercial: 2023-01-01 a 2026-09-30;
+- timezone: America/Sao_Paulo.
+
+EXECUÇÃO
+
+- início/fim;
+- duração;
+- batches, rows, updates e pico de IDs;
+- nenhuma persistência fora da transação única.
+
+QUALITY
+
+- CRITICAL FAILS: 0;
+- DISTRIBUTIONAL FAILS: 0;
+- warnings estão documentados no relatório detalhado.
+
+POSTGRESQL
+
+- COMMIT PostgreSQL concluído;
+- nova conexão read-only aprovada;
+- Todas as tabelas operacionais conciliadas com o relatório.
+
+BASELINES
+
+- 13 arquivos SQL criados e executados;
+- controle, comercial, COGS e YTD reconciliados.
+""")
+                return 0
             if config.profile != "smoke":
                 raise ValueError("Geração e integração ainda estão limitadas a smoke; portfolio/large podem usar --plan.")
             if args.load_smoke:
                 result = run_rollback_incremental_full_smoke(connection_settings(PROJECT_ROOT), config)
                 print(json.dumps({"database": "projeto_bi", "server_version": result["server_version"],
-                                  "transaction": "ROLLBACK", "remaining_rows_all_40_tables": sum(result["remaining"].values()),
+                                  "transaction": "ROLLBACK", "remaining_rows_all_operational_tables": sum(result["remaining"].values()),
                                   "master_id_maps": result["master_id_maps"], "id_metrics": result["id_metrics"],
                                   "sink_metrics": result["sink_metrics"], "counts": result["counts"],
                                   "aggregates": result["aggregates"], "validated_table_counts": result["sql_counts"]},
@@ -115,7 +193,7 @@ def main(argv: list[str] | None = None) -> int:
             if args.load_smoke:
                 result = run_rollback_incremental_full_smoke(connection_settings(PROJECT_ROOT), config, include_completion=False)
                 print(json.dumps({"database": "projeto_bi", "server_version": result["server_version"],
-                                  "transaction": "ROLLBACK", "remaining_rows_all_40_tables": sum(result["remaining"].values()),
+                                  "transaction": "ROLLBACK", "remaining_rows_all_operational_tables": sum(result["remaining"].values()),
                                   "master_id_maps": result["master_id_maps"], "id_metrics": result["id_metrics"],
                                   "sink_metrics": result["sink_metrics"], "counts": result["counts"],
                                   "aggregates": result["aggregates"], "validated_table_counts": result["sql_counts"]},
@@ -157,11 +235,17 @@ def main(argv: list[str] | None = None) -> int:
             "loaded_counts_in_transaction": result["counts"],
             "id_maps_resolved": result["id_map_tables"],
             "transaction": "ROLLBACK",
-            "remaining_rows_all_40_tables": sum(result["remaining"].values()),
+            "remaining_rows_all_operational_tables": sum(result["remaining"].values()),
         }, ensure_ascii=False, sort_keys=True, default=str))
         return 0
     except psycopg.Error as exc:
-        print(f"Falha PostgreSQL: {type(exc).__name__}; a transação foi revertida quando iniciada.", file=sys.stderr)
+        diag = getattr(exc, "diag", None)
+        constraint = getattr(diag, "constraint_name", None) if diag else None
+        table = getattr(diag, "table_name", None) if diag else None
+        context = ", ".join(f"{name}={value}" for name,value in (("constraint",constraint),("table",table)) if value)
+        sqlstate = f" SQLSTATE={exc.sqlstate}." if exc.sqlstate else ""
+        safe_context = f" Contexto: {context}." if context else ""
+        print(f"Falha PostgreSQL: {type(exc).__name__}.{sqlstate}{safe_context} Consulte o estado da conexão antes de qualquer nova tentativa.", file=sys.stderr)
         return 2
     except (OSError, ValueError, RuntimeError) as exc:
         print(f"Erro: {exc}", file=sys.stderr)

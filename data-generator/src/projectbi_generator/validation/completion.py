@@ -24,9 +24,11 @@ def validate_completed_data(data: TransactionData, master: MasterData, config: G
     customers = {row.code: row for row in master.customers}
     payments = {row.key: row for row in data.payments}
     returns = {row.key: row for row in data.returns}
+    cancellations = {row.key: row for row in data.sales_order_item_cancellations}
     payment_by_order: dict[str, list] = defaultdict(list)
     installments_by_payment: dict[str, list] = defaultdict(list)
     refunds_by_payment: dict[str, list] = defaultdict(list)
+    refunds_by_cancellation: dict[str, list] = defaultdict(list)
     return_quantity: dict[str, int] = defaultdict(int)
     _unique("payments", [row.key for row in data.payments])
     _unique("payment references", [row.reference for row in data.payments])
@@ -59,12 +61,13 @@ def validate_completed_data(data: TransactionData, master: MasterData, config: G
         payment_by_order[order.key].append(payment)
 
     captured_total = Decimal("0.00")
+    completed_refunds_by_order = _completed_refunds_by_order(data)
     for order in data.sales_orders:
         operations = payment_by_order[order.key]
         captured = sum((row.amount for row in operations if row.status in SUCCESS), Decimal("0.00"))
         captured_total += captured
         if order.status == "cancelled":
-            if captured != 0 or not any(row.status == "cancelled" for row in operations):
+            if not _cancelled_order_financially_resolved(operations, captured, completed_refunds_by_order[order.key]):
                 raise ValueError("Pedido cancelado não possui cancelamento financeiro coerente.")
         elif captured != order.total:
             raise ValueError("Operações capturadas não conciliam exatamente com o total do pedido.")
@@ -216,10 +219,21 @@ def validate_completed_data(data: TransactionData, master: MasterData, config: G
     for refund in data.refunds:
         payment = payments.get(refund.payment_key)
         ret = returns.get(refund.return_key) if refund.return_key else None
+        cancellation = cancellations.get(refund.cancellation_key) if refund.cancellation_key else None
         if payment is None or payment.status not in SUCCESS or payment.order_key != refund.order_key or refund.order_key not in orders:
             raise ValueError("Refund não referencia pagamento capturado do mesmo pedido.")
         if ret and ret.order_key != refund.order_key:
             raise ValueError("Refund referencia devolução de outro pedido.")
+        if ret is not None and cancellation is not None:
+            raise ValueError("Refund não pode representar devolução e cancelamento simultaneamente.")
+        if refund.reason_code == "stock_timeout":
+            if cancellation is None or cancellation.order_key != refund.order_key or ret is not None:
+                raise ValueError("Refund stock_timeout precisa apontar somente para cancelamento do mesmo pedido.")
+            if refund.status != "completed":
+                raise ValueError("Cancelamento por prazo não pode encerrar pedido com refund incompleto.")
+            refunds_by_cancellation[cancellation.key].append(refund)
+        elif cancellation is not None:
+            raise ValueError("Refund não stock_timeout não pode apontar para cancelamento por prazo.")
         if refund.status not in {"requested", "processing", "completed", "rejected", "cancelled"} or refund.amount <= 0:
             raise ValueError("Status/valor de refund inválido.")
         if refund.requested_at > cutoff or refund.requested_at < payment.settled_at or (refund.processed_at and (refund.processed_at < refund.requested_at or refund.processed_at > cutoff)):
@@ -230,6 +244,12 @@ def validate_completed_data(data: TransactionData, master: MasterData, config: G
         completed = sum((row.amount for row in rows if row.status == "completed"), Decimal("0.00"))
         if completed > payment.amount:
             raise ValueError("Refund acumulado excede valor capturado do pagamento.")
+    for cancellation in data.sales_order_item_cancellations:
+        expected = cancellation.net_cancelled_amount + cancellation.shipping_cancelled_amount
+        linked = refunds_by_cancellation.get(cancellation.key, [])
+        refunded = sum((row.amount for row in linked if row.status == "completed"), Decimal("0.00"))
+        if refunded != expected:
+            raise ValueError("Refunds ligados ao cancelamento divergem do valor líquido/frete cancelado.")
     if any(sum((row.amount for row in rows if row.status == "completed"), Decimal("0.00")) > sum((payment.amount for payment in payment_by_order[order_key] if payment.status in SUCCESS), Decimal("0.00")) for order_key, rows in _refunds_by_order(data).items()):
         raise ValueError("Refund acumulado excede captura total do pedido.")
 
@@ -266,10 +286,13 @@ def validate_completed_data(data: TransactionData, master: MasterData, config: G
         else:
             raise ValueError("Evento de estoque não permitido na Fase 3D.")
     positions = {(row.product_sku, row.location_code): row for row in data.stock_positions.values()}
-    if set(positions) != set(balances):
-        raise ValueError("Stock positions não cobre exatamente o conjunto de eventos físicos.")
+    if not set(balances).issubset(positions):
+        raise ValueError("Evento de estoque não possui posição final correspondente.")
     for key, position in positions.items():
-        if position.on_hand_quantity != balances[key] or position.reserved_quantity != reserved[key] or position.available_quantity != balances[key] - reserved[key] or position.average_unit_cost != averages[key]:
+        if (position.on_hand_quantity != balances.get(key, 0)
+                or position.reserved_quantity != reserved.get(key, 0)
+                or position.available_quantity != position.on_hand_quantity - position.reserved_quantity
+                or position.average_unit_cost != averages.get(key, Decimal("0.00000000"))):
             raise ValueError("Stock position/average cost diverge do ledger cronológico.")
     active = defaultdict(int)
     for reservation in data.stock_reservations:
@@ -288,6 +311,11 @@ def validate_completed_data(data: TransactionData, master: MasterData, config: G
         "installments": len(data.payment_installments), "fulfillment_events": len(data.fulfillment_events),
         "transfers": len(data.stock_transfers), "returns": len(data.returns),
         "return_items": len(data.return_items), "refunds": len(data.refunds),
+        "item_cancellations": len(data.sales_order_item_cancellations),
+        "cancelled_units": sum(row.cancelled_quantity for row in data.sales_order_item_cancellations),
+        "gross_cancelled_amount": sum((row.gross_cancelled_amount for row in data.sales_order_item_cancellations), Decimal("0.00")),
+        "discount_cancelled_amount": sum((row.discount_cancelled_amount for row in data.sales_order_item_cancellations), Decimal("0.00")),
+        "net_cancelled_amount": sum((row.net_cancelled_amount for row in data.sales_order_item_cancellations), Decimal("0.00")),
         "captured_amount": captured_total, "refund_amount": data.summary()["refund_amount"],
         "net_financial_amount": captured_total - data.summary()["refund_amount"],
     }
@@ -303,3 +331,17 @@ def _refunds_by_order(data: TransactionData) -> dict[str, list]:
     for row in data.refunds:
         result[row.order_key].append(row)
     return result
+
+
+def _completed_refunds_by_order(data: TransactionData) -> dict[str, Decimal]:
+    result: dict[str, Decimal] = defaultdict(lambda: Decimal("0.00"))
+    for row in data.refunds:
+        if row.status == "completed":
+            result[row.order_key] += row.amount
+    return result
+
+
+def _cancelled_order_financially_resolved(operations: list, captured: Decimal, completed_refunds: Decimal) -> bool:
+    if captured == 0:
+        return any(row.status == "cancelled" for row in operations)
+    return completed_refunds == captured

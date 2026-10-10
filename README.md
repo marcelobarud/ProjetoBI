@@ -36,13 +36,13 @@ O banco operacional deverá representar um ecossistema empresarial coerente, e n
 
 ## Estado atual
 
-**Fase 3E.2c.4 concluída em caráter experimental; M1 do plano mestre está em andamento.** A política candidata de abastecimento foi comparada em 10.000 intenções e passou pela integração PostgreSQL com `ROLLBACK`; uma conexão nova confirmou zero linhas nas 41 tabelas da estrutura aprovada (migrations 001–003). O dataset Portfolio completo ainda não foi gerado nem persistido; a meta de 120.000 pedidos aceitos, auditoria de escala, baselines e preparação analítica permanecem pendentes. Consulte [`docs/PROJECT_COMPLETION_PLAN.md`](docs/PROJECT_COMPLETION_PLAN.md), [`docs/data-generation/implementation.md`](docs/data-generation/implementation.md) e [`docs/data-generation/validation-report.md`](docs/data-generation/validation-report.md).
+**M0–M4 concluídos; M6 documental aprovado; M5 PERFORMANCE READY.** O Portfolio de 120.000 pedidos passou pelas auditorias lógica, distributiva e de estoque; as fixtures PostgreSQL de 10.000 e 50.000 pedidos passaram com rollback e confirmação independente de zero linhas nas 41 tabelas. O sink foi otimizado e revalidado em 10.000 pedidos com rollback. A autorização controlada para um único `COMMIT` foi concedida, mas a carga definitiva ainda não foi iniciada; os baselines finais dependem dela. A construção do modelo Power BI aguarda o encerramento do M5. Consulte [`docs/PROJECT_COMPLETION_PLAN.md`](docs/PROJECT_COMPLETION_PLAN.md), [`docs/powerbi/readiness.md`](docs/powerbi/readiness.md), [`docs/data-generation/implementation.md`](docs/data-generation/implementation.md) e [`docs/data-generation/validation-report.md`](docs/data-generation/validation-report.md).
 
 ## Fases previstas
 
 1. Revisar e aprovar o domínio conceitual (concluído) e consolidar a proposta relacional operacional (Fases 2A e 2A.1 concluídas).
 2. Implementar e validar o esquema operacional no PostgreSQL 18 (Fases 2B, 2B.1 e 2B.2 concluídas; sem dados de negócio persistidos).
-3. Planejar e desenvolver a geração de dados sintéticos consistentes em Python. Fases 3A, 3B, 3C, 3D e 3E.1 concluídas; Fase 3E.2c.4 homologada como experimento. A conclusão do Portfolio, seus baselines SQL e a preparação para Power BI seguem no [`plano mestre`](docs/PROJECT_COMPLETION_PLAN.md); qualquer primeira persistência do Portfolio exige autorização explícita.
+3. Planejar e desenvolver a geração de dados sintéticos consistentes em Python. Fases 3A–3E.1 e M0–M4 do plano mestre concluídos; a geração Portfolio foi validada em modo descartável e rollback-only. A primeira persistência e seus baselines dependem de autorização explícita e seguem no [`plano mestre`](docs/PROJECT_COMPLETION_PLAN.md).
 4. Explorar e selecionar os dados que farão parte da camada analítica.
 5. Construir as transformações, o modelo semântico e as medidas no Power BI.
 6. Desenvolver e revisar os relatórios, mantendo documentação e versionamento alinhados.

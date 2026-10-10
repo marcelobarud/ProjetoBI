@@ -103,6 +103,21 @@ class AppliedDiscount:
 
 
 @dataclass
+class SalesOrderItemCancellation:
+    key: str
+    order_key: str
+    item_key: str
+    cancelled_quantity: int
+    cancellation_reason: str
+    cancelled_at: datetime
+    gross_cancelled_amount: Decimal
+    discount_cancelled_amount: Decimal
+    net_cancelled_amount: Decimal
+    shipping_cancelled_amount: Decimal = Decimal("0.00")
+    external_reference: str | None = None
+
+
+@dataclass
 class StockReservation:
     key: str
     order_key: str
@@ -265,6 +280,7 @@ class Refund:
     reason_code: str
     requested_at: datetime
     processed_at: datetime | None
+    cancellation_key: str | None = None
 
 
 @dataclass
@@ -290,6 +306,7 @@ class TransactionData:
     sales_order_items: list[SaleOrderItem] = field(default_factory=list)
     order_status_history: list[OrderStatusEvent] = field(default_factory=list)
     applied_discounts: list[AppliedDiscount] = field(default_factory=list)
+    sales_order_item_cancellations: list[SalesOrderItemCancellation] = field(default_factory=list)
     stock_reservations: list[StockReservation] = field(default_factory=list)
     fulfillments: list[Fulfillment] = field(default_factory=list)
     fulfillment_items: list[FulfillmentItem] = field(default_factory=list)
@@ -316,6 +333,7 @@ class TransactionData:
             "sales_orders": len(self.sales_orders),
             "sales_order_items": len(self.sales_order_items),
             "discounts": len(self.applied_discounts),
+            "sales_order_item_cancellations": len(self.sales_order_item_cancellations),
             "reservations": len(self.stock_reservations),
             "fulfillments": len(self.fulfillments),
             "fulfillment_items": len(self.fulfillment_items),

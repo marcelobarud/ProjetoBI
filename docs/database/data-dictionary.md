@@ -365,6 +365,7 @@
 | sales_order_id | BIGINT | Não | Chave para validar mesmo pedido. |
 | payment_id | BIGINT | Não | FK composta para pagamento/pedido. |
 | return_id | BIGINT | Sim | FK composta para devolução/pedido; nulo para estorno sem devolução. |
+| sales_order_item_cancellation_id | BIGINT | Sim | FK composta para cancelamento de item/pedido; nulo quando o estorno não se refere a cancelamento. |
 | status | VARCHAR(20) | Não | Estado próprio do reembolso. |
 | amount | NUMERIC(19,2) | Não | Valor solicitado/estornado. |
 | reason_code | VARCHAR(30) | Sim | Motivo limitado por domínio. |
@@ -529,7 +530,26 @@
 | product_name_snapshot | VARCHAR(180) | Não | Nome comercial snapshot. |
 | quantity | BIGINT | Não | Quantidade vendida positiva. |
 | unit_sale_price | NUMERIC(19,2) | Não | Preço unitário aplicado. |
+| fulfilled_quantity | BIGINT | Não | Quantidade expedida acumulada, sincronizada por trigger a partir dos fulfillment items. |
+| cancelled_quantity | BIGINT | Não | Quantidade cancelada acumulada, sincronizada a partir dos cancelamentos registrados. |
 | created_at | TIMESTAMPTZ | Não | Criação da linha. |
+
+### sales.sales_order_item_cancellations
+
+| Coluna | Tipo | Nulável | Finalidade |
+|---|---|---|---|
+| sales_order_item_cancellation_id | BIGINT GENERATED ALWAYS AS IDENTITY | Não | PK técnica. |
+| sales_order_id | BIGINT | Não | Pedido proprietário do item cancelado. |
+| sales_order_item_id | BIGINT | Não | Item do pedido; FK composta impede cruzar pedidos. |
+| cancelled_quantity | BIGINT | Não | Quantidade positiva cancelada após expiração do prazo de estoque. |
+| cancellation_reason | VARCHAR(30) | Não | Motivo controlado; atualmente `stock_timeout`. |
+| cancelled_at | TIMESTAMPTZ | Não | Instante do cancelamento. |
+| gross_cancelled_amount | NUMERIC(19,2) | Não | Valor bruto das unidades canceladas. |
+| discount_cancelled_amount | NUMERIC(19,2) | Não | Parcela determinística dos descontos originais. |
+| net_cancelled_amount | NUMERIC(19,2) | Não | Valor líquido cancelado, bruto menos desconto. |
+| shipping_cancelled_amount | NUMERIC(19,2) | Não | Frete estornado somente no cancelamento integral sem expedição. |
+| external_reference | VARCHAR(120) | Sim | Referência lógica/auditável do evento. |
+| created_at | TIMESTAMPTZ | Não | Instante de gravação. |
 
 ### sales.order_status_history
 

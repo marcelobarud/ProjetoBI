@@ -51,7 +51,8 @@ A regra que vincula customer_type a exatamente um perfil PF/PJ depende de consis
 |---|---|---|
 | sales_channels | PK(sales_channel_id) | UNIQUE(channel_code); UNIQUE(sales_channel_id, channel_type) para FK composta do pedido; channel_type ∈ {physical, ecommerce, marketplace}. |
 | sales_orders | PK(sales_order_id); (sales_channel_id, channel_type) → sales_channels; customer_id opcional → customers; store_id opcional → core.stores; salesperson_employee_id opcional → employees; customer_address_id opcional → customer_addresses | UNIQUE(order_number); CHECK cliente nulo somente se channel_type=physical; order_status ∈ {draft, placed, confirmed, cancelled, completed}; currency_code = BRL; valores monetários ≥ 0; total conciliado com subtotal, desconto e frete pela aplicação. |
-| sales_order_items | PK(sales_order_item_id); sales_order_id → sales_orders; product_id → products | UNIQUE(sales_order_id, line_number); UNIQUE(sales_order_id, sales_order_item_id) para FKs compostas; quantity > 0; unit_sale_price ≥ 0. Custo realizado não é armazenado na linha de pedido. |
+| sales_order_items | PK(sales_order_item_id); sales_order_id → sales_orders; product_id → products | UNIQUE(sales_order_id, line_number); UNIQUE(sales_order_id, sales_order_item_id) para FKs compostas; quantity > 0; unit_sale_price ≥ 0; fulfilled_quantity/cancelled_quantity não negativos e soma ≤ quantity. Custo realizado não é armazenado na linha de pedido. |
+| sales_order_item_cancellations | PK; (sales_order_id,sales_order_item_id) → sales_order_items | quantidade positiva; motivo `stock_timeout`; valores BRL não negativos; líquido = bruto − desconto; cumulativo limitado junto à quantidade expedida por triggers transacionais; índices por item e pedido. |
 | order_status_history | PK(order_status_history_id); sales_order_id → sales_orders; changed_by_employee_id opcional → employees | status ∈ {draft, placed, confirmed, cancelled, completed}; eventos imutáveis por convenção; sequência/estado corrente atualizados na mesma transação. |
 | applied_discounts | PK(applied_discount_id); (sales_order_id, sales_order_item_id) → sales_order_items | discount_scope ∈ {line, order_allocation}; amount > 0; desconto da linha não pode exceder seu valor elegível; soma das alocações de cabeçalho = desconto do pedido; valor líquido de cada linha ≥ 0 (validação transacional). |
 
@@ -89,7 +90,7 @@ A reconciliação física entre ledger e posição e o pareamento de dois movime
 | payment_methods | PK(payment_method_id) | UNIQUE(method_code); method_type ∈ {card, cash, instant, bank_transfer, other}. |
 | payments | PK(payment_id); sales_order_id → sales_orders; payment_method_id → payment_methods | UNIQUE(sales_order_id, payment_id) para FK de reembolso; status ∈ {pending, authorized, captured, settled, declined, cancelled, failed}; currency_code = BRL; amount > 0; valores recebidos dependem do estado financeiro, não do pedido. |
 | payment_installments | PK(payment_installment_id); payment_id → payments | UNIQUE(payment_id, installment_number); installment_number > 0; amount > 0; status ∈ {pending, paid, overdue, cancelled, failed}. |
-| refunds | PK(refund_id); (sales_order_id, payment_id) → payments; (sales_order_id, return_id) → after_sales.returns opcional | status ∈ {requested, processing, completed, rejected, cancelled}; amount > 0; referência composta impede cruzar pedidos. |
+| refunds | PK(refund_id); (sales_order_id, payment_id) → payments; (sales_order_id, return_id) → after_sales.returns opcional; (sales_order_id, sales_order_item_cancellation_id) → sales_order_item_cancellations opcional | status ∈ {requested, processing, completed, rejected, cancelled}; amount > 0; estorno não pode referenciar simultaneamente devolução e cancelamento; reembolso limitado à captura. |
 
 Soma de parcelas igual ao valor contratado e soma dos reembolsos concluídos limitada ao valor liquidado/reembolsável dependem de validação transacional e regras do meio de pagamento.
 
@@ -150,7 +151,7 @@ Além dos índices de PK/UNIQUE acima, criar somente os seguintes grupos de apoi
 
 Índices parciais únicos adicionais: CPF/CNPJ e tax_identifier quando preenchidos; endereço/contact primário ativo por cliente; fornecedor preferencial ativo por produto; referências externas idempotentes quando a origem garantir unicidade. Não adicionar GIN a specifications nesta versão; avaliar somente se consultas operacionais reais por chaves internas justificarem. Evitar índices redundantes com PK/UNIQUE, baixa seletividade sem carga comprovada e todas as colunas indiscriminadamente.
 
-Os códigos de motivo são propostas curtas a revisar: returns.reason_code ∈ {defective, damaged, incorrect_item, buyer_remorse, other}; refunds.reason_code ∈ {customer_request, return, duplicate_charge, other}; stock_movements.reason_code para ajuste ∈ {count_correction, damage, loss, found, other}. Não há regra fiscal implícita nesses vocabulários.
+Os códigos de motivo de devolução são `returns.reason_code` ∈ {defective, damaged, incorrect_item, buyer_remorse, other}; `refunds.reason_code` ∈ {customer_request, return, duplicate_charge, other, stock_timeout}; stock_movements.reason_code para ajuste ∈ {count_correction, damage, loss, found, other}. O refund de cancelamento aponta explicitamente para sales_order_item_cancellations e nunca simultaneamente para return_id. Não há regra fiscal implícita nesses vocabulários.
 
 ### Cobertura adicional de FKs
 
@@ -174,3 +175,7 @@ Além dos grupos acima, criar índices simples nas FKs opcionais ou nas FKs que 
 ## Exclusão e preservação histórica
 
 As FKs não usam ON DELETE CASCADE. Cadastros transacionais referenciados não devem ser apagados; inativar. Remoção de rascunhos sem histórico pode ser avaliada futuramente em política explícita.
+
+## Migration 003 — cancelamento parcial de item
+
+`database/migrations/003_partial_item_cancellations.sql` adiciona `sales.sales_order_item_cancellations`, os contadores acumulados `fulfilled_quantity` e `cancelled_quantity` em `sales.sales_order_items` e a FK composta de refunds para cancelamento. Checks na linha limitam a soma expedida + cancelada à quantidade original. Triggers atualizam os contadores a partir das mudanças em `logistics.fulfillment_items` e `sales.sales_order_item_cancellations`; os updates atômicos na mesma linha do item serializam concorrência e a CHECK rejeita excesso. Índices da nova entidade e da referência de refund suportam consultas por item/pedido. A migration aplicada e as contagens estruturais constam em `validation-report.md`.

@@ -1,13 +1,17 @@
 from copy import deepcopy
 from dataclasses import replace
 from collections import Counter
+from datetime import datetime, timedelta
 from decimal import Decimal
 import hashlib
 import json
+from types import SimpleNamespace
+from zoneinfo import ZoneInfo
 
 import pytest
 
-from projectbi_generator.generators.completion import extend_transactions, generate_full_transactions_incremental
+from projectbi_generator.generators.completion import _replay_extended_stock, extend_transactions, generate_full_transactions_incremental
+from projectbi_generator.models.transactions import StockMovement, StockStateEvent, TransactionData
 from projectbi_generator.sinks import CollectingSink, CountingDiscardingSink
 from projectbi_generator.sinks import _canonical
 from projectbi_generator.validation.completion import validate_completed_data
@@ -170,6 +174,7 @@ def test_incremental_full_smoke_matches_legacy_all_21_tables(completed_data, mas
     legacy_tables["stock_positions"] = list(completed_data.stock_positions.values())
     streamed_tables = {name: sink.rows_by_table[name] for name in legacy_tables}
     assert canonical_digest(legacy_tables) == canonical_digest(streamed_tables)
+    assert canonical_digest(streamed_tables) == "36640f5474a02c02168cb50f983327b2c9f181bd5d8cdaca50ab5513bf23874a"
     actual = {"orders": 300, "items": 630, "payments": 314, "installments": 587,
               "fulfillments": 193, "fulfillment_items": 227, "fulfillment_events": 590,
               "transfers": 2, "returns": 8, "refunds": 6}
@@ -224,6 +229,43 @@ def test_sellable_return_updates_average_before_later_fulfillment(completed_data
         assert movement.unit_cost == returned.unit_cost
         return
     pytest.fail("Smoke não exercitou fulfillment posterior a retorno vendável no mesmo produto/local.")
+
+
+def test_same_timestamp_stock_events_follow_causal_priority_and_replay_order():
+    at = datetime(2026, 1, 2, 12, tzinfo=ZoneInfo("America/Sao_Paulo"))
+    later = at + timedelta(minutes=1)
+    data = TransactionData()
+    data.stock_movements = [
+        StockMovement("m-retail-a", "SKU-ROUND", "LOC-RETAIL", "fulfillment", -1, Decimal("0"), at, fulfillment_item_key="fi-a"),
+        StockMovement("m-retail-b", "SKU-ROUND", "LOC-RETAIL", "fulfillment", -1, Decimal("0"), at, fulfillment_item_key="fi-b"),
+        StockMovement("m-return", "SKU-ROUND", "LOC-RETAIL", "customer_return", 1, Decimal("0"), at, return_item_key="ri-a"),
+        StockMovement("m-destination-sale", "SKU-TRANSFER", "LOC-DEST", "fulfillment", -1, Decimal("0"), later + timedelta(minutes=1), fulfillment_item_key="fi-dest"),
+    ]
+    data.return_items = [SimpleNamespace(key="ri-a", source_fulfillment_item_key="fi-a")]
+    data.stock_state_events = [
+        StockStateEvent("z-retail-receipt", at, "receipt", "SKU-ROUND", "LOC-RETAIL", 2, 10, Decimal("10.00000000")),
+        StockStateEvent("reserve-a", at, "reserve", "SKU-ROUND", "LOC-RETAIL", 1, 15),
+        StockStateEvent("fulfill-a", at, "fulfillment", "SKU-ROUND", "LOC-RETAIL", 1, 20, movement_key="m-retail-a"),
+        StockStateEvent("b-retail-receipt", at, "receipt", "SKU-ROUND", "LOC-RETAIL", 1, 30, Decimal("20.00000000")),
+        StockStateEvent("return-before-sale", at, "customer_return", "SKU-ROUND", "LOC-RETAIL", 1, 40,
+                        movement_key="m-return", return_item_key="ri-a"),
+        StockStateEvent("reserve-b", at, "reserve", "SKU-ROUND", "LOC-RETAIL", 1, 50),
+        StockStateEvent("fulfill-b", at, "fulfillment", "SKU-ROUND", "LOC-RETAIL", 1, 60, movement_key="m-retail-b"),
+        StockStateEvent("source-receipt", later, "receipt", "SKU-TRANSFER", "LOC-SOURCE", 2, 10, Decimal("50.00000000")),
+        StockStateEvent("transfer-out", later, "transfer_out", "SKU-TRANSFER", "LOC-SOURCE", 1, 40, transfer_item_key="ti-1"),
+        StockStateEvent("transfer-in-first", later + timedelta(minutes=1), "transfer_in", "SKU-TRANSFER", "LOC-DEST", 1, 10, transfer_item_key="ti-1"),
+        StockStateEvent("destination-reserve", later + timedelta(minutes=1), "reserve", "SKU-TRANSFER", "LOC-DEST", 1, 20),
+        StockStateEvent("destination-fulfillment", later + timedelta(minutes=1), "fulfillment", "SKU-TRANSFER", "LOC-DEST", 1, 30, movement_key="m-destination-sale"),
+    ]
+
+    _replay_extended_stock(data)
+
+    movements = {row.key: row for row in data.stock_movements}
+    assert movements["m-retail-a"].unit_cost == Decimal("10.00000000")
+    assert movements["m-return"].unit_cost == Decimal("10.00000000")
+    assert movements["m-retail-b"].unit_cost == Decimal("13.33333333")
+    assert movements["MOV-TRANSFER-ti-1-OUT"].unit_cost == movements["MOV-TRANSFER-ti-1-IN"].unit_cost == Decimal("50.00000000")
+    assert movements["m-destination-sale"].unit_cost == Decimal("50.00000000")
 
 
 def test_distant_return_and_refund_keep_only_bounded_active_state(master_data, config):

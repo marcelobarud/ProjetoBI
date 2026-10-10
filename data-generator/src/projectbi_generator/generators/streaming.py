@@ -83,6 +83,7 @@ class StreamingCoreResult:
     TABLES = (
         "purchase_orders", "purchase_order_items", "goods_receipts", "goods_receipt_items",
         "sales_orders", "sales_order_items", "order_status_history", "applied_discounts",
+        "sales_order_item_cancellations",
         "stock_reservations", "fulfillments", "fulfillment_items", "stock_movements",
         "stock_state_events", "payments", "payment_installments", "fulfillment_events",
         "stock_transfers", "stock_transfer_items", "returns", "return_items", "refunds",
@@ -131,6 +132,11 @@ class StreamingCoreResult:
             "non_sellable_returns": 0,
             "returned_units": 0,
             "refund_count": 0,
+            "item_cancellations": 0,
+            "cancelled_units": 0,
+            "gross_cancelled_amount": Decimal("0.00"),
+            "discount_cancelled_amount": Decimal("0.00"),
+            "net_cancelled_amount": Decimal("0.00"),
         }
 
     def _emit(self, table: str, row: Any) -> None:
@@ -153,6 +159,12 @@ class StreamingCoreResult:
             self.aggregates["items"] += 1
         elif table == "applied_discounts":
             self.aggregates["discount_count"] += 1
+        elif table == "sales_order_item_cancellations":
+            self.aggregates["item_cancellations"] += 1
+            self.aggregates["cancelled_units"] += row.cancelled_quantity
+            self.aggregates["gross_cancelled_amount"] += row.gross_cancelled_amount
+            self.aggregates["discount_cancelled_amount"] += row.discount_cancelled_amount
+            self.aggregates["net_cancelled_amount"] += row.net_cancelled_amount
         elif table == "fulfillments":
             self.aggregates["fulfillments"] += 1
         elif table == "fulfillment_items":

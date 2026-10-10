@@ -1,6 +1,6 @@
 # ProjetoBI — Plano Mestre de Conclusão e Preparação para Power BI
 
-**Status:** EM EXECUÇÃO — M0 concluído; próximo marco M1
+**Status:** M5 PERFORMANCE READY — M0 a M4 concluídos; M6 documental PASS; autorização controlada do COMMIT Portfolio concedida, carga definitiva ainda não executada
 **Diretório:** `D:\Codex\ProjetoBI`
 **Objetivo principal:** concluir e validar o dataset Portfolio, disponibilizar baselines SQL confiáveis e preparar a exploração analítica no Power BI.
 
@@ -57,22 +57,13 @@ A candidata utiliza distribuição inicial conservativa por SKU, reposição bas
 
 As transferências tiveram ganho marginal no ensaio e não devem ser ativadas definitivamente sem comparação adicional.
 
-Última suíte sem integração: 113 aprovados, 6 ignorados. Integração PostgreSQL da candidata aprovada com rollback e 41 tabelas vazias.
+M1 homologou safety 3× e transferências automáticas desligadas no profile; a integração PostgreSQL da configuração aprovada passou em M4 com rollback. A integração 10k da candidata experimental com transferências também passou anteriormente.
 
-### Pendências conhecidas
+### Pendências atuais
 
-1. Homologar a política oficial de abastecimento.
-2. Controlar 120.000 pedidos aceitos, distinguindo intenções e recusas.
-3. Calibrar volumes anuais e sazonalidade.
-4. Calibrar distribuição por canal.
-5. Calibrar recorrência e segmentos PF/PJ.
-6. Calibrar métodos de pagamento por canal.
-7. Validar lifecycle, descontos, returns e margem após os ajustes.
-8. Comprovar determinismo, performance e memória em escala.
-9. Executar auditoria lógica integral sem persistência.
-10. Executar integração PostgreSQL representativa com rollback.
-11. Executar carga definitiva somente após autorização de persistência.
-12. Criar baselines, validação final e preparar a entrada no Power BI.
+1. Executar a carga única autorizada de 120.000 pedidos quando houver solicitação para iniciar; não fazê-la automaticamente durante o diagnóstico de desempenho.
+2. Após a carga, validar baselines e documentação final; preservar os dados se qualquer gate pós-COMMIT falhar.
+3. Depois da conclusão do M5, iniciar a fase aprovada de modelagem Power BI; M6 preparatório foi concluído sem criar modelo ou medidas.
 
 ## 3. Regras de execução
 
@@ -280,7 +271,7 @@ Não alterar schema sem autorização.
 
 **Objetivo:** persistir o Portfolio validado e preparar sua exploração analítica.
 
-Este marco exige autorização explícita para o primeiro COMMIT de dados Portfolio.
+O usuário concedeu autorização controlada para um único COMMIT Portfolio. O diagnóstico de desempenho documentado abaixo não executou essa carga.
 
 Após autorização:
 
@@ -300,7 +291,7 @@ Não reproduzir fanout ao juntar várias tabelas fato.
 
 Após o COMMIT, não executar testes que dependam de banco vazio na mesma database e nunca resetar a base para contornar falhas.
 
-**Gate M5:** dataset persistido e verificado, 120.000 pedidos aceitos, baselines aprovados, documentação final e zero divergências críticas.
+**Gate M5:** dataset persistido e verificado, 120.000 pedidos aceitos, baselines aprovados, documentação final e zero divergências críticas. O status `M5 PERFORMANCE READY` significa somente que o diagnóstico/correção de desempenho passou; não significa que o dataset esteja persistido.
 
 ## 10. Marco M6 — Preparação analítica e transição para Power BI
 
@@ -415,14 +406,79 @@ O objetivo completo será alcançado quando:
 - **Limitações conhecidas:** memória ainda não foi medida; a política de abastecimento permanece experimental e M1 deverá comparar com/sem transferências antes de configurar a candidata oficial. M2–M4 não estão homologados.
 - **Próximo passo:** M1 — reproduzir comparações de abastecimento, medir memória e fila, escolher configuração técnica dentro das bandas aprovadas e registrar a decisão sem alterar regras comerciais.
 
+### Checkpoint M1 — 2026-10-08
+
+- **Status:** PASS. Profile Portfolio homologado tecnicamente com bootstrap 65% para lojas, reposição por cobertura ligada, segurança 3× e transferências automáticas da política desligadas. As 12 transferências estruturais configuradas permanecem separadas dessa flag.
+- **Evidência de política:** matriz controlada de 10.000 intenções, mesma seed/código e mesmo digest de intenções em todas as variantes; conservation do estoque inicial por SKU confirmada. Safety 3 foi escolhido frente a safety 2 (19 aceitos adicionais, 56 unidades perdidas a menos, 3 pedidos a menos no cutoff; custo adicional de 8.677 unidades ordenadas e redução de 326.729,73 dias/1.103 episódios de ruptura). Safety 4 foi rejeitado pelo ganho marginal frente ao custo adicional. Transferências automáticas foram desligadas por desempenho ligeiramente pior e economia de apenas 46 unidades de procurement no teste safety 2.
+- **Escala/memória:** em 25.000 intenções com sink descartável, bootstrap 65% levou 95,93 s e teve pico incremental Python de 44,2 MiB; cobertura safety 3 levou 107,06 s e pico de 34,1 MiB. Ambos limitaram batches a 5.000 e fila a 11.496 eventos. Estados ativos, pedidos e backorders foram medidos; detalhes estão em `docs/data-generation/validation-report.md`.
+- **Validação:** configuração coberta por teste unitário; suíte atual: 114 passed/6 skipped em 21,84 s. A integração PostgreSQL da candidata safety 2 + transferências repetiu e passou em 504,78 s com rollback e 41 tabelas vazias. A integração específica do perfil M1 fica para o M4.
+- **Git:** working tree acumulada preservada. Sem commit nesta subfase conforme instrução explícita da Fase 3E.2c.4; sem push.
+- **Limitações:** o resultado 25k é diagnóstico de desempenho, não confirma as distribuições comerciais de 120k. A variante oficial ainda não foi executada em PostgreSQL; isso está planejado em M4.
+- **Próximo passo:** M2 — separar alvo de pedidos aceitos de intenções e calibrar volumes anuais/canais/clientes/pagamentos sem alterar as faixas aprovadas.
+
+### Checkpoint M2 — execução Portfolio descartável (2026-10-09)
+
+- **Execução final:** profile Portfolio, seed `20261005`, meta de 120.000 pedidos aceitos, gerador incremental e sink de agregação/descarte. Não conectou ao PostgreSQL nem persistiu linhas. Duração transacional 110,68 s, master 1,61 s, 4.350.830 linhas encaminhadas ao sink, batch máximo 5.000 e fila máxima 11.496 eventos.
+- **Pedidos/tempo/canais:** exatamente 120.000 aceitos; 176.292 intenções processadas, 214.604 planejadas, 38.312 puladas por quota preenchida e cap de tentativas 230.000. Quotas realizadas: 2023 24.000 (20%), 2024 30.000 (25%), 2025 36.000 (30%) e jan–set/2026 30.000 (25%). Mix anual de canal foi exatamente o configurado: físico 54/53/52/50%; e-commerce 29/29/29/31%; marketplaces combinados 17/18/19/19%. Sem novembro de 2026.
+- **Distribuições:** 116.305 completed (96,92%), 3.265 cancelled (2,72%) e 430 confirmed no cutoff (0,36%); canais totais físico/e-commerce/marketplace 52,15/29,50/18,35%; anonimato físico 31,69%. Recorrência PF: 42/38/16/4% e PJ: 25/45/25/5% nas quatro faixas; média PJ 4,0779 pedidos versus PF 3,2446. Cartão/instantâneo/dinheiro/transferência 48,08/42,96/8,19/0,76%; descontos 38,74%, incidência Black Friday 54,69% versus 37,27% nos demais meses; pedidos completed com devolução 5,95%; participação de receita completed PJ 19,12%; ticket médio PJ/PF 1,6944×.
+- **Financeiro — regra aprovada pelo usuário e aplicada:** preservar COGS original nos movimentos fulfillment; deduzir da margem apenas o custo histórico das devoluções `sellable` reintegradas; identificar `non-sellable` como perda que permanece incluída no COGS analítico. Benchmark: receita BRL 922.588.975,44; COGS original BRL 725.466.564,62; reversão vendável BRL 8.010.914,36; COGS analítico BRL 717.455.650,26; perda não vendável identificada BRL 12.296.704,23; margem 22,23%. Reconciliação fecha ao centavo e a margem está dentro de 8–28%.
+- **Reconciliação financeira:** COGS completed original BRL 725.466.564,62 menos reversão sellable BRL 8.010.914,36 = COGS analítico BRL 717.455.650,26. Perda non-sellable BRL 12.296.704,23 é um subconjunto do COGS analítico mantido e não foi abatida novamente.
+- **Gate M2: PASS.** Quotas mensais/canais e alvo aceito conferidos célula a célula; classificador Portfolio reportou zero falhas críticas, zero falhas distribucionais e zero avisos. Receita, COGS, reversão e perda reconciliados conforme a regra aprovada.
+
+### Checkpoint M3 — auditoria/replay Portfolio 120k (2026-10-09)
+
+- **Quotas e distribuições:** 120.000/120.000 aceitos; 0 células mensais por canal divergentes; classificador Portfolio: 0 critical fails, 0 distributional fails, 0 warnings. A suíte de memória completa passou 117 testes e 6 integrações PostgreSQL ficaram ignoradas por opção de execução.
+- **Replay independente de estoque:** 675.382 eventos reproduzidos em ordem causal e média móvel; 13.837 posições em 1.000 SKUs; 11.949 unidades iniciais; saldo final 10.089 unidades físicas/disponíveis; zero posições com divergência em quantidade, reserva ou custo médio; zero saldo disponível final sem demanda. Rupturas agregadas: 7.342.024,68 dias-item e 166.369 episódios.
+- **Performance/memória:** auditoria descartável com replay, sem tracemalloc: 113,19 s de transações e 1,61 s de master; batch máximo 5.000; 11.496 eventos pendentes no pico; 745 pedidos ativos e 609 backorders ativos no pico, sem estados ativos após encerramento. Medição final com tracemalloc da versão que inclui o auditor lógico: 662,81 s, pico de heap Python 923,64 MiB e heap corrente 515,98 MiB. O working set observado em amostra chegou a pelo menos 2,35 GiB; não é um medidor de pico do processo.
+- **Auditoria lógica descartável:** 9 de 9 gates passaram nos 120k: totais de item/desconto; fulfillment/cancelamentos; parcelas; pagamentos/refunds; returns contra fulfillment original; lifecycle de eventos logísticos; links/valores de refunds; COGS analítico e perda sem dupla contagem; pares de movimentos de transferências. Sink reteve agregados de 120.000 pedidos, 241.637 itens, 237.742 linhas de fulfillment, 127.380 pagamentos e 7.129 itens de devolução; descartou as linhas relacionais após agregação. Resultado: zero divergências.
+- **Fixture SQL reduzida:** 300 pedidos do profile smoke, PostgreSQL major 18. A geração streaming independente teve contagens idênticas às do fixture PostgreSQL; 39 checks SQL ficaram em zero; os cinco agregados financeiros (receita, COGS original, reversão vendável, perda não vendável e COGS analítico) coincidiram com o baseline SQL; nove gates lógicos passaram; `ROLLBACK` e nova conexão confirmaram zero linhas nas 41 tabelas. Duração da fixture 2,55 s.
+- **Determinismo:** teste entre batch sizes 73 e 127 passou, comparando integralmente as linhas coletadas e as contagens. M3: PASS. A medição de memória é documentada como alta e deve ser considerada ao planejar escalas de persistência; o sink continua descartável.
+- **Próximo naquele checkpoint:** M4 — fixtures PostgreSQL rollback-only para 10.000 e 50.000 pedidos aceitos. O checkpoint M4 abaixo registra a conclusão dessas verificações; M5 continua aguardando autorização explícita para COMMIT permanente.
+
+### Checkpoint M4 — homologação PostgreSQL rollback-only (2026-10-09)
+
+- **Status:** PASS. As fixtures Portfolio de 10.000 e 50.000 pedidos aceitos concluíram no PostgreSQL 18, cada uma em transação única com `ANALYZE`, validações e `ROLLBACK` explícito.
+- **Fixture 10k:** 10.000 pedidos; 341.396 linhas transacionais; 39 invariantes SQL sem falhas; 41 tabelas vazias verificadas após rollback; duração 466,99 s. Os controles negativos rejeitaram cancelamento acima da quantidade elegível e validaram refund dividido em pagamentos, dentro de savepoints revertidos.
+- **Fixture 50k:** 50.000 pedidos; 1.454.848 linhas transacionais; 39 invariantes SQL sem falhas; zero IDs transacionais retidos; 41 tabelas vazias verificadas após rollback; duração 8.597,54 s. O cenário teve 53.082 pagamentos, 81.993 parcelas, 3.022 refunds, 2.992 returns, 163.833 movimentos de estoque e 217.220 eventos logísticos.
+- **Conciliação financeira SQL 50k:** receita líquida de fulfillments completed BRL 385.445.464,80; COGS original de fulfillment BRL 302.895.054,13; reversão dos custos de returns `sellable` BRL 3.313.558,21; COGS analítico BRL 299.581.495,92; perda `non-sellable` identificada BRL 5.076.322,25. O COGS original permanece no ledger; a perda `non-sellable` é subconjunto do COGS analítico, sem dedução dupla.
+- **Estado do banco:** verificação independente após a conclusão, em conexão nova, confirmou 41 tabelas, zero tabelas não vazias e zero linhas operacionais. Nenhuma carga Portfolio foi commitada.
+- **Próximo:** M5 aguarda autorização explícita para o primeiro `COMMIT` permanente. Nenhuma persistência, baseline dependente de dados ou trabalho no Power BI foi iniciado.
+
+### Checkpoint M6 — prontidão analítica documental (2026-10-09)
+
+- **Status:** PASS documental. O inventário cobre 41 entidades e suas granularidades/PKs; registra fatos e dimensões candidatos, métricas neutras, relações temporais, fanouts, política de margem, datas locais e limites do snapshot corrente.
+- **Consultas:** quatro SELECTs de referência em `database/queries/powerbi_readiness/` foram executados dentro da fixture smoke PostgreSQL de 300 pedidos: 300 linhas em pedido, 17 grupos de margem canal/categoria, 2 anos na consulta YTD e 35 posições correntes; 23, 10, 8 e 13 colunas. Os 39 invariantes SQL passaram; `ROLLBACK` e nova conexão confirmaram 41 tabelas vazias. A inspeção de schema separada foi `READ ONLY`; nenhuma linha permaneceu persistida.
+- **Fonte verificada:** PostgreSQL 18, 9 schemas, 41 tabelas, 72 FKs e zero linhas operacionais em inspeção somente leitura. Uma amostra de métricas financeiras 50k rollback-only foi documentada com a conciliação M4, sem apresentá-la como dado persistido.
+- **Limites:** não foram criados usuário/role nem privilégios; a orientação read-only está documentada. Não foi criado PBIP, modelo semântico, Power Query, DAX ou relatório.
+- **Gate M6: PASS para iniciar a futura modelagem.** M5 continua à espera da autorização explícita do usuário para o primeiro COMMIT definitivo.
+
+### Preflight M5 — pronto, sem persistência (2026-10-09)
+
+- **Configuração/alvo:** carregamento local de configuração sem expor credenciais; a conexão read-only confirmou database `projeto_bi`, PostgreSQL major 18, 9 schemas, 41 tabelas, guard estrutural PASS e zero linhas.
+- **Plano sem escrita:** `python -m projectbi_generator.cli full --profile portfolio --plan` retornou alvo de 120.000 pedidos aceitos, 219.009 linhas mestre estimadas, 2.200.000 linhas transacionais estimadas e batch 5.000; `database_connected=false`, `generated=false` e `persistent_write=false`.
+- **Revisão do caminho de persistência:** o CLI só aceita `--commit` com profile Portfolio; `run_portfolio_commit` revalida estrutura e vazio em conexão read-only e em uma única transação, executa validações críticas/distribucionais antes do COMMIT e verifica a base em nova conexão read-only depois. A criação/execução dos 13 baselines ocorre após o COMMIT.
+- **Baselines pré-validados sem persistência:** os 13 SQLs oficiais foram executados dentro de fixture smoke de 300 pedidos; 00 retornou 41 tabelas, 11 reconciliou COGS, reversão vendável, perda não vendável e margem, 12 trouxe 2025/2026, e os cinco critérios de reconciliação do validador passaram. A fixture passou 39 invariantes e reverteu todas as linhas. Os arquivos definitivos de baseline continuam destinados à etapa M5 depois do COMMIT.
+- **Correção preventiva de M5:** essa execução encontrou `sales_order_id` ambíguo na métrica pré-COMMIT `margin_return_costs`; a junção agora declara `o.sales_order_id=ri.sales_order_id`. Também foi atualizado o rótulo do resultado do baseline de controle de 40 para 41 tabelas. O novo teste de integração para os 13 baselines passou em 11,79 s. Suíte local: 117 passados e 7 integrações condicionais ignoradas.
+- **Gate de autorização:** nenhum comando `--commit` foi executado. A verificação `--plan` não gerou dados; a fixture smoke usada para validar as consultas existiu somente na transação rollback-only. Nenhum dado Portfolio foi persistido, staged ou publicado. O plano para no M5, aguardando autorização explícita para iniciar a carga definitiva.
+
+### Checkpoint M5 — diagnóstico final de desempenho/capacidade (2026-10-09)
+
+- **Causa reproduzida:** `_write_stock` executava `UPDATE inventory.stock_positions` e `INSERT inventory.stock_movements` de forma individual para cada evento de estoque. Na fixture 10k, isso somou 76.565 comandos de update (120,35 s) e 41.968 inserts individuais (40,78 s). O backend PostgreSQL atingiu 74–102% de um núcleo, sem wait event; Python ficou entre 0–34% e a I/O observada permaneceu abaixo de 1 MiB/s. A migration 003 também atualiza `sales_order_items` por trigger para cada `fulfillment_item`: 20.205 itens e 20.206 updates contabilizados no teste, com 32,40 s antes da correção e 9,84 s depois; esse comportamento é necessário à integridade e não foi alterado.
+- **Correção:** o sink agora mantém o estado causal em memória durante cada lote, insere `stock_movements` em lote na ordem original e atualiza cada posição tocada uma vez por lote. Em database vazia, a criação inicial da posição retorna também seus valores, evitando um `SELECT ... FOR UPDATE` adicional; colisões continuam fazendo o `SELECT ... FOR UPDATE`. Nenhuma migration, constraint, regra comercial ou seed foi alterada.
+- **Medição comparável 10k:** o probe anterior à correção fechou em 374,08 s (351,28 s geração transacional, 345,34 s em `consume`, 176,99 s em `_write_stock`, com partes sobrepostas). Após batch writes, fechou em 131,77 s: queda de 64,8%; 109,53 s geração transacional, 5,79 s fora do sink, 103,74 s em `consume`, 39,51 s no writer de estoque, 1,83 s `ANALYZE` e 1,45 s validações SQL. O sink passou de 155.527 para 53.024 round trips aproximados. 1.412 flushes, batch máximo 5.000, 341.396 linhas relacionais e 0 IDs transitórios ao final.
+- **Validação de dados:** a fixture 10k pós-correção passou os 39 invariantes, terminou com `ROLLBACK` e confirmou zero linhas nas 41 tabelas em conexão nova e numa conferência independente. O smoke PostgreSQL de 300 pedidos passou após a otimização adicional de `_position`; digest do gerador e os cinco agregados oracle permaneceram aprovados. A suíte completa passou 117 testes; 7 integrações condicionais foram ignoradas na execução sem a flag de integração.
+- **Capacidade observada:** durante a fixture, RAM livre ficou aproximadamente entre 7,36 e 8,16 GiB de 15,87 GiB; working set privado Python ~155 MiB e backend PostgreSQL ~20 MiB; pagefile manteve ~292 MiB usados (26 GiB alocados). O volume D tinha 385,39 GiB livres. PostgreSQL 18.6: database 332 MB, diretório WAL 621 MB/37 arquivos ao final; o WAL emitido pelo probe otimizado foi 323.406.408 bytes incluindo master e transações. `max_wal_size=1 GiB` é limite brando; espaço disponível é suficiente, embora checkpoints possam afetar duração. `track_io_timing=off` e `pg_stat_statements` ausente limitam a atribuição de latência física/por query; os tempos por chamada vieram da instrumentação temporária do cliente e amostras WMI do processo.
+- **Projeção/limites:** a simples multiplicação do 10k otimizado projeta ~26 minutos para 120k, antes de variação por maior volume, validação pós-COMMIT e baselines; use apenas como ordem de grandeza, sem garantia. Os 50k/120k não foram executados após a correção por limite desta etapa. A evidência de CPU/memória/disco é suficiente para `M5 PERFORMANCE READY`, com monitoramento contínuo na futura carga única.
+- **Estado:** nenhum `--commit`, migration ou escrita permanente foi executado. A autorização única concedida continua não consumida. M5 (dataset persistido e baselines finais) segue incompleto; este checkpoint cobre apenas desempenho/capacidade.
+
 ### Estado dos marcos
 
 | Marco | Status | Evidência/pendência |
 |---|---|---|
 | M0 — estado técnico | PASS | Checkpoint acima; schema e banco atuais verificados. |
-| M1 — abastecimento | IN PROGRESS | Matriz 10k experimental aprovada; ainda falta homologar a configuração e medir memória. |
-| M2 — calibrar Portfolio | PLANNED | 120k aceitos e distribuições finais não executados. |
-| M3 — auditoria lógica/escala | PLANNED | Falta auditoria dos 120k aceitos e memória. |
-| M4 — PostgreSQL rollback | PLANNED | 10k intenções já passou para candidata; falta validar a configuração homologada e as escalas progressivas exigidas. |
-| M5 — persistência/baselines | WAITING APPROVAL | Nenhuma carga persistente; exige autorização explícita para COMMIT. |
-| M6 — preparação analítica | PLANNED | Pode iniciar trabalho documental independente sem ler dados persistentes. |
+| M1 — abastecimento | PASS | Profile técnico configurado; trade-offs, transferências, conservação e medição incremental documentados. |
+| M2 — calibrar Portfolio | PASS | Alvo 120k, quotas mensais/canais, bandas de negócio e reconciliação da margem passaram em 2026-10-09. |
+| M3 — auditoria lógica/escala | PASS | Quotas, distribuições, replay, 9 gates lógicos em 120k, determinismo entre batches e comparação com 39 checks SQL em fixture reduzida passaram. Pico heap Python medido em 923,64 MiB; working set observado em amostra >=2,35 GiB. |
+| M4 — PostgreSQL rollback | PASS | Fixtures 10k e 50k, 39 invariantes SQL por fixture, controles negativos de cancelamento/refund e confirmação independente das 41 tabelas vazias passaram. |
+| M5 — persistência/baselines | PERFORMANCE READY — LOAD NOT RUN | Autorização controlada concedida; diagnóstico passou. Carga definitiva e baselines finais ainda não executados. |
+| M6 — preparação analítica | PASS | Inventário, grãos, fatos/dimensões candidatos, métricas, política temporal, precauções de fanout e quatro consultas executáveis documentados. |

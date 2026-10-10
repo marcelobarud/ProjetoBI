@@ -36,6 +36,7 @@ class GeneratorConfig:
     volumes: dict[str, int]
     composition: dict[str, int]
     generation: dict[str, int]
+    order_plan: dict
     stores: tuple[StoreConfig, ...]
 
     @property
@@ -115,6 +116,58 @@ def load_config(profile: str | None = None, config_dir: Path | None = None) -> G
         if composition.get("individual_customers", 0) + composition.get("business_customers", 0) != volumes.get("customers"):
             raise ConfigurationError("A composição PF/PJ deve totalizar o volume de clientes.")
 
+    order_plan = profile_data.get("order_plan", {"mode": "intentions"})
+    mode = order_plan.get("mode") if isinstance(order_plan, dict) else None
+    if mode not in {"intentions", "accepted_quotas"}:
+        raise ConfigurationError("order_plan.mode deve ser intentions ou accepted_quotas.")
+    if mode == "accepted_quotas":
+        try:
+            annual_shares = {int(year): value for year, value in order_plan["annual_shares_percent"].items()}
+            channel_shares = {
+                int(year): {str(channel): value for channel, value in weights.items()}
+                for year, weights in order_plan["channel_shares_percent"].items()
+            }
+            month_weights = {int(month): value for month, value in order_plan["month_weights"].items()}
+            physical_multipliers = {
+                int(year): value for year, value in order_plan["physical_attempt_multiplier_percent"].items()
+            }
+            frequency_shares = {
+                str(kind): {str(bucket): value for bucket, value in values.items()}
+                for kind, values in order_plan["customer_frequency_shares_percent"].items()
+            }
+            intention_cap = order_plan["intention_cap"]
+        except (KeyError, TypeError, ValueError, AttributeError) as exc:
+            raise ConfigurationError("Order plan aceito está incompleto ou inválido.") from exc
+        expected_years = set(range(start_date.year, end_date.year + 1))
+        numeric_values = [*annual_shares.values(), *month_weights.values(), *physical_multipliers.values()]
+        numeric_values.extend(value for row in channel_shares.values() for value in row.values())
+        if (set(annual_shares) != expected_years or set(channel_shares) != expected_years
+                or set(physical_multipliers) != expected_years
+                or sum(annual_shares.values()) != 100
+                or any(not isinstance(value, int) or isinstance(value, bool) or value < 0 for value in numeric_values)
+                or any(sum(row.values()) != 100 for row in channel_shares.values())
+                or any(set(row) != {"physical", "ecommerce", "marketplace"} for row in channel_shares.values())
+                or set(month_weights) != set(range(1, 13))
+                or any(value <= 0 for value in month_weights.values())
+                or any(value < 100 for value in physical_multipliers.values())
+                or set(frequency_shares) != {"individual", "business"}
+                or any(set(row) != {"one", "two_to_four", "five_to_ten", "eleven_plus"}
+                       or sum(row.values()) != 100
+                       or any(not isinstance(value, int) or isinstance(value, bool) or value < 0 for value in row.values())
+                       for row in frequency_shares.values())
+                or not isinstance(intention_cap, int) or isinstance(intention_cap, bool)
+                or intention_cap < generation["sales_orders"]):
+            raise ConfigurationError("Order plan deve cobrir horizonte, bandas e limite de intenções válidos.")
+        order_plan = {
+            "mode": mode,
+            "intention_cap": intention_cap,
+            "annual_shares_percent": annual_shares,
+            "channel_shares_percent": channel_shares,
+            "month_weights": month_weights,
+            "physical_attempt_multiplier_percent": physical_multipliers,
+            "customer_frequency_shares_percent": frequency_shares,
+        }
+
     stores = tuple(
         StoreConfig(
             code=item["code"],
@@ -145,5 +198,6 @@ def load_config(profile: str | None = None, config_dir: Path | None = None) -> G
         volumes=volumes,
         composition=composition,
         generation=generation,
+        order_plan=order_plan,
         stores=stores,
     )

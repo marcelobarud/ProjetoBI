@@ -1,6 +1,6 @@
 # Proposta de modelo relacional operacional
 
-**Fase 2B.2 — estrutura física vigente.** O modelo PostgreSQL 18 foi aplicado e validado em `projeto_bi` pelas migrations `001_initial_schema.sql` e `002_add_store_address.sql`. O endereço operacional corrente das lojas é estruturado em `core.stores`; a V1 não mantém histórico de mudança de endereço.
+**Estado físico vigente após a Fase 3E.2c.3.** PostgreSQL 18 em `projeto_bi`, nove schemas e 41 tabelas. Migrations `001_initial_schema.sql`, `002_add_store_address.sql` e `003_partial_item_cancellations.sql` foram aplicadas. O endereço operacional corrente das lojas é estruturado em `core.stores`; não há histórico de mudança de endereço.
 
 O modelo representa o sistema operacional da empresa brasileira, com valores monetários em BRL. Não é um modelo estrela, não prescreve tabelas para o Power BI e não inclui views analíticas.
 
@@ -9,7 +9,7 @@ O modelo representa o sistema operacional da empresa brasileira, com valores mon
 - **Database alvo:** `projeto_bi` (a criação depende de conexão configurada).
 - **PostgreSQL:** versão 18, sem extensões externas obrigatórias.
 - **Schemas:** 9.
-- **Tabelas:** 40.
+- **Tabelas:** 41 (40 da estrutura inicial e uma entidade incremental de cancelamento por item).
 - **Identificadores:** `BIGINT GENERATED ALWAYS AS IDENTITY` para as PKs técnicas; códigos de negócio ficam em atributos separados e únicos quando necessários.
 - **Nomenclatura:** inglês, `snake_case`, tabelas no plural, PK `<singular>_id`, FK com o nome da chave referenciada, constraints `pk_`, `fk_`, `uq_`, `ck_` e índices `idx_`.
 - **Exclusões:** registros cadastrais usados por transações não são apagados em cascata; as relações usam restrição de exclusão e cadastros são inativados.
@@ -183,7 +183,11 @@ As 37 entidades conceituais foram revistas, não convertidas mecanicamente. O re
 
 ## Estado da implementação
 
-As migrations 001 e 002 foram aplicadas e validadas no PostgreSQL 18.6. A estrutura atual possui 9 schemas e 40 tabelas; os totais vigentes de constraints e índices estão em `docs/database/validation-report.md`.
+As migrations 001 e 002 foram aplicadas e validadas no PostgreSQL 18.6 durante a Fase 2B.2. A evolução vigente de 41 tabelas, incluindo a migration 003, está registrada abaixo; os totais de constraints e índices ficam em `docs/database/validation-report.md`.
+
+## Cancelamentos parciais — 3E.2c.3
+
+`sales.sales_order_item_cancellations` preserva quantidade e valores cancelados por item, com FK composta para garantir o vínculo ao pedido correto. `sales.sales_order_items` mantém a quantidade original e recebe contadores cacheados de unidades expedidas/canceladas; triggers derivados das tabelas de fulfillment e cancelamento atualizam os saldos, e CHECK limita a soma à quantidade original. `payments.refunds.sales_order_item_cancellation_id` liga explicitamente cada parcela de estorno ao cancelamento e impede que o mesmo refund represente também uma devolução. Desconto proporcional usa rateio determinístico por unidade; a política de frete retorna o valor integral apenas quando o pedido inteiro é cancelado sem expedição. Ver `operational-transactions.md` e `validation-report.md` para lifecycle e homologação.
 
 ## Detalhes para a Fase 2B / camada operacional
 

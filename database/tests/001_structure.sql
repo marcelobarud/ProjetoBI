@@ -3,6 +3,7 @@ DECLARE
     actual_count BIGINT;
     expected_count BIGINT;
     store_address_column_count BIGINT;
+    partial_cancel_table_count BIGINT;
     expected_check_count BIGINT;
     expected_index_count BIGINT;
     missing_names TEXT;
@@ -53,13 +54,19 @@ BEGIN
         (SELECT string_agg(schema_name || '.' || table_name, ', ') FROM (SELECT schema_name, table_name FROM expected EXCEPT SELECT schema_name, table_name FROM actual) x),
         (SELECT string_agg(schema_name || '.' || table_name, ', ') FROM (SELECT schema_name, table_name FROM actual EXCEPT SELECT schema_name, table_name FROM expected) x)
     INTO expected_count, actual_count, missing_names, unexpected_names;
-    IF expected_count <> 40 OR actual_count <> expected_count OR missing_names IS NOT NULL OR unexpected_names IS NOT NULL THEN
-        RAISE EXCEPTION 'Tabelas divergentes: esperado %, encontrado %, ausentes [%], inesperadas [%]', expected_count, actual_count, missing_names, unexpected_names;
+    SELECT count(*) INTO partial_cancel_table_count
+      FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace
+     WHERE n.nspname='sales' AND c.relname='sales_order_item_cancellations' AND c.relkind IN ('r','p');
+    IF expected_count <> 40 OR actual_count NOT IN (40,41) OR missing_names IS NOT NULL
+       OR (actual_count=40 AND unexpected_names IS NOT NULL)
+       OR (actual_count=41 AND unexpected_names IS DISTINCT FROM 'sales.sales_order_item_cancellations')
+       OR partial_cancel_table_count <> actual_count-40 THEN
+        RAISE EXCEPTION 'Tabelas divergentes: base 001/002 ou 003 esperada; encontrado %, ausentes [%], inesperadas [%]', actual_count, missing_names, unexpected_names;
     END IF;
 
     IF EXISTS (
         SELECT 1 FROM (VALUES
-            ('core',4), ('crm',5), ('catalog',5), ('sales',5), ('procurement',5),
+            ('core',4), ('crm',5), ('catalog',5), ('sales',5+partial_cancel_table_count), ('procurement',5),
             ('inventory',6), ('payments',4), ('logistics',4), ('after_sales',2)
         ) AS e(schema_name, expected_tables)
         LEFT JOIN pg_class c ON c.relnamespace = to_regnamespace(e.schema_name) AND c.relkind IN ('r','p')
@@ -76,8 +83,8 @@ BEGIN
     IF store_address_column_count NOT IN (0, 8) THEN
         RAISE EXCEPTION 'Migration de endereço de loja está parcial: % de 8 colunas presentes.', store_address_column_count;
     END IF;
-    expected_check_count := CASE WHEN store_address_column_count = 8 THEN 78 ELSE 75 END;
-    expected_index_count := CASE WHEN store_address_column_count = 8 THEN 149 ELSE 148 END;
+    expected_check_count := (CASE WHEN store_address_column_count = 8 THEN 78 ELSE 75 END) + partial_cancel_table_count*7;
+    expected_index_count := (CASE WHEN store_address_column_count = 8 THEN 149 ELSE 148 END) + partial_cancel_table_count*5;
 
     SELECT count(*) INTO actual_count
     FROM pg_constraint c
@@ -85,7 +92,7 @@ BEGIN
     JOIN pg_namespace n ON n.oid = t.relnamespace
     WHERE n.nspname IN ('core','crm','catalog','sales','procurement','inventory','payments','logistics','after_sales')
       AND c.contype = 'p';
-    IF actual_count <> 40 THEN RAISE EXCEPTION 'Esperadas 40 PKs, encontradas %.', actual_count; END IF;
+    IF actual_count <> 40+partial_cancel_table_count THEN RAISE EXCEPTION 'Quantidade de PKs diverge, encontrada %.', actual_count; END IF;
 
     SELECT count(*) INTO actual_count
     FROM pg_constraint c
@@ -93,7 +100,7 @@ BEGIN
     JOIN pg_namespace n ON n.oid = t.relnamespace
     WHERE n.nspname IN ('core','crm','catalog','sales','procurement','inventory','payments','logistics','after_sales')
       AND c.contype = 'f';
-    IF actual_count <> 70 THEN RAISE EXCEPTION 'Esperadas 70 FKs, encontradas %.', actual_count; END IF;
+    IF actual_count <> 70+partial_cancel_table_count*2 THEN RAISE EXCEPTION 'Quantidade de FKs diverge, encontrada %.', actual_count; END IF;
 
     SELECT count(*) INTO actual_count
     FROM pg_constraint c
@@ -109,7 +116,7 @@ BEGIN
     JOIN pg_namespace n ON n.oid = t.relnamespace
     WHERE n.nspname IN ('core','crm','catalog','sales','procurement','inventory','payments','logistics','after_sales')
       AND c.contype = 'u';
-    IF actual_count <> 37 THEN RAISE EXCEPTION 'Esperadas 37 constraints UNIQUE, encontradas %.', actual_count; END IF;
+    IF actual_count <> 37+partial_cancel_table_count THEN RAISE EXCEPTION 'Quantidade de constraints UNIQUE diverge, encontrada %.', actual_count; END IF;
 
     IF (SELECT count(*) FROM pg_indexes WHERE schemaname IN ('core','crm','catalog','sales','procurement','inventory','payments','logistics','after_sales')) <> expected_index_count THEN
         RAISE EXCEPTION 'Esperados % índices físicos, contagem divergente.', expected_index_count;
@@ -172,6 +179,36 @@ BEGIN
         RAISE EXCEPTION 'FKs compostas críticas estão ausentes.';
     END IF;
 
+    IF partial_cancel_table_count = 1 THEN
+        IF (SELECT count(*) FROM information_schema.columns WHERE
+            (table_schema='sales' AND table_name='sales_order_items' AND column_name IN ('fulfilled_quantity','cancelled_quantity') AND data_type='bigint' AND is_nullable='NO')
+            OR (table_schema='payments' AND table_name='refunds' AND column_name='sales_order_item_cancellation_id' AND data_type='bigint' AND is_nullable='YES')) <> 3 THEN
+            RAISE EXCEPTION 'Colunas de saldo ou rastreabilidade de cancelamento parcial divergentes.';
+        END IF;
+        IF (SELECT count(*) FROM pg_constraint WHERE conname IN (
+            'fk_sales_order_item_cancellations_item','fk_refunds_item_cancellation',
+            'ck_sales_order_items_resolution_nonnegative','ck_sales_order_items_resolution_cap',
+            'uq_sales_order_item_cancellations_order_id','ck_sales_order_item_cancellations_quantity',
+            'ck_sales_order_item_cancellations_reason','ck_sales_order_item_cancellations_amounts',
+            'ck_sales_order_item_cancellations_net','ck_refunds_single_origin'
+        )) <> 10 THEN
+            RAISE EXCEPTION 'Constraints de cancelamento parcial ou refund estão ausentes.';
+        END IF;
+        IF (SELECT count(*) FROM pg_trigger WHERE NOT tgisinternal AND tgname IN (
+            'trg_fulfillment_items_sync_item_quantity','trg_item_cancellations_sync_item_quantity'
+        )) <> 2 THEN
+            RAISE EXCEPTION 'Triggers transacionais de saldo de item estão ausentes.';
+        END IF;
+        IF (SELECT count(*) FROM pg_indexes WHERE schemaname IN ('sales','payments') AND indexname IN (
+            'idx_sales_order_item_cancellations_item','idx_sales_order_item_cancellations_order','idx_refunds_item_cancellation'
+        )) <> 3 THEN
+            RAISE EXCEPTION 'Índices de cancelamento/refund estão ausentes.';
+        END IF;
+        IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname='ck_refunds_reason' AND pg_get_constraintdef(oid) LIKE '%stock_timeout%') THEN
+            RAISE EXCEPTION 'Motivo stock_timeout ausente no domínio de refunds.';
+        END IF;
+    END IF;
+
     IF (SELECT count(*) FROM pg_indexes WHERE indexname IN (
         'idx_stock_movements_product_location_time', 'idx_stock_movements_fulfillment_item',
         'idx_fulfillment_items_order_item', 'idx_return_items_source_fulfillment',
@@ -181,6 +218,6 @@ BEGIN
         RAISE EXCEPTION 'Índices essenciais de consulta/rastreabilidade estão ausentes.';
     END IF;
 
-    RAISE NOTICE 'Validação estrutural aprovada: database projeto_bi, 9 schemas, 40 tabelas, colunas vigentes, PK/FK/CHECK/UNIQUE e índices conferidos.';
+    RAISE NOTICE 'Validação estrutural aprovada: database projeto_bi, 9 schemas, % tabelas, colunas vigentes, PK/FK/CHECK/UNIQUE e índices conferidos.', 40+partial_cancel_table_count;
 END;
 $validate$;

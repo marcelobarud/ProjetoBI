@@ -73,6 +73,7 @@ def test_transient_id_registry_releases_5000_order_lifecycles_without_connection
         registry.release("sales_order_items", key + "-ITEM")
         registry.release("sales_orders", key)
     assert registry.current_entries == 0
+    assert registry.current_by_type == {}
     assert registry.max_entries == 82
     assert peak == 80
     with pytest.raises(KeyError, match="inexistente"):

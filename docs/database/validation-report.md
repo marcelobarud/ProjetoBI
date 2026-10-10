@@ -83,3 +83,25 @@ O teste transacional foi executado com sucesso:
 | Linhas em todas as 40 tabelas operacionais | 0 |
 
 As PKs e FKs mantiveram as contagens validadas na Fase 2B.1. O schema está **READY FOR GENERATOR** para a futura implementação, sujeita à autorização da fase. `catalog.products.discontinued_at` permanece uma melhoria **OPTIONAL**, fora do gate. Nenhum dado sintético foi gerado e a Fase 3B e o Power BI não foram iniciados.
+
+## Fase 3E.2c.3 — cancelamento parcial (2026-10-07)
+
+A migration incremental 003 foi aplicada após confirmar que a estrutura aprovada anterior estava intacta e vazia. A validação após a migration confirmou:
+
+| Verificação | Resultado |
+| --- | ---: |
+| Versão PostgreSQL | 18.6 |
+| Schemas | 9 |
+| Tabelas | 41 |
+| Primary keys | 41 |
+| Foreign keys | 72 |
+| CHECK constraints | 85 |
+| UNIQUE constraints | 38 |
+| Índices físicos | 154 |
+| Linhas em todas as tabelas depois dos rollbacks | 0 |
+
+`database/tests/001_structure.sql` passou. Foram reconfirmados specifications JSONB, coluna gerada `available_quantity`, `source_fulfillment_item_id`, ausência de `unit_cost_snapshot`, os CHECKs de BRL previstos e a pendência de domínio de `unit_of_measure` sem CHECK.
+
+O rollback full PostgreSQL de 10.000 intenções passou nas validações relacionais, financeiras e replay de estoque. A fixture de cancelamento com duas capturas confirmou refund de BRL 90,00 dividido em duas linhas dentro dos saldos disponíveis; o controle negativo de quantidade excedente foi rejeitado. A integração multibatch de 1.000 intenções também passou. Smoke permaneceu sem diferenças de digest. Verificação em conexão nova depois das integrações encontrou zero registros nas 41 tabelas; nenhum dado de negócio foi persistido.
+
+O estado estrutural é **READY FOR PARTIAL CANCELLATION**. Esta conclusão não valida a calibração do abastecimento, a escala Portfolio 120k ou uma fase de Power BI.

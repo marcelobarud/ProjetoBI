@@ -42,7 +42,7 @@ Para reproduzir em ambiente descartável, use uma database vazia e execute o mes
 - `database/tests/002_smoke_rollback.sql` é um smoke test mínimo em transação que termina em `ROLLBACK`; execute por `Invoke-SmokeTest.ps1` apenas em `projeto_bi` depois da migration.
 - `database/tests/003_store_address_rollback.sql` testa endereço válido, rejeições dos CHECKs e nulabilidade dentro de `BEGIN`/`ROLLBACK`; `Invoke-StoreAddressTest.ps1` exige zero lojas antes/depois do teste.
 
-Conexão, migrations 001/002 e validações da Fase 2B.2 concluídas no PostgreSQL 18.6. A estrutura vigente mantém 9 schemas e 40 tabelas; totais atuais de PK/FK/CHECK/UNIQUE/índices e a contagem após rollback estão registrados no relatório de validação. A database permanece sem dados de negócio sintéticos.
+Conexão, migrations 001/002 e validações da Fase 2B.2 concluídas no PostgreSQL 18.6. A estrutura inicial mantinha 9 schemas e 40 tabelas; a evolução estrutural vigente é a seção de 3E.2c.3 e o relatório de validação. A database permanece sem dados de negócio sintéticos.
 
 ## Pendência de domínio
 
@@ -55,3 +55,9 @@ Conexão, migrations 001/002 e validações da Fase 2B.2 concluídas no PostgreS
 - **`psql` ausente:** configure `POSTGRES_PSQL_PATH`, adicione o cliente PostgreSQL 18 ao `PATH` ou disponibilize-o em `C:\Program Files\PostgreSQL\18\`; nenhum cliente é instalado automaticamente.
 - **Database existente com objetos inesperados:** não remova objetos; revise-os manualmente antes de autorizar qualquer procedimento.
 - **Falha de permissão:** solicite ao administrador a permissão necessária fora dos arquivos versionados; não embuta credenciais em scripts.
+
+## Fase 3E.2c.3 — cancelamento parcial de itens
+
+A migration `003_partial_item_cancellations.sql` acrescenta a entidade `sales.sales_order_item_cancellations`, os contadores acumulados `fulfilled_quantity` e `cancelled_quantity` em `sales.sales_order_items`, e referência composta de refunds ao cancelamento. Os triggers sincronizam os contadores com fulfillment items e cancelamentos; a constraint da linha serializa o limite total contra a quantidade originalmente comprada. O sink insere cancelamentos antes de refunds e resolve suas identities técnicas por `INSERT ... RETURNING`; a referência do pedido fica retida até o fechamento do lifecycle e é liberada com as demais referências do pedido.
+
+Ao exceder 14 dias desde `placed_at`, o gerador cancela somente o saldo não expedido, estorna o valor líquido das unidades com rateio determinístico de descontos e preserva o frete quando houve expedição. Sem expedição, cancelamento integral estorna o frete cobrado e conserva o status `cancelled`. O pedido parcialmente realizado pode terminar `completed` somente após fulfillment terminal, resolução de todas as unidades e refunds concluídos. Cancelar saldo não gera movimento de estoque ou devolução.

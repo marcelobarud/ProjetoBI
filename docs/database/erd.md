@@ -4,6 +4,37 @@
 
 Para manter os identificadores Mermaid legíveis, nomes de entidade usam o schema e a tabela unidos por sublinhado; por exemplo, sales_order_status_history representa sales.order_status_history.
 
+## Cancelamento parcial — migration 003
+
+~~~mermaid
+erDiagram
+  sales_sales_orders ||--|{ sales_sales_order_items : contem
+  sales_sales_order_items ||--o{ sales_sales_order_item_cancellations : cancela_saldo
+  payments_payments ||--o{ payments_refunds : recebe
+  sales_sales_order_item_cancellations ||--o{ payments_refunds : origem_do_estorno
+  sales_sales_order_items {
+    bigint sales_order_item_id PK
+    bigint quantity
+    bigint fulfilled_quantity
+    bigint cancelled_quantity
+  }
+  sales_sales_order_item_cancellations {
+    bigint sales_order_item_cancellation_id PK
+    bigint sales_order_id FK
+    bigint sales_order_item_id FK
+    bigint cancelled_quantity
+    numeric gross_cancelled_amount
+    numeric discount_cancelled_amount
+    numeric net_cancelled_amount
+  }
+  payments_refunds {
+    bigint refund_id PK
+    bigint payment_id FK
+    bigint sales_order_item_cancellation_id FK
+    numeric amount
+  }
+~~~
+
 ## Visão geral
 
 ~~~mermaid
