@@ -2,7 +2,7 @@
 
 ## Escopo entregue
 
-A implementação atual cobre o ecossistema transacional e a política experimental de abastecimento da Fase 3E. O Portfolio foi auditado em modo descartável para 120.000 pedidos e validado em fixtures PostgreSQL rollback-only de 10.000 e 50.000 pedidos. M0–M4 passaram e M6 documental concluiu a preparação analítica sem criar modelo Power BI; a estrutura contém 9 schemas e 41 tabelas (migrations 001–003) e permanece sem dados operacionais persistidos. M5 está `PERFORMANCE READY`; a autorização controlada para uma única persistência foi concedida, mas o dataset ainda não foi carregado. As seções históricas preservam os gates e resultados de cada fase; o status integrado está em `docs/PROJECT_COMPLETION_PLAN.md`.
+A implementação atual cobre o ecossistema transacional e a política experimental de abastecimento da Fase 3E. M0–M4 passaram; M5 concluiu a persistência de exatamente 120.000 pedidos e os 13 baselines SQL foram reconciliados. A database `projeto_bi` contém 9 schemas, 41 tabelas e 3.894.457 linhas operacionais após as migrations 001–003. M6 concluiu a preparação documental analítica sem criar modelo Power BI. A Fase 4.0 registrou o backup lógico definitivo e preparou as decisões e a estrutura documental PBIP/TMDL; a criação do projeto Power BI permanece para uma fase autorizada posterior. As seções históricas preservam os gates e resultados de cada fase; o status integrado está em `docs/PROJECT_COMPLETION_PLAN.md`.
 
 O banco operacional continua sendo a fonte de verdade para tipos, constraints e relações. O gerador usa chaves lógicas para resolver os IDs identity retornados pelo PostgreSQL; não pressupõe IDs técnicos fixos. A ordem de dependências está em [dependency-order.md](dependency-order.md).
 

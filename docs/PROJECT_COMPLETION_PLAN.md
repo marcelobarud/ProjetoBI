@@ -25,7 +25,7 @@ Não enfraquecer invariantes de integridade ou alterar faixas comerciais aprovad
 - Migrations 001, 002 e 003 aplicadas.
 - Migration 003: cancelamento parcial de itens.
 - 41 PKs, 72 FKs, 85 CHECKs, 38 UNIQUEs e 154 índices.
-- Nenhum dado operacional persistido após os testes relatados.
+- Estado atual (2026-10-10): 3.894.457 linhas nas 41 tabelas, incluindo 120.000 pedidos. O backup lógico da Fase 4.0 está registrado em `docs/database/backup-and-restore.md`; a contagem posterior ao backup permaneceu inalterada.
 
 ### Gerador
 
@@ -62,7 +62,7 @@ M1 homologou safety 3× e transferências automáticas desligadas no profile; a 
 ### Próxima fase
 
 1. M5 está concluído: os 120.000 pedidos foram persistidos, conferidos em nova conexão e os 13 baselines SQL foram aprovados e reconciliados.
-2. O ProjetoBI está pronto para iniciar a modelagem Power BI quando essa fase for solicitada.
+2. A Fase 4.0 concluiu backup lógico e preparação documental para PBIP/TMDL. A criação do projeto de Desktop e a seleção/importação das tabelas aguardam uma fase Power BI autorizada.
 3. Não iniciar automaticamente PBIP, modelo semântico, Power Query, medidas DAX ou relatórios nesta etapa.
 
 ## 3. Regras de execução
@@ -482,6 +482,7 @@ O objetivo completo será alcançado quando:
 | M4 — PostgreSQL rollback | PASS | Fixtures 10k e 50k, 39 invariantes SQL por fixture, controles negativos de cancelamento/refund e confirmação independente das 41 tabelas vazias passaram. |
 | M5 — persistência/baselines | PASS | COMMIT único em 2026-10-10; 120.000 pedidos, 41 tabelas conferidas em nova conexão read-only, zero falhas críticas/distributivas e 13 baselines SQL reconciliados. Ver `docs/data-generation/portfolio-validation.md`. |
 | M6 — preparação analítica | PASS | Inventário, grãos, fatos/dimensões candidatos, métricas, política temporal, precauções de fanout e quatro consultas executáveis documentados. |
+| Fase 4.0 — backup e preparação PBIP/TMDL | PASS documental | Backup lógico custom verificado em `D:\Backups\ProjetoBI`; hash, limites de verificação, estrutura PBIP proposta e pendências analíticas estão documentados. Nenhum projeto Power BI foi criado. |
 
 ### Execução definitiva M5 — 2026-10-10
 
@@ -494,3 +495,14 @@ O objetivo completo será alcançado quando:
 - **Duração:** pipeline transacional 24.006,6 s; validações SQL pré-COMMIT 40,3 s; validação pós-COMMIT 32,7 s; baselines 38,75 s; total até pós-validação 24.098,2 s e total com baselines 24.136,9 s (aprox. 6h42). Pico de memória durante a carga não foi medido.
 - **Resultado:** `M5 PASS — PROJECTBI READY FOR POWER BI`. Nenhum Power BI, PBIP, Power Query ou DAX foi iniciado. Não fazer nova carga Portfolio; a base já contém dados.
 - **Checkpoint final de documentação/baselines:** registrado no commit local associado a esta execução; sem push.
+
+### Fase 4.0 — backup definitivo e preparação PBIP/TMDL (2026-10-10)
+
+- **Git de entrada:** branch `main`; commits `61aacc284f5e05b5c4922f1e676f5930d69ebe61` e `fb28dab69a9781072cf67837e0157ab26e2c414a` presentes; working tree limpa antes da fase; `.env` ignorado.
+- **Origem somente leitura:** PostgreSQL 18.6, database `projeto_bi`, 9 schemas, 41 tabelas, migrations 001–003 confirmadas pelos guards estruturais e presença das colunas da migration 003; 120.000 pedidos e 3.894.457 linhas. Tamanho lógico observado: 1.193.948.863 bytes.
+- **Backup:** `pg_dump` 18.6 em formato custom; exit code 0; 68.365.155 bytes; `pg_restore --list` exit code 0, 9 schemas e 41 entradas de dados de tabelas; SHA-256 `76C2AA25C02F8C70CA697E5AB5D5CBBD9BAFAA0A68EECE2E3018049B4CFA453D`. Local: `D:\Backups\ProjetoBI\ProjetoBI_projeto_bi_20261010T102821-0300.backup`.
+- **Verificação posterior:** inspeção read-only repetiu 3.894.457 linhas e 120.000 pedidos. O catálogo do archive foi lido com sucesso, mas não se fez restore de teste nem se criou database de teste; recomenda-se uma cópia em unidade física independente.
+- **Preparação analítica:** decisão documental por PBIP/TMDL e PBIR quando compatível, layout proposto e conjunto inicial de tabelas candidatas registrado. O Desktop não foi localizado na máquina; nenhum PBIP/TMDL incompleto foi criado. Credencial Power BI read-only separada segue pendente.
+- **Entidades vazias:** cancelamentos por linha (0) e transferências/itens de transferência (0) documentados com seus limites analíticos. O relatório não permite provar qual guarda de elegibilidade/cutoff impediu as 12 transferências estruturais declaradas; não foram inventados dados nem alterada a base.
+- **Documentação:** README, plano mestre, implementação do gerador, prontidão analítica e `.gitignore` atualizados. Veja `docs/database/backup-and-restore.md` e `docs/powerbi/phase-4.0-preparation.md`.
+- **Próxima fase:** interromper aqui. A construção do projeto Power BI e qualquer acesso interativo permanecem para solicitação/aprovação específica.

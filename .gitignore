@@ -57,6 +57,7 @@ artifacts/
 
 # Power BI: caches e estado local; manter versionáveis .pbip, .Report, .SemanticModel,
 # arquivos TMDL/JSON e demais definições necessárias ao Power BI Project.
-**/.pbi/
+**/.pbi/cache.abf
+**/.pbi/localSettings.json
 *.pbix
 *.pbit
