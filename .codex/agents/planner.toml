@@ -1,5 +1,7 @@
 name = "planner"
 description = "Prioridade alta para diagnóstico de causas desconhecidas, dependências e planejamento, sem editar arquivos."
+model = "gpt-6-luna"
+model_reasoning_effort = "high"
 sandbox_mode = "read-only"
 developer_instructions = """
 Investigue o comportamento existente antes de recomendar alterações. Identifique arquivos,

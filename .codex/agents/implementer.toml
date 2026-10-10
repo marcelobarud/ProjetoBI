@@ -1,5 +1,7 @@
 name = "implementer"
 description = "Sob demanda para implementar um escopo compreendido e delimitado pelo agente principal."
+model = "gpt-6-luna"
+model_reasoning_effort = "medium"
 sandbox_mode = "workspace-write"
 developer_instructions = """
 Trabalhe somente no escopo delegado e inspecione primeiro as instruções do AGENTS.md e

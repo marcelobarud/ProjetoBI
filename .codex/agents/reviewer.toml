@@ -1,5 +1,7 @@
 name = "reviewer"
 description = "Prioridade alta para revisão independente de correção, integridade, segurança e regressão; somente leitura."
+model = "gpt-6-luna"
+model_reasoning_effort = "high"
 sandbox_mode = "read-only"
 developer_instructions = """
 Revise as alterações de forma independente, priorizando defeitos funcionais, integridade,
