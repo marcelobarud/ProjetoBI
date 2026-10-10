@@ -48,4 +48,8 @@
 - Não configure um remoto nem faça push automaticamente. Só publique alterações quando o usuário solicitar explicitamente.
 - Nunca versionar senhas, tokens, chaves, arquivos `.env` reais, connection strings com credenciais ou outros segredos. Use `.env.example` apenas com nomes de variáveis e valores vazios ou fictícios explicitamente seguros.
 - Antes de commitar, confira o conteúdo staged e o `git status` para garantir que não há credenciais ou arquivos locais indevidos.
-- Crie commits somente quando o usuário ou a fase correspondente os autorizar explicitamente. Não faça merge, rebase ou push sem solicitação explícita.
+  - Crie commits somente quando o usuário ou a fase correspondente os autorizar explicitamente.
+  - Se a revisão imediata da tarefa encontrar um erro no commit local mais recente antes do início de outra tarefa, trate a correção como continuação da tarefa e atualize esse commit com `git commit --amend`, em vez de criar um commit corretivo separado.
+  - Antes de emendar um commit, confira a branch, o histórico e o estado da worktree. Inclua somente arquivos da tarefa e preserve alterações staged, unstaged ou não rastreadas que não pertençam a ela. Confira o conteúdo staged antes de atualizar o commit.
+  - Se outra tarefa já tiver começado quando um erro anterior for descoberto, registre a correção em um novo commit. Nunca emende commits publicados ou compartilhados sem autorização explícita para reescrever esse histórico.
+  - Não faça merge, rebase ou push sem solicitação explícita. Se o commit a corrigir não for o mais recente ou não puder ser identificado com segurança, não use reset ou rebase por suposição; peça orientação antes de reescrever o histórico.
