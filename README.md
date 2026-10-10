@@ -36,13 +36,13 @@ O banco operacional deverá representar um ecossistema empresarial coerente, e n
 
 ## Estado atual
 
-**M0–M4 concluídos; M6 documental aprovado; M5 LOAD RETRY READY.** O lifecycle de IDs foi corrigido e validado no fluxo completo de 120.000 pedidos pelo sink PostgreSQL com adaptador de identidades, além das integrações rollback-only de smoke e 10.000 pedidos. A segunda e última tentativa autorizada da carga permanente está liberada pelos gates e ainda não foi iniciada. Os baselines finais e a modelagem Power BI permanecem pendentes. Consulte [`docs/PROJECT_COMPLETION_PLAN.md`](docs/PROJECT_COMPLETION_PLAN.md), [`docs/powerbi/readiness.md`](docs/powerbi/readiness.md), [`docs/data-generation/implementation.md`](docs/data-generation/implementation.md) e [`docs/data-generation/validation-report.md`](docs/data-generation/validation-report.md).
+**M0–M6 preparatórios e M5 concluídos; ProjetoBI pronto para iniciar Power BI.** O Portfolio de 120.000 pedidos foi persistido no PostgreSQL 18.6 e validado em nova conexão somente leitura. Os 13 baselines SQL foram executados e reconciliados; houve zero falhas críticas e zero falhas distributivas. O checkpoint de código da carga é `61aacc284f5e05b5c4922f1e676f5930d69ebe61`; o checkpoint final de documentação/baselines consta no plano mestre. A modelagem Power BI, PBIP, Power Query e DAX continuam para a próxima fase aprovada. Consulte [`docs/PROJECT_COMPLETION_PLAN.md`](docs/PROJECT_COMPLETION_PLAN.md), [`docs/powerbi/readiness.md`](docs/powerbi/readiness.md), [`docs/data-generation/implementation.md`](docs/data-generation/implementation.md) e [`docs/data-generation/portfolio-validation.md`](docs/data-generation/portfolio-validation.md).
 
 ## Fases previstas
 
 1. Revisar e aprovar o domínio conceitual (concluído) e consolidar a proposta relacional operacional (Fases 2A e 2A.1 concluídas).
-2. Implementar e validar o esquema operacional no PostgreSQL 18 (Fases 2B, 2B.1 e 2B.2 concluídas; sem dados de negócio persistidos).
-3. Planejar e desenvolver a geração de dados sintéticos consistentes em Python. Fases 3A–3E.1 e M0–M4 do plano mestre concluídos; a geração Portfolio foi validada em modo descartável e rollback-only. A primeira persistência e seus baselines dependem de autorização explícita e seguem no [`plano mestre`](docs/PROJECT_COMPLETION_PLAN.md).
+2. Implementar e validar o esquema operacional no PostgreSQL 18 (Fases 2B, 2B.1 e 2B.2 concluídas; o dataset Portfolio foi persistido depois, na Fase M5).
+3. Planejar e desenvolver a geração de dados sintéticos consistentes em Python. Fases 3A–3E.1 e M0–M5 concluídos; o Portfolio foi carregado e os baselines reconciliados. O registro operacional está em [`portfolio-validation.md`](docs/data-generation/portfolio-validation.md) e no [`plano mestre`](docs/PROJECT_COMPLETION_PLAN.md).
 4. Explorar e selecionar os dados que farão parte da camada analítica.
 5. Construir as transformações, o modelo semântico e as medidas no Power BI.
 6. Desenvolver e revisar os relatórios, mantendo documentação e versionamento alinhados.

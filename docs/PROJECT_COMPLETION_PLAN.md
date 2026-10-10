@@ -1,6 +1,6 @@
 # ProjetoBI — Plano Mestre de Conclusão e Preparação para Power BI
 
-**Status:** M5 LOAD RETRY READY — falhas do lifecycle de IDs corrigidas e gates aprovados; segunda e última tentativa autorizada ainda não iniciada
+**Status:** M5 PASS — Portfolio persistido e reconciliado; ProjetoBI pronto para iniciar Power BI
 **Diretório:** `D:\Codex\ProjetoBI`
 **Objetivo principal:** concluir e validar o dataset Portfolio, disponibilizar baselines SQL confiáveis e preparar a exploração analítica no Power BI.
 
@@ -59,12 +59,11 @@ As transferências tiveram ganho marginal no ensaio e não devem ser ativadas de
 
 M1 homologou safety 3× e transferências automáticas desligadas no profile; a integração PostgreSQL da configuração aprovada passou em M4 com rollback. A integração 10k da candidata experimental com transferências também passou anteriormente.
 
-### Pendências atuais
+### Próxima fase
 
-1. Executar a segunda e última tentativa autorizada da carga integral de 120.000 pedidos, somente após o checkpoint local reproduzível.
-2. Se a tentativa falhar, preservar o rollback/estado encontrado e não repetir sem nova autorização explícita.
-3. Após um COMMIT bem-sucedido, validar baselines e documentação final; preservar os dados se qualquer gate pós-COMMIT falhar.
-4. Depois da conclusão do M5, iniciar a fase aprovada de modelagem Power BI; M6 preparatório foi concluído sem criar modelo ou medidas.
+1. M5 está concluído: os 120.000 pedidos foram persistidos, conferidos em nova conexão e os 13 baselines SQL foram aprovados e reconciliados.
+2. O ProjetoBI está pronto para iniciar a modelagem Power BI quando essa fase for solicitada.
+3. Não iniciar automaticamente PBIP, modelo semântico, Power Query, medidas DAX ou relatórios nesta etapa.
 
 ## 3. Regras de execução
 
@@ -272,7 +271,7 @@ Não alterar schema sem autorização.
 
 **Objetivo:** persistir o Portfolio validado e preparar sua exploração analítica.
 
-O usuário concedeu autorização controlada para um único COMMIT Portfolio. O diagnóstico de desempenho documentado abaixo não executou essa carga.
+O usuário concedeu autorização controlada para uma única tentativa adicional de COMMIT após a falha de lifecycle anterior. Essa tentativa foi executada em 2026-10-10 e consumiu a autorização. O resultado final está registrado no checkpoint de execução ao fim deste documento e em `docs/data-generation/portfolio-validation.md`.
 
 Após autorização:
 
@@ -292,7 +291,7 @@ Não reproduzir fanout ao juntar várias tabelas fato.
 
 Após o COMMIT, não executar testes que dependam de banco vazio na mesma database e nunca resetar a base para contornar falhas.
 
-**Gate M5:** dataset persistido e verificado, 120.000 pedidos aceitos, baselines aprovados, documentação final e zero divergências críticas. O status `M5 PERFORMANCE READY` significa somente que o diagnóstico/correção de desempenho passou; não significa que o dataset esteja persistido.
+**Gate M5: PASS.** Dataset persistido e verificado, 120.000 pedidos aceitos, 13 baselines aprovados e reconciliados, documentação final e zero divergências críticas ou distributivas. `M5 PERFORMANCE READY` foi apenas o gate de desempenho anterior à carga; não deve ser confundido com a conclusão desta fase.
 
 ## 10. Marco M6 — Preparação analítica e transição para Power BI
 
@@ -481,5 +480,17 @@ O objetivo completo será alcançado quando:
 | M2 — calibrar Portfolio | PASS | Alvo 120k, quotas mensais/canais, bandas de negócio e reconciliação da margem passaram em 2026-10-09. |
 | M3 — auditoria lógica/escala | PASS | Quotas, distribuições, replay, 9 gates lógicos em 120k, determinismo entre batches e comparação com 39 checks SQL em fixture reduzida passaram. Pico heap Python medido em 923,64 MiB; working set observado em amostra >=2,35 GiB. |
 | M4 — PostgreSQL rollback | PASS | Fixtures 10k e 50k, 39 invariantes SQL por fixture, controles negativos de cancelamento/refund e confirmação independente das 41 tabelas vazias passaram. |
-| M5 — persistência/baselines | LOAD RETRY READY — SECOND ATTEMPT AUTHORIZED | Lifecycle de IDs validado em 120k pelo sink oficial com adaptador de identidade; smoke e fixture PostgreSQL de 10k rollback-only passaram, com 39 invariantes e banco vazio. Segunda tentativa autorizada ainda não iniciada. |
+| M5 — persistência/baselines | PASS | COMMIT único em 2026-10-10; 120.000 pedidos, 41 tabelas conferidas em nova conexão read-only, zero falhas críticas/distributivas e 13 baselines SQL reconciliados. Ver `docs/data-generation/portfolio-validation.md`. |
 | M6 — preparação analítica | PASS | Inventário, grãos, fatos/dimensões candidatos, métricas, política temporal, precauções de fanout e quatro consultas executáveis documentados. |
+
+### Execução definitiva M5 — 2026-10-10
+
+- **Checkpoint do código gerador:** `61aacc284f5e05b5c4922f1e676f5930d69ebe61` (`fix: corrige lifecycle de IDs PostgreSQL`); era o HEAD limpo e confirmado antes da execução. `.env` permaneceu ignorado e não foi incluído.
+- **Carga única:** seed `20261005`, profile `portfolio`, 120.000 pedidos aceitos. O processo executou em uma transação, usou `ANALYZE`, validou invariantes críticas e gates distributivos antes do COMMIT. COMMIT concluído em 2026-10-10 06:17:06 (-03:00).
+- **Volumetria:** 3.675.448 linhas transacionais inseridas e 846.799 updates; 1.546 flushes, batch máximo 5.000, 4.673.957 linhas recebidas do emissor, pico/final de IDs 11.614/0. As contagens totais persistidas nas 41 tabelas somam 3.894.457.
+- **Qualidade pré e pós-COMMIT:** zero falhas críticas, zero falhas distributivas e zero warnings distributivos. As 39 invariantes SQL passaram; contagens, validações críticas e distribuição foram repetidas em nova conexão read-only.
+- **Baselines:** os 13 SQLs em `database/queries/baselines/` executaram em conexão `READ ONLY`; todas as 41 contagens reconciliaram. Reconciliações de vendas/descontos, pagamentos/refunds, COGS canônico, reversão de custo apenas para devoluções sellable, perda non-sellable sem dupla contagem, margem e YTD passaram. Resultados detalhados estão em `docs/data-generation/portfolio-validation.md`.
+- **Indicadores financeiros:** pedidos concluídos 116.305; receita líquida de produto BRL 949.319.764,19; capturado BRL 953.974.572,04; refunds concluídos BRL 26.727.257,07; COGS fulfillment canônico BRL 725.981.540,99143845; COGS analítico ajustado BRL 717.455.650,25964524; perda non-sellable identificada BRL 12.296.704,23413595; lucro bruto analítico BRL 205.133.325,18535476; margem 22,23%. Valores e definições completos constam no relatório.
+- **Duração:** pipeline transacional 24.006,6 s; validações SQL pré-COMMIT 40,3 s; validação pós-COMMIT 32,7 s; baselines 38,75 s; total até pós-validação 24.098,2 s e total com baselines 24.136,9 s (aprox. 6h42). Pico de memória durante a carga não foi medido.
+- **Resultado:** `M5 PASS — PROJECTBI READY FOR POWER BI`. Nenhum Power BI, PBIP, Power Query ou DAX foi iniciado. Não fazer nova carga Portfolio; a base já contém dados.
+- **Checkpoint final de documentação/baselines:** registrado no commit local associado a esta execução; sem push.

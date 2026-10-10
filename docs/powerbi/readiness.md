@@ -2,7 +2,9 @@
 
 **Escopo:** preparação documental M6. Não cria modelo semântico, medidas DAX, relatório ou conexão Power BI.
 **Fonte:** database operacional PostgreSQL 18, migrations 001–003, 9 schemas e 41 tabelas.
-**Estado verificado em 2026-10-09:** inspeção `BEGIN READ ONLY`; 72 FKs; 41 tabelas vazias; zero linhas persistidas. As amostras de valores abaixo vêm de fixtures sintéticas rollback-only, não de um dataset permanente.
+**Estado estrutural/documental verificado em 2026-10-09:** inspeção `BEGIN READ ONLY`; 72 FKs; naquele momento, 41 tabelas vazias e zero linhas persistidas. As amostras numéricas históricas abaixo vêm de fixtures sintéticas rollback-only e não descrevem o Portfolio permanente.
+
+**Atualização M5 (2026-10-10):** o Portfolio foi persistido e revalidado em nova conexão read-only; 120.000 pedidos, 41 tabelas e 13 baselines SQL passaram por contagens/reconciliações. O projeto está pronto para iniciar a modelagem Power BI, mas este documento permanece preparatório: não define modelo semântico, medidas DAX ou relatório. Consulte `../data-generation/portfolio-validation.md` para o estado e as métricas reais do dataset.
 
 ## 1. Inventário de entidades e granularidade
 
