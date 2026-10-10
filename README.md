@@ -36,7 +36,7 @@ O banco operacional deverá representar um ecossistema empresarial coerente, e n
 
 ## Estado atual
 
-**M0–M4 concluídos; M6 documental aprovado; M5 PERFORMANCE READY.** O Portfolio de 120.000 pedidos passou pelas auditorias lógica, distributiva e de estoque; as fixtures PostgreSQL de 10.000 e 50.000 pedidos passaram com rollback e confirmação independente de zero linhas nas 41 tabelas. O sink foi otimizado e revalidado em 10.000 pedidos com rollback. A autorização controlada para um único `COMMIT` foi concedida, mas a carga definitiva ainda não foi iniciada; os baselines finais dependem dela. A construção do modelo Power BI aguarda o encerramento do M5. Consulte [`docs/PROJECT_COMPLETION_PLAN.md`](docs/PROJECT_COMPLETION_PLAN.md), [`docs/powerbi/readiness.md`](docs/powerbi/readiness.md), [`docs/data-generation/implementation.md`](docs/data-generation/implementation.md) e [`docs/data-generation/validation-report.md`](docs/data-generation/validation-report.md).
+**M0–M4 concluídos; M6 documental aprovado; M5 LOAD RETRY READY.** O lifecycle de IDs foi corrigido e validado no fluxo completo de 120.000 pedidos pelo sink PostgreSQL com adaptador de identidades, além das integrações rollback-only de smoke e 10.000 pedidos. A segunda e última tentativa autorizada da carga permanente está liberada pelos gates e ainda não foi iniciada. Os baselines finais e a modelagem Power BI permanecem pendentes. Consulte [`docs/PROJECT_COMPLETION_PLAN.md`](docs/PROJECT_COMPLETION_PLAN.md), [`docs/powerbi/readiness.md`](docs/powerbi/readiness.md), [`docs/data-generation/implementation.md`](docs/data-generation/implementation.md) e [`docs/data-generation/validation-report.md`](docs/data-generation/validation-report.md).
 
 ## Fases previstas
 

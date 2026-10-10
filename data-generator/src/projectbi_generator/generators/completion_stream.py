@@ -28,9 +28,11 @@ COST_SCALE = Decimal("0.00000001")
 class _PaymentState:
     pending_attempts: int
     pending_fulfillment_items: int
+    pending_fulfillment_events: int = 0
     pending_stock_items: int = 0
     open_returns: int = 0
     captured: list[tuple[str, Decimal, Decimal, datetime]] = field(default_factory=list)
+    core_finalized: bool = False
 
 
 @dataclass
@@ -115,6 +117,7 @@ class IncrementalCompletionState:
         self.metrics.update({
             "current_active_payments": 0, "max_active_payments": 0,
             "current_active_fulfillments": 0, "max_active_fulfillments": 0,
+            "current_pending_fulfillment_events": 0, "max_pending_fulfillment_events": 0,
             "current_active_transfers": 0, "max_active_transfers": 0,
             "current_return_eligibility": 0, "max_return_eligibility": 0,
             "current_active_returns": 0, "max_active_returns": 0,
@@ -208,7 +211,16 @@ class IncrementalCompletionState:
             if self.policy_single_card is None or candidate < self.policy_single_card:
                 self.policy_single_card = candidate
         attempts = self._payment_attempts(order, index, cancelled)
-        self.active_payments[order.key] = _PaymentState(len(attempts), pending_fulfillment_items, pending_stock_items)
+        pending_fulfillment_events = sum(
+            pending for fulfillment, pending in self.active_fulfillments.values()
+            if fulfillment.order_key == order.key
+        )
+        self.active_payments[order.key] = _PaymentState(
+            pending_attempts=len(attempts),
+            pending_fulfillment_items=pending_fulfillment_items,
+            pending_fulfillment_events=pending_fulfillment_events,
+            pending_stock_items=pending_stock_items,
+        )
         self._update_active(order.key, "current_active_payments", "max_active_payments", len(self.active_payments))
         split = len(attempts) == 2 and "SPLIT" in attempts[0]["reference"]
         if split:
@@ -259,6 +271,14 @@ class IncrementalCompletionState:
             self._schedule(delivered, 14, f"LOG-{ordinal:05d}-DELIVERED", "fulfillment_event", {"fulfillment_key": fulfillment.key, "type": "delivered", "employee": None, "description": "Entrega confirmada."})
         self.active_fulfillments[fulfillment.key] = (fulfillment, number)
         self.metrics["current_active_fulfillments"] = len(self.active_fulfillments)
+        state = self.active_payments.get(fulfillment.order_key)
+        if state is not None:
+            state.pending_fulfillment_events += number
+        self.metrics["current_pending_fulfillment_events"] += number
+        self.metrics["max_pending_fulfillment_events"] = max(
+            self.metrics["max_pending_fulfillment_events"],
+            self.metrics["current_pending_fulfillment_events"],
+        )
 
     def on_core_movement(self, movement: StockMovement) -> None:
         key = (movement.product_sku, movement.location_code)
@@ -339,10 +359,31 @@ class IncrementalCompletionState:
 
     def _maybe_evict_payment_state(self, order_key: str) -> None:
         state = self.active_payments.get(order_key)
-        if state and not state.pending_attempts and not state.pending_fulfillment_items and not state.pending_stock_items and not state.open_returns:
+        if (state and not state.pending_attempts and not state.pending_fulfillment_items
+                and not state.pending_fulfillment_events and not state.pending_stock_items and not state.open_returns):
             self.active_payments.pop(order_key, None)
-            self.result.release_transaction_id("sales_orders", order_key)
+            if state.core_finalized:
+                self.result.release_transaction_id("sales_orders", order_key)
+            else:
+                self.metrics["current_sales_order_ids_waiting_core_finalization"] = (
+                    self.metrics.get("current_sales_order_ids_waiting_core_finalization", 0) + 1
+                )
+                self.metrics["max_sales_order_ids_waiting_core_finalization"] = max(
+                    self.metrics.get("max_sales_order_ids_waiting_core_finalization", 0),
+                    self.metrics["current_sales_order_ids_waiting_core_finalization"],
+                )
             self.metrics["current_active_payments"] = len(self.active_payments)
+
+    def on_core_order_finalized(self, order_key: str) -> None:
+        """Release the order ID only after both completion and deferred core rows close."""
+        state = self.active_payments.get(order_key)
+        if state is None:
+            self.metrics["current_sales_order_ids_waiting_core_finalization"] = max(
+                0, self.metrics.get("current_sales_order_ids_waiting_core_finalization", 0) - 1
+            )
+            self.result.release_transaction_id("sales_orders", order_key)
+            return
+        state.core_finalized = True
 
     def on_backorder_resolved(self, order_key: str) -> None:
         state = self.active_payments.get(order_key)
@@ -564,12 +605,19 @@ class IncrementalCompletionState:
             row = FulfillmentEvent(payload["fulfillment_key"], payload["type"], event.occurred_at, payload["employee"], payload["description"])
             self.result.fulfillment_events.append(row)
             fulfillment, pending = self.active_fulfillments[row.fulfillment_key]
+            order_key = fulfillment.order_key
             pending -= 1
             if pending <= 0:
                 self.active_fulfillments.pop(row.fulfillment_key, None)
             else:
                 self.active_fulfillments[row.fulfillment_key] = (fulfillment, pending)
             self.metrics["current_active_fulfillments"] = len(self.active_fulfillments)
+            state = self.active_payments.get(order_key)
+            if state is None or state.pending_fulfillment_events <= 0:
+                raise ValueError("Contador de eventos de fulfillment inconsistente.")
+            state.pending_fulfillment_events -= 1
+            self.metrics["current_pending_fulfillment_events"] -= 1
+            self._maybe_evict_payment_state(order_key)
         elif kind == "transfer_out":
             active = self.active_transfers[payload["item_key"]]
             position = positions[(payload["sku"], payload["location"])]
@@ -717,5 +765,7 @@ class IncrementalCompletionState:
                 },
             }
             raise ValueError(f"Estados ativos 3D permaneceram após o cutoff: {details}.")
+        if self.metrics.get("current_sales_order_ids_waiting_core_finalization", 0):
+            raise ValueError("IDs de pedidos permaneceram aguardando a finalização do núcleo 3C.")
         if self.metrics["total_events_processed"] > self.metrics["total_events_scheduled"]:
             raise ValueError("Contagem de eventos 3D processados excede eventos agendados.")

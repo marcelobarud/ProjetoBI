@@ -761,8 +761,9 @@ def generate_transactions(
             return [store_locations[store_code]] if store_code else []
         return warehouse_codes
 
-    def allocate_order_discount(order_key: str, items: list[SaleOrderItem], at: datetime, gross: list[Decimal], index: int) -> Decimal:
+    def allocate_order_discount(order_key: str, items: list[SaleOrderItem], at: datetime, gross: list[Decimal], index: int) -> tuple[Decimal, list[AppliedDiscount]]:
         nonlocal discount_counter
+        emitted_rows: list[AppliedDiscount] = []
         if index == 1:
             amount = _money(gross[0] * Decimal("0.05"))
             if amount < CENT:
@@ -786,21 +787,24 @@ def generate_transactions(
             discount_by_item[item.key] = allocation
             if allocation > 0:
                 discount_counter += 1
-                result.applied_discounts.append(AppliedDiscount(
+                emitted_rows.append(AppliedDiscount(
                     f"DISC-SM-{discount_counter:05d}", order_key, item.key, scope, allocation,
                     code, "Desconto sintético smoke", at,
                 ))
-        return amount
+        return amount, emitted_rows
 
     def finalize_order_3c(order_key: str) -> None:
         order = result_by_order.pop(order_key, None)
         if order is None:
             return
         publish("sales_orders", order_key)
-        if completion_state is None and isinstance(result, StreamingCoreResult):
-            result.release_transaction_id("sales_orders", order_key)
         for reservation in reservations_by_order.pop(order_key, []):
             publish("stock_reservations", reservation.key)
+        if isinstance(result, StreamingCoreResult):
+            if completion_state is None:
+                result.release_transaction_id("sales_orders", order_key)
+            else:
+                completion_state.on_core_order_finalized(order_key)
         for reservation_key in [key for key in unassigned_reservations if key[0] == order_key]:
             unassigned_reservations.pop(reservation_key, None)
         for item_key in sale_item_keys_by_order.pop(order_key, []):
@@ -1262,8 +1266,9 @@ def generate_transactions(
                 sale_rng.random() < Decimal("0.38") if config.profile == "smoke"
                 else sale_rng.randrange(100) < discount_rate
             )
+        pending_discount_rows: list[AppliedDiscount] = []
         if discount_selected:
-            discount = allocate_order_discount(order_key, sale_items, at, gross, idx)
+            discount, pending_discount_rows = allocate_order_discount(order_key, sale_items, at, gross, idx)
         fulfillment_type = "store_pickup" if channel_type == "physical" or (idx % 13 == 0 and channel_type == "ecommerce") else "delivery"
         fulfillment_type_by_order[order_key] = fulfillment_type
         order_index_by_key[order_key] = idx
@@ -1290,6 +1295,10 @@ def generate_transactions(
                 result.runtime_metrics.get("max_active_orders", 0), len(result_by_order)
             )
         result.sales_order_items.extend(sale_items)
+        # Discounts reference both parent and item IDs. Publish them only after
+        # those rows have entered the shared emitter, so a batch boundary cannot
+        # make a discount arrive before its dependencies.
+        result.applied_discounts.extend(pending_discount_rows)
         result.order_status_history.extend((
             OrderStatusEvent(order_key, "draft", at - timedelta(minutes=5), salesperson),
             OrderStatusEvent(order_key, "placed", at, salesperson),
@@ -1533,6 +1542,11 @@ def generate_transactions(
         fi.fulfilled_quantity = quantity
         fulfilled_quantity_by_order[fi.order_key] += quantity
         fulfilled_quantity_by_item[sale_item.key] = fulfilled_quantity_by_item.get(sale_item.key, 0) + quantity
+        # The movement emitted below references this identity. Publish the
+        # fulfilled snapshot first so a batch boundary cannot send the movement
+        # before its fulfillment-item ID exists in the sink.
+        publish("fulfillment_items", fi.key)
+        fulfillment_items_by_key.pop(fi.key, None)
         audit_order = result_by_order[fi.order_key]
         audit_add(audit_key(audit_order.placed_at.year, audit_order.channel_type, audit_order.channel_code,
                             audit_order.store_code, sale_item.product_sku,
@@ -1551,8 +1565,6 @@ def generate_transactions(
         if fulfilled + cancelled == ordered and outstanding_lines_by_order[fi.order_key] == 0 and order.status not in {"cancelled", "completed"}:
             order.status = "completed"
             result.order_status_history.append(OrderStatusEvent(order.key, "completed", at, order.salesperson_code))
-        publish("fulfillment_items", fi.key)
-        fulfillment_items_by_key.pop(fi.key, None)
         pending_fulfillments_by_order[fi.order_key] -= 1
         if pending_fulfillments_by_order[fi.order_key] == 0 and outstanding_lines_by_order[fi.order_key] == 0:
             finalize_order_3c(fi.order_key)

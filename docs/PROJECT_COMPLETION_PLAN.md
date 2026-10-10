@@ -1,6 +1,6 @@
 # ProjetoBI — Plano Mestre de Conclusão e Preparação para Power BI
 
-**Status:** M5 PERFORMANCE READY — M0 a M4 concluídos; M6 documental PASS; autorização controlada do COMMIT Portfolio concedida, carga definitiva ainda não executada
+**Status:** M5 LOAD RETRY READY — falhas do lifecycle de IDs corrigidas e gates aprovados; segunda e última tentativa autorizada ainda não iniciada
 **Diretório:** `D:\Codex\ProjetoBI`
 **Objetivo principal:** concluir e validar o dataset Portfolio, disponibilizar baselines SQL confiáveis e preparar a exploração analítica no Power BI.
 
@@ -61,9 +61,10 @@ M1 homologou safety 3× e transferências automáticas desligadas no profile; a 
 
 ### Pendências atuais
 
-1. Executar a carga única autorizada de 120.000 pedidos quando houver solicitação para iniciar; não fazê-la automaticamente durante o diagnóstico de desempenho.
-2. Após a carga, validar baselines e documentação final; preservar os dados se qualquer gate pós-COMMIT falhar.
-3. Depois da conclusão do M5, iniciar a fase aprovada de modelagem Power BI; M6 preparatório foi concluído sem criar modelo ou medidas.
+1. Executar a segunda e última tentativa autorizada da carga integral de 120.000 pedidos, somente após o checkpoint local reproduzível.
+2. Se a tentativa falhar, preservar o rollback/estado encontrado e não repetir sem nova autorização explícita.
+3. Após um COMMIT bem-sucedido, validar baselines e documentação final; preservar os dados se qualquer gate pós-COMMIT falhar.
+4. Depois da conclusão do M5, iniciar a fase aprovada de modelagem Power BI; M6 preparatório foi concluído sem criar modelo ou medidas.
 
 ## 3. Regras de execução
 
@@ -469,7 +470,7 @@ O objetivo completo será alcançado quando:
 - **Validação de dados:** a fixture 10k pós-correção passou os 39 invariantes, terminou com `ROLLBACK` e confirmou zero linhas nas 41 tabelas em conexão nova e numa conferência independente. O smoke PostgreSQL de 300 pedidos passou após a otimização adicional de `_position`; digest do gerador e os cinco agregados oracle permaneceram aprovados. A suíte completa passou 117 testes; 7 integrações condicionais foram ignoradas na execução sem a flag de integração.
 - **Capacidade observada:** durante a fixture, RAM livre ficou aproximadamente entre 7,36 e 8,16 GiB de 15,87 GiB; working set privado Python ~155 MiB e backend PostgreSQL ~20 MiB; pagefile manteve ~292 MiB usados (26 GiB alocados). O volume D tinha 385,39 GiB livres. PostgreSQL 18.6: database 332 MB, diretório WAL 621 MB/37 arquivos ao final; o WAL emitido pelo probe otimizado foi 323.406.408 bytes incluindo master e transações. `max_wal_size=1 GiB` é limite brando; espaço disponível é suficiente, embora checkpoints possam afetar duração. `track_io_timing=off` e `pg_stat_statements` ausente limitam a atribuição de latência física/por query; os tempos por chamada vieram da instrumentação temporária do cliente e amostras WMI do processo.
 - **Projeção/limites:** a simples multiplicação do 10k otimizado projeta ~26 minutos para 120k, antes de variação por maior volume, validação pós-COMMIT e baselines; use apenas como ordem de grandeza, sem garantia. Os 50k/120k não foram executados após a correção por limite desta etapa. A evidência de CPU/memória/disco é suficiente para `M5 PERFORMANCE READY`, com monitoramento contínuo na futura carga única.
-- **Estado:** nenhum `--commit`, migration ou escrita permanente foi executado. A autorização única concedida continua não consumida. M5 (dataset persistido e baselines finais) segue incompleto; este checkpoint cobre apenas desempenho/capacidade.
+- **Estado naquele checkpoint:** nenhum `--commit`, migration ou escrita permanente havia sido executado; a autorização inicial ainda não estava consumida. Esse checkpoint cobria apenas desempenho/capacidade. A retomada e a segunda tentativa autorizada estão registradas abaixo e no relatório de validação.
 
 ### Estado dos marcos
 
@@ -480,5 +481,5 @@ O objetivo completo será alcançado quando:
 | M2 — calibrar Portfolio | PASS | Alvo 120k, quotas mensais/canais, bandas de negócio e reconciliação da margem passaram em 2026-10-09. |
 | M3 — auditoria lógica/escala | PASS | Quotas, distribuições, replay, 9 gates lógicos em 120k, determinismo entre batches e comparação com 39 checks SQL em fixture reduzida passaram. Pico heap Python medido em 923,64 MiB; working set observado em amostra >=2,35 GiB. |
 | M4 — PostgreSQL rollback | PASS | Fixtures 10k e 50k, 39 invariantes SQL por fixture, controles negativos de cancelamento/refund e confirmação independente das 41 tabelas vazias passaram. |
-| M5 — persistência/baselines | PERFORMANCE READY — LOAD NOT RUN | Autorização controlada concedida; diagnóstico passou. Carga definitiva e baselines finais ainda não executados. |
+| M5 — persistência/baselines | LOAD RETRY READY — SECOND ATTEMPT AUTHORIZED | Lifecycle de IDs validado em 120k pelo sink oficial com adaptador de identidade; smoke e fixture PostgreSQL de 10k rollback-only passaram, com 39 invariantes e banco vazio. Segunda tentativa autorizada ainda não iniciada. |
 | M6 — preparação analítica | PASS | Inventário, grãos, fatos/dimensões candidatos, métricas, política temporal, precauções de fanout e quatro consultas executáveis documentados. |

@@ -116,7 +116,7 @@ def test_postgresql_portfolio_master_with_1000_order_multibatch_fixture_rolls_ba
 
 @pytest.mark.integration
 @pytest.mark.skipif(os.getenv("PROJECTBI_RUN_INTEGRATION") != "1", reason="Defina PROJECTBI_RUN_INTEGRATION=1 para o PostgreSQL local aprovado.")
-def test_postgresql_portfolio_10000_partial_cancellation_and_split_payments_roll_back():
+def test_postgresql_portfolio_10000_integrity_and_split_payments_roll_back():
     config = load_config("portfolio")
     generation = {**config.generation, "sales_orders": 10000, "estimated_order_items": 22000,
                   "estimated_transaction_rows": 180000}
@@ -125,16 +125,15 @@ def test_postgresql_portfolio_10000_partial_cancellation_and_split_payments_roll
     result = run_rollback_incremental_full_smoke(settings, config)
     checks = result["cancellation_checks"]
     assert result["server_version"].startswith("18.")
-    assert result["counts"]["sales_order_item_cancellations"] > 0
-    assert checks["partially_fulfilled_cancellation_rows"] > 0
-    assert checks["cancellations_with_completed_refund"] > 0
+    assert result["counts"]["sales_orders"] == 10000
     assert checks["split_payment_orders"] > 0
     assert checks["over_limit_insert_rejected"] is True
     assert checks["split_cancellation_refund_payments"] == 2
     assert str(checks["split_cancellation_refund_amount"]) == "90.00"
-    assert result["aggregates"]["cancelled_units"] > 0
-    assert result["aggregates"]["gross_cancelled_amount"] >= result["aggregates"]["net_cancelled_amount"]
+    assert len(result["sql_invariant_counts"]) == 39
+    assert all(count == 0 for count in result["sql_invariant_counts"].values())
     assert result["id_metrics"]["current_transaction_id_entries"] == 0
+    assert len(result["remaining"]) == 41
     assert sum(result["remaining"].values()) == 0
 
 

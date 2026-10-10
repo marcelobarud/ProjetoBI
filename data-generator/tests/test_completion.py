@@ -11,10 +11,104 @@ from zoneinfo import ZoneInfo
 import pytest
 
 from projectbi_generator.generators.completion import _replay_extended_stock, extend_transactions, generate_full_transactions_incremental
-from projectbi_generator.models.transactions import StockMovement, StockStateEvent, TransactionData
-from projectbi_generator.sinks import CollectingSink, CountingDiscardingSink
+from projectbi_generator.generators.completion_stream import IncrementalCompletionState
+from projectbi_generator.generators.streaming import StreamingCoreResult
+from projectbi_generator.models.transactions import StockMovement, StockReservation, StockStateEvent, TransactionData
+from projectbi_generator.sinks import CollectingSink, CountingDiscardingSink, TransactionBatchEmitter
 from projectbi_generator.sinks import _canonical
 from projectbi_generator.validation.completion import validate_completed_data
+
+
+def test_sales_order_id_is_retained_until_deferred_reservations_are_consumed(
+    completed_data, master_data, config,
+):
+    class IdLifecycleSink:
+        def __init__(self):
+            self.active_orders = set()
+            self.reservation_order_refs = 0
+
+        def consume(self, batch):
+            for row in batch.rows_by_table.get("sales_orders", ()):
+                self.active_orders.add(row.key)
+            for row in (batch.updates_by_table or {}).get("sales_orders", ()):
+                assert row.key in self.active_orders
+            for row in batch.rows_by_table.get("stock_reservations", ()):
+                assert row.order_key in self.active_orders
+                self.reservation_order_refs += 1
+            for entity, key in batch.release_keys:
+                if entity == "sales_orders":
+                    assert key in self.active_orders
+                    self.active_orders.remove(key)
+
+    sink = IdLifecycleSink()
+    emitter = TransactionBatchEmitter(sink, batch_size=2)
+    result = StreamingCoreResult(emitter)
+    state = IncrementalCompletionState(config, master_data, result, lambda *_args: None, None)
+    order = completed_data.sales_orders[0]
+    reservation = StockReservation(
+        "RES-ID-LIFECYCLE", order.key, "ITEM-ID-LIFECYCLE", "SKU-ID-LIFECYCLE",
+        "LOC-ID-LIFECYCLE", 1, "active", order.placed_at,
+    )
+
+    result.sales_orders.append(order)
+    result.stock_reservations.append(reservation)
+    state.on_sale(order, 1, False, pending_fulfillment_items=0)
+    state.active_payments[order.key].pending_attempts = 0
+    state._maybe_evict_payment_state(order.key)
+
+    # This update fills the batch. The order's reservation is still deferred.
+    result.sales_orders.publish(order.key)
+    result.stock_reservations.publish(reservation.key)
+    emitter.flush()
+    assert sink.reservation_order_refs == 1
+
+    state.on_core_order_finalized(order.key)
+    emitter.close()
+    assert not sink.active_orders
+    assert state.metrics["current_sales_order_ids_waiting_core_finalization"] == 0
+
+
+def test_discount_rows_are_emitted_after_order_and_item_dependencies(master_data, config):
+    class DependencySink:
+        def __init__(self):
+            self.orders = set()
+            self.items = {}
+            self.fulfillment_items = {}
+            self.movements = {}
+            self.discounts = 0
+
+        def consume(self, batch):
+            for row in batch.rows_by_table.get("sales_orders", ()):
+                self.orders.add(row.key)
+            for row in batch.rows_by_table.get("sales_order_items", ()):
+                assert row.order_key in self.orders
+                self.items[row.key] = row.order_key
+            for row in batch.rows_by_table.get("applied_discounts", ()):
+                assert row.order_key in self.orders
+                assert self.items.get(row.item_key) == row.order_key
+                self.discounts += 1
+            for row in batch.rows_by_table.get("fulfillment_items", ()):
+                assert row.order_key in self.orders
+                assert row.sale_item_key in self.items
+                self.fulfillment_items[row.key] = row.order_key
+            for row in batch.rows_by_table.get("stock_movements", ()):
+                self.movements[row.key] = row
+            for row in batch.rows_by_table.get("stock_state_events", ()):
+                if row.event_type == "fulfillment":
+                    movement = self.movements.pop(row.movement_key)
+                    assert movement.fulfillment_item_key in self.fulfillment_items
+            for entity, key in batch.release_keys:
+                if entity == "sales_orders":
+                    self.orders.remove(key)
+                    self.items = {item: order for item, order in self.items.items() if order != key}
+                    self.fulfillment_items = {
+                        item: order for item, order in self.fulfillment_items.items() if order != key
+                    }
+
+    sink = DependencySink()
+    result = generate_full_transactions_incremental(config, master_data, sink, batch_size=1)
+    assert sink.discounts > 0
+    assert result.counts()["applied_discounts"] == sink.discounts
 
 
 def test_phase3d_is_deterministic_and_preserves_phase3c_sales(config, master_data, transaction_data, completed_data):

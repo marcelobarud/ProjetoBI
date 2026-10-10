@@ -246,6 +246,13 @@ class PostgreSQLTransactionSink:
             refs = self._order_refs.pop(key, {})
             for child_entity, child_keys in refs.items():
                 for child_key in child_keys:
+                    if child_entity == "payments":
+                        # A payment's installments can span emitter batches. Keep
+                        # its timestamp until the parent order closes, rather than
+                        # dropping it after the first installment batch.
+                        self._timestamps["payments"].pop(child_key, None)
+                    elif child_entity == "fulfillments":
+                        self._timestamps["fulfillments"].pop(child_key, None)
                     if child_key in self.ids._ids.get(child_entity, {}):
                         self.ids.release(child_entity, child_key)
             if key in self.ids._ids.get(entity, {}):
@@ -322,8 +329,6 @@ class PostgreSQLTransactionSink:
             """INSERT INTO payments.payment_installments (payment_id,installment_number,due_on,amount,status,paid_at,external_reference,created_at,updated_at)
                VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s) RETURNING payment_installment_id""",
             [(self._id("payments",x.payment_key),x.number,x.due_on,x.amount,x.status,x.paid_at,x.key,self._timestamps["payments"][x.payment_key],x.paid_at or self._timestamps["payments"][x.payment_key]) for x in rows])
-        for key in {x.payment_key for x in rows}:
-            self._timestamps["payments"].pop(key, None)
 
     def _write_logistics(self, r: dict[str, tuple[Any, ...]]) -> None:
         rows = r.get("fulfillments", ())
@@ -339,8 +344,6 @@ class PostgreSQLTransactionSink:
                VALUES (%s,%s,%s,%s,%s,%s,%s) RETURNING fulfillment_item_id""",
             [(self._id("sales_orders",x.order_key),self._id("fulfillments",x.fulfillment_key),self._id("sales_order_items",x.sale_item_key),
               x.quantity_allocated,x.fulfilled_quantity,self._timestamps["fulfillments"][x.fulfillment_key],self._timestamps["fulfillments"][x.fulfillment_key]) for x in rows])
-        for key in {x.fulfillment_key for x in rows}:
-            self._timestamps["fulfillments"].pop(key, None)
         rows = r.get("fulfillment_events", ())
         self._insert_many([(self._id("fulfillments",x.fulfillment_key),x.event_type,x.occurred_at,self._master("employees",x.recorded_by_employee_code),x.description,x.occurred_at) for x in rows],
             "INSERT INTO logistics.fulfillment_events (fulfillment_id,event_type,occurred_at,recorded_by_employee_id,description,created_at) VALUES (%s,%s,%s,%s,%s,%s)")
@@ -383,8 +386,6 @@ class PostgreSQLTransactionSink:
             self._many("UPDATE after_sales.return_items SET quantity_approved=%s,quantity_received=%s,item_condition=%s,stock_destination=%s,received_at=%s WHERE return_item_id=%s",
                        [(x.quantity_approved,x.quantity_received,x.item_condition,x.stock_destination,x.received_at,self._id("return_items",x.key)) for x in item_updates])
             self.metrics.rows_updated += len(item_updates)
-        for x in initial:
-            self._timestamps["returns"].pop(x.return_key, None)
         rows = r.get("sales_order_item_cancellations", ())
         self._insert_returning("sales_order_item_cancellations", rows, [x.key for x in rows],
             """INSERT INTO sales.sales_order_item_cancellations
