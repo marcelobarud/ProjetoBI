@@ -1,6 +1,6 @@
 # ProjetoBI — Plano Mestre de Conclusão e Preparação para Power BI
 
-**Status:** M5 PASS — Portfolio persistido e reconciliado; Fases 4.2–4.5C PASS.
+**Status:** M5 PASS — Portfolio persistido e reconciliado; Fases 4.2–4.6 PASS. O modelo semântico tem 10 tabelas, 55 medidas e 21 relações; dashboards ainda não foram implementados.
 **Diretório:** `D:\Codex\ProjetoBI`
 **Objetivo principal:** concluir e validar o dataset Portfolio, disponibilizar baselines SQL confiáveis e preparar a exploração analítica no Power BI.
 
@@ -63,7 +63,7 @@ M1 homologou safety 3× e transferências automáticas desligadas no profile; a 
 
 1. M5 está concluído: os 120.000 pedidos foram persistidos, conferidos em nova conexão e os 13 baselines SQL foram aprovados e reconciliados.
 2. A Fase 4.0 concluiu backup lógico e preparação documental; a Fase 4.1 criou e reabriu o projeto inicial PBIP com TMDL e PBIR, sem carregar dados.
-3. A Fase 4.2 criou e validou `projetobi_pbi_ro`; a Fase 4.3 validou duas fatos comerciais, cinco dimensões, calendário e nove relações no Desktop. A Fase 4.5A centralizou as 28 medidas em `_Medidas`; a serialização nativa do Desktop foi regularizada em `74ca3be`. A Fase 4.5B adicionou a fundação financeira/devoluções, validou grants mínimos, refresh, reabertura, reconciliações SQL × DAX e precisão inteira escalada. Medidas financeiras definitivas e relatórios continuam fora do escopo.
+3. A Fase 4.2 criou e validou `projetobi_pbi_ro`; a Fase 4.3 validou duas fatos comerciais, cinco dimensões, calendário e nove relações no Desktop. A Fase 4.5A centralizou as medidas em `_Medidas`; a serialização nativa do Desktop foi regularizada em `74ca3be`. A Fase 4.5B adicionou a fundação financeira/devoluções e a Fase 4.5C implementou 27 medidas financeiras (55 no total), com refresh, reabertura, reconciliações SQL × DAX e precisão inteira escalada. A Fase 4.6 auditou as 10 tabelas, 11 Display Folders, 21 relações, dependências, filtros, política temporal, segurança e desempenho; o modelo semântico está pronto para iniciar dashboards. Páginas analíticas ainda não foram criadas.
 
 ## 3. Regras de execução
 
@@ -492,6 +492,7 @@ O objetivo completo será alcançado quando:
 | Fase 4.5A.1 — regularização da serialização nativa | PASS | O commit `74ca3be` registra apenas as oito normalizações de formatação do Desktop; as 28 medidas e seus metadados foram verificados equivalentes. |
 | Fase 4.5B — fundação financeira e de devoluções | PASS | Grãos e relações validados; grants mínimos, refresh e reabertura aprovados; somas `Int64` escaladas, amostras por canal/categoria/período e regressão comercial reconciliadas SQL × DAX. Nenhuma medida financeira definitiva foi criada. Ver `docs/powerbi/phase-4.5b-financial-model-foundation.md`. |
 | Fase 4.5C — medidas DAX financeiras e margem analítica | PASS | 27 medidas novas (55 no total), refresh Desktop, erro DAX zero, persistência, fechamento e reabertura sem erro; reconciliações PostgreSQL × DAX por 1.000 produtos, 144 combinações canal/categoria/ano, 45 meses, destinos, datas operacionais/coorte e YTD passaram. Ver `docs/powerbi/phase-4.5c-financial-dax-measures.md`. |
+| Fase 4.6 — auditoria integrada e working tree | PASS | 10 tabelas, 55 medidas em 11 pastas, 21 relações; validações SQL × DAX, filtros, datas e desempenho concluídas. Working tree inicial de 15 arquivos classificada e preservada, com plano seguro de regularização; dashboard não iniciado. Ver `docs/powerbi/phase-4.6-semantic-model-audit.md` e `docs/git/POWERBI_WORKTREE_AUDIT.md`. |
 
 ### Execução definitiva M5 — 2026-10-10
 
