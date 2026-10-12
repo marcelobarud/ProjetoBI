@@ -1,0 +1,333 @@
+table FatoDevolucoes
+	lineageTag: 0dab837c-3c08-513f-9e6e-0afec6e953fd
+
+	column return_item_id
+		dataType: int64
+		isHidden
+		isKey
+		formatString: 0
+		lineageTag: 3eb3fe30-41f3-5a1c-8002-b111f9eb087f
+		summarizeBy: none
+		sourceColumn: return_item_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column return_id
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 3a481f09-6e2c-503d-acd8-3cd53b0942c5
+		summarizeBy: none
+		sourceColumn: return_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column sales_order_id
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 305c9d48-0003-5650-847e-ae351e7d7c5b
+		summarizeBy: none
+		sourceColumn: sales_order_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column sales_order_item_id
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: e6f8f532-3b19-5f3b-9e6d-f45c76f25fd4
+		summarizeBy: none
+		sourceColumn: sales_order_item_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column source_fulfillment_item_id
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 693caa49-ed98-550b-93f9-c0957620ae82
+		summarizeBy: none
+		sourceColumn: source_fulfillment_item_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column source_fulfillment_id
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 0967ae12-9bed-5bdb-aba1-fda2ea1ac6c5
+		summarizeBy: none
+		sourceColumn: source_fulfillment_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column product_id
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 5c5ff85c-1b75-51f2-b320-19fe6cdcff3b
+		summarizeBy: none
+		sourceColumn: product_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column customer_id
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: d059a466-8ded-5399-b31b-324e47e673bc
+		summarizeBy: none
+		sourceColumn: customer_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column store_id
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: ed06fc7c-0163-51c4-a929-82523971aded
+		summarizeBy: none
+		sourceColumn: store_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column sales_channel_id
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 2a989f0c-780c-5599-a346-12a23628d0f0
+		summarizeBy: none
+		sourceColumn: sales_channel_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column order_status
+		dataType: string
+		lineageTag: 55bd4585-de05-5cc5-afea-e917b5767e60
+		summarizeBy: none
+		sourceColumn: order_status
+
+		annotation SummarizationSetBy = Automatic
+
+	column return_status
+		dataType: string
+		lineageTag: bd3b598d-c002-5182-8fd1-e0fa6a2bc022
+		summarizeBy: none
+		sourceColumn: return_status
+
+		annotation SummarizationSetBy = Automatic
+
+	column return_reason_code
+		dataType: string
+		lineageTag: 35fe2de9-0fb0-5f55-b12e-b01771a1d6ce
+		summarizeBy: none
+		sourceColumn: return_reason_code
+
+		annotation SummarizationSetBy = Automatic
+
+	column item_condition
+		dataType: string
+		lineageTag: 2035e523-f30c-53b3-8faf-168eba3348cf
+		summarizeBy: none
+		sourceColumn: item_condition
+
+		annotation SummarizationSetBy = Automatic
+
+	column stock_destination
+		dataType: string
+		lineageTag: a563ab01-6e20-500c-a099-2cdd5797e1a0
+		summarizeBy: none
+		sourceColumn: stock_destination
+
+		annotation SummarizationSetBy = Automatic
+
+	column quantity_requested
+		dataType: int64
+		formatString: #,0
+		lineageTag: 9f0c5840-a6cd-5d0f-bd68-d17ed116687a
+		summarizeBy: sum
+		sourceColumn: quantity_requested
+
+		annotation SummarizationSetBy = Automatic
+
+	column quantity_approved
+		dataType: int64
+		formatString: #,0
+		lineageTag: b289b1cc-e050-5fb3-bdc5-b41648973a95
+		summarizeBy: sum
+		sourceColumn: quantity_approved
+
+		annotation SummarizationSetBy = Automatic
+
+	column quantity_received
+		dataType: int64
+		formatString: #,0
+		lineageTag: 10529c3d-bf6d-5002-bce7-26b70f695dff
+		summarizeBy: sum
+		sourceColumn: quantity_received
+
+		annotation SummarizationSetBy = Automatic
+
+	column order_item_quantity
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 4608b15b-606c-5646-a70b-b43641ec9e2c
+		summarizeBy: none
+		sourceColumn: order_item_quantity
+
+		annotation SummarizationSetBy = Automatic
+
+	column unit_sale_price
+		dataType: decimal
+		isHidden
+		formatString: $ #,##0.00;($ #,##0.00);$ 0.00
+		lineageTag: 9a079736-b844-5211-b060-04b20b267aa3
+		summarizeBy: none
+		sourceColumn: unit_sale_price
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column applied_discount_amount
+		dataType: decimal
+		isHidden
+		formatString: $ #,##0.00;($ #,##0.00);$ 0.00
+		lineageTag: 65501aa0-1741-5a7d-a435-0a31baf85862
+		summarizeBy: none
+		sourceColumn: applied_discount_amount
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column return_requested_at_local
+		dataType: dateTime
+		isHidden
+		formatString: General Date
+		lineageTag: 315bbd7d-4417-5cd3-bb39-2660701d9601
+		summarizeBy: none
+		sourceColumn: return_requested_at_local
+
+		annotation SummarizationSetBy = Automatic
+
+	column return_received_at_local
+		dataType: dateTime
+		isHidden
+		formatString: General Date
+		lineageTag: b0babdaa-21a4-5a45-b0e6-5bda9365c6d2
+		summarizeBy: none
+		sourceColumn: return_received_at_local
+
+		annotation SummarizationSetBy = Automatic
+
+	column return_received_date
+		dataType: dateTime
+		isHidden
+		formatString: Long Date
+		lineageTag: a9f0db3c-c7bb-5e2a-b1e3-7a93c1c379e7
+		summarizeBy: none
+		sourceColumn: return_received_date
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column order_date
+		dataType: dateTime
+		isHidden
+		formatString: Long Date
+		lineageTag: 3372d836-34dc-5782-a472-ec32c6a5adf8
+		summarizeBy: none
+		sourceColumn: order_date
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column return_movement_count
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 469202c1-48d1-58c3-8833-da3361fe5e4b
+		summarizeBy: none
+		sourceColumn: return_movement_count
+
+		annotation SummarizationSetBy = Automatic
+
+	column return_movement_cost_x1e8
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: b7d59fe8-c207-5c5e-aaca-13a059d8e363
+		summarizeBy: none
+		sourceColumn: return_movement_cost_x1e8
+
+		annotation SummarizationSetBy = Automatic
+
+	column source_fulfillment_movement_count
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 205e975f-757d-577c-9739-dfc0e778ecdf
+		summarizeBy: none
+		sourceColumn: source_fulfillment_movement_count
+
+		annotation SummarizationSetBy = Automatic
+
+	column source_historical_unit_cost_x1e8
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 6f0e45c2-66d3-5980-845e-7800550be1f3
+		summarizeBy: none
+		sourceColumn: source_historical_unit_cost_x1e8
+
+		annotation SummarizationSetBy = Automatic
+
+	column sellable_cogs_reversal_x1e8
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: bf2ecd20-caa2-5efb-9ed9-8d87d2197121
+		summarizeBy: none
+		sourceColumn: sellable_cogs_reversal_x1e8
+
+		annotation SummarizationSetBy = Automatic
+
+	column non_sellable_loss_x1e8
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 5beb9ee0-518a-564e-9908-921469527172
+		summarizeBy: none
+		sourceColumn: non_sellable_loss_x1e8
+
+		annotation SummarizationSetBy = Automatic
+
+	column returned_commercial_value_x1e8
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 32c5dd26-d298-58b9-882b-5bf2bc5a62b0
+		summarizeBy: none
+		sourceColumn: returned_commercial_value_x1e8
+
+		annotation SummarizationSetBy = Automatic
+
+	partition FatoDevolucoes = m
+		mode: import
+		source =
+				let
+					Source = PostgreSQL.Database("127.0.0.1:5432", "projeto_bi"),
+					data_query = "WITH item_discount AS (SELECT sales_order_id, sales_order_item_id, sum(amount) AS discount_amount FROM sales.applied_discounts GROUP BY sales_order_id, sales_order_item_id), fulfillment_history AS (SELECT fulfillment_item_id, count(*) AS movement_count, round(sum(abs(quantity_delta)::numeric * unit_cost) / nullif(sum(abs(quantity_delta)), 0), 8) AS historical_unit_cost FROM inventory.stock_movements WHERE movement_type = 'fulfillment' GROUP BY fulfillment_item_id), return_movement AS (SELECT return_item_id, count(*) AS movement_count, sum(abs(quantity_delta)::numeric * unit_cost) AS return_cost FROM inventory.stock_movements WHERE movement_type = 'customer_return' AND return_item_id IS NOT NULL GROUP BY return_item_id) SELECT ri.return_item_id, ri.return_id, ri.sales_order_id, ri.sales_order_item_id, ri.source_fulfillment_item_id, fi.fulfillment_id AS source_fulfillment_id, i.product_id, o.customer_id, o.store_id, o.sales_channel_id, o.order_status, r.status AS return_status, r.reason_code AS return_reason_code, ri.item_condition, ri.stock_destination, ri.quantity_requested, ri.quantity_approved, ri.quantity_received, i.quantity AS order_item_quantity, i.unit_sale_price, coalesce(d.discount_amount, 0::numeric) AS applied_discount_amount, r.requested_at AT TIME ZONE 'America/Sao_Paulo' AS return_requested_at_local, ri.received_at AT TIME ZONE 'America/Sao_Paulo' AS return_received_at_local, (ri.received_at AT TIME ZONE 'America/Sao_Paulo')::date AS return_received_date, (o.placed_at AT TIME ZONE 'America/Sao_Paulo')::date AS order_date, coalesce(rm.movement_count, 0)::bigint AS return_movement_count, coalesce(rm.return_cost * 100000000, 0)::bigint AS return_movement_cost_x1e8, coalesce(fh.movement_count, 0)::bigint AS source_fulfillment_movement_count, (fh.historical_unit_cost * 100000000)::bigint AS source_historical_unit_cost_x1e8, CASE WHEN o.order_status = 'completed' AND ri.stock_destination = 'sellable' THEN coalesce(rm.return_cost * 100000000, 0)::bigint ELSE 0::bigint END AS sellable_cogs_reversal_x1e8, CASE WHEN o.order_status = 'completed' AND ri.quantity_received > 0 AND ri.stock_destination IN ('quarantine', 'repair', 'discard') THEN (ri.quantity_received::numeric * fh.historical_unit_cost * 100000000)::bigint ELSE 0::bigint END AS non_sellable_loss_x1e8, CASE WHEN o.order_status = 'completed' THEN round(ri.quantity_received::numeric * (i.unit_sale_price - coalesce(d.discount_amount, 0::numeric) / nullif(i.quantity, 0)) * 100000000)::bigint ELSE 0::bigint END AS returned_commercial_value_x1e8 FROM after_sales.return_items AS ri JOIN after_sales.returns AS r USING (return_id, sales_order_id) JOIN sales.sales_orders AS o USING (sales_order_id) JOIN sales.sales_order_items AS i USING (sales_order_id, sales_order_item_id) LEFT JOIN item_discount AS d USING (sales_order_id, sales_order_item_id) LEFT JOIN logistics.fulfillment_items AS fi ON fi.fulfillment_item_id = ri.source_fulfillment_item_id LEFT JOIN fulfillment_history AS fh ON fh.fulfillment_item_id = ri.source_fulfillment_item_id LEFT JOIN return_movement AS rm USING (return_item_id)",
+					data = Value.NativeQuery(Source, data_query, null, [EnableFolding = true]),
+					typed = Table.TransformColumnTypes(data, {{"quantity_requested", Int64.Type}, {"quantity_approved", Int64.Type}, {"quantity_received", Int64.Type}, {"return_requested_at_local", type datetime}, {"return_received_at_local", type datetime}, {"return_received_date", type date}, {"order_date", type date}, {"return_movement_count", Int64.Type}, {"return_movement_cost_x1e8", Int64.Type}, {"source_fulfillment_movement_count", Int64.Type}, {"source_historical_unit_cost_x1e8", Int64.Type}, {"sellable_cogs_reversal_x1e8", Int64.Type}, {"non_sellable_loss_x1e8", Int64.Type}, {"returned_commercial_value_x1e8", Int64.Type}, {"unit_sale_price", Currency.Type}, {"applied_discount_amount", Currency.Type}})
+				in
+					typed
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table

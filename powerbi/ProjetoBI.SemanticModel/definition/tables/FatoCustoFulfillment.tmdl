@@ -1,0 +1,217 @@
+table FatoCustoFulfillment
+	lineageTag: 5d333d48-a609-53b8-8544-c0a4c35d2792
+
+	column stock_movement_id
+		dataType: int64
+		isHidden
+		isKey
+		formatString: 0
+		lineageTag: 7b761f44-024c-5d73-927d-bc8422b31a52
+		summarizeBy: none
+		sourceColumn: stock_movement_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column fulfillment_item_id
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 1da1e416-9fcf-59a0-91de-e48d7461890f
+		summarizeBy: none
+		sourceColumn: fulfillment_item_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column fulfillment_id
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 7ffb6d43-35c9-5fa8-89ff-853fcec86ba2
+		summarizeBy: none
+		sourceColumn: fulfillment_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column sales_order_id
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 305c9d48-0003-5650-847e-ae351e7d7c5b
+		summarizeBy: none
+		sourceColumn: sales_order_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column sales_order_item_id
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: e6f8f532-3b19-5f3b-9e6d-f45c76f25fd4
+		summarizeBy: none
+		sourceColumn: sales_order_item_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column product_id
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 5c5ff85c-1b75-51f2-b320-19fe6cdcff3b
+		summarizeBy: none
+		sourceColumn: product_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column stock_location_id
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: cd875dfa-95f2-5efc-9d86-463a83d59736
+		summarizeBy: none
+		sourceColumn: stock_location_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column movement_type
+		dataType: string
+		isHidden
+		lineageTag: 3b51ea78-8de8-5237-8622-13a16250006f
+		summarizeBy: none
+		sourceColumn: movement_type
+
+		annotation SummarizationSetBy = Automatic
+
+	column quantity_delta
+		dataType: int64
+		isHidden
+		formatString: #,0
+		lineageTag: dd32e7f6-6a13-5514-889b-eac604bfbd91
+		summarizeBy: sum
+		sourceColumn: quantity_delta
+
+		annotation SummarizationSetBy = Automatic
+
+	column quantity_fulfilled
+		dataType: int64
+		formatString: #,0
+		lineageTag: 509b0f63-d4b3-58f6-9fdc-1301fe975d73
+		summarizeBy: sum
+		sourceColumn: quantity_fulfilled
+
+		annotation SummarizationSetBy = Automatic
+
+	column unit_cost_x1e8
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 314b412e-1fd1-58d3-a164-02ed2c465648
+		summarizeBy: none
+		sourceColumn: unit_cost_x1e8
+
+		annotation SummarizationSetBy = Automatic
+
+	column fulfillment_cogs_x1e8
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 7c7a92bb-aaa7-5a9e-8bcd-17905e7ebdad
+		summarizeBy: none
+		sourceColumn: fulfillment_cogs_x1e8
+
+		annotation SummarizationSetBy = Automatic
+
+	column occurred_at_utc_iso
+		dataType: string
+		isHidden
+		lineageTag: 038131ca-a18c-5d6a-863d-ff459d797734
+		summarizeBy: none
+		sourceColumn: occurred_at_utc_iso
+
+		annotation SummarizationSetBy = Automatic
+
+	column movement_datetime_local
+		dataType: dateTime
+		isHidden
+		formatString: General Date
+		lineageTag: ea4f38cf-66a5-5a60-9637-04003de47847
+		summarizeBy: none
+		sourceColumn: movement_datetime_local
+
+		annotation SummarizationSetBy = Automatic
+
+	column movement_date
+		dataType: dateTime
+		isHidden
+		formatString: Long Date
+		lineageTag: 896bd37b-4cf4-54b5-b3bc-58041d93824a
+		summarizeBy: none
+		sourceColumn: movement_date
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column order_date
+		dataType: dateTime
+		isHidden
+		formatString: Long Date
+		lineageTag: 3372d836-34dc-5782-a472-ec32c6a5adf8
+		summarizeBy: none
+		sourceColumn: order_date
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column order_status
+		dataType: string
+		lineageTag: 55bd4585-de05-5cc5-afea-e917b5767e60
+		summarizeBy: none
+		sourceColumn: order_status
+
+		annotation SummarizationSetBy = Automatic
+
+	column customer_id
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: d059a466-8ded-5399-b31b-324e47e673bc
+		summarizeBy: none
+		sourceColumn: customer_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column store_id
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: ed06fc7c-0163-51c4-a929-82523971aded
+		summarizeBy: none
+		sourceColumn: store_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column sales_channel_id
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 2a989f0c-780c-5599-a346-12a23628d0f0
+		summarizeBy: none
+		sourceColumn: sales_channel_id
+
+		annotation SummarizationSetBy = Automatic
+
+	partition FatoCustoFulfillment = m
+		mode: import
+		source =
+				let
+					Source = PostgreSQL.Database("127.0.0.1:5432", "projeto_bi"),
+					data_query = "SELECT m.stock_movement_id, m.fulfillment_item_id, fi.fulfillment_id, fi.sales_order_id, fi.sales_order_item_id, m.product_id, m.stock_location_id, m.movement_type, m.quantity_delta, abs(m.quantity_delta) AS quantity_fulfilled, (m.unit_cost * 100000000)::bigint AS unit_cost_x1e8, (abs(m.quantity_delta)::numeric * m.unit_cost * 100000000)::bigint AS fulfillment_cogs_x1e8, to_char(m.occurred_at AT TIME ZONE 'UTC', 'YYYY-MM-DD') || 'T' || to_char(m.occurred_at AT TIME ZONE 'UTC', 'HH24:MI:SS.US') || 'Z' AS occurred_at_utc_iso, m.occurred_at AT TIME ZONE 'America/Sao_Paulo' AS movement_datetime_local, (m.occurred_at AT TIME ZONE 'America/Sao_Paulo')::date AS movement_date, (o.placed_at AT TIME ZONE 'America/Sao_Paulo')::date AS order_date, o.order_status, o.customer_id, o.store_id, o.sales_channel_id FROM inventory.stock_movements AS m JOIN logistics.fulfillment_items AS fi USING (fulfillment_item_id) JOIN sales.sales_orders AS o USING (sales_order_id) WHERE m.movement_type = 'fulfillment'",
+					data = Value.NativeQuery(Source, data_query, null, [EnableFolding = true]),
+					typed = Table.TransformColumnTypes(data, {{"quantity_delta", Int64.Type}, {"quantity_fulfilled", Int64.Type}, {"unit_cost_x1e8", Int64.Type}, {"fulfillment_cogs_x1e8", Int64.Type}, {"movement_datetime_local", type datetime}, {"movement_date", type date}, {"order_date", type date}})
+				in
+					typed
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table

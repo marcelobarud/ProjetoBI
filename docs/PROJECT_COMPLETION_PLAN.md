@@ -1,6 +1,6 @@
 # ProjetoBI — Plano Mestre de Conclusão e Preparação para Power BI
 
-**Status:** M5 PASS — Portfolio persistido e reconciliado; Fases 4.2–4.5A PASS; Fase 4.5A.1 BLOCKED
+**Status:** M5 PASS — Portfolio persistido e reconciliado; Fases 4.2–4.5B PASS; Fase 4.5A.1 regularizada
 **Diretório:** `D:\Codex\ProjetoBI`
 **Objetivo principal:** concluir e validar o dataset Portfolio, disponibilizar baselines SQL confiáveis e preparar a exploração analítica no Power BI.
 
@@ -63,7 +63,7 @@ M1 homologou safety 3× e transferências automáticas desligadas no profile; a 
 
 1. M5 está concluído: os 120.000 pedidos foram persistidos, conferidos em nova conexão e os 13 baselines SQL foram aprovados e reconciliados.
 2. A Fase 4.0 concluiu backup lógico e preparação documental; a Fase 4.1 criou e reabriu o projeto inicial PBIP com TMDL e PBIR, sem carregar dados.
-3. A Fase 4.2 criou e validou `projetobi_pbi_ro`; as sete fontes homologadas foram importadas e reconciliadas. A Fase 4.3 estruturou e validou duas fatos, cinco dimensões, calendário comercial e nove relações unidirecionais no Desktop. Medidas definitivas e relatórios permanecem fora desta fase.
+3. A Fase 4.2 criou e validou `projetobi_pbi_ro`; a Fase 4.3 validou duas fatos comerciais, cinco dimensões, calendário e nove relações no Desktop. A Fase 4.5A centralizou as 28 medidas em `_Medidas`; a serialização nativa do Desktop foi regularizada em `74ca3be`. A Fase 4.5B adicionou a fundação financeira/devoluções, validou grants mínimos, refresh, reabertura, reconciliações SQL × DAX e precisão inteira escalada. Medidas financeiras definitivas e relatórios continuam fora do escopo.
 
 ## 3. Regras de execução
 
@@ -489,6 +489,8 @@ O objetivo completo será alcançado quando:
 | Fase 4.4 — medidas DAX comerciais | PASS | 28 medidas em `FatoPedidos` e `FatoItensPedido`; erros DAX/TMDL zerados no mecanismo local, reconciliações comerciais e YTD aprovadas, refresh e reabertura sem erro. Ver `docs/powerbi/phase-4.4-commercial-dax-measures.md`. |
 | Fase 4.5A — centralização das medidas | PASS | 28 medidas movidas para `_Medidas`, validação TMDL/DAX aprovada, confirmação visual das sete pastas e ciclo salvar/fechar/reabrir concluídos sem erro. Ver `docs/powerbi/phase-4.5a-measures-centralization.md`. |
 | Fase 4.5A.1 — formatação DAX em TMDL | BLOCKED | O Desktop reformatou oito expressões simples para a mesma linha da declaração ao salvar; ver `docs/powerbi/phase-4.5a1-dax-formatting.md`. |
+| Fase 4.5A.1 — regularização da serialização nativa | PASS | O commit `74ca3be` registra apenas as oito normalizações de formatação do Desktop; as 28 medidas e seus metadados foram verificados equivalentes. |
+| Fase 4.5B — fundação financeira e de devoluções | PASS | Grãos e relações validados; grants mínimos, refresh e reabertura aprovados; somas `Int64` escaladas, amostras por canal/categoria/período e regressão comercial reconciliadas SQL × DAX. Nenhuma medida financeira definitiva foi criada. Ver `docs/powerbi/phase-4.5b-financial-model-foundation.md`. |
 
 ### Execução definitiva M5 — 2026-10-10
 

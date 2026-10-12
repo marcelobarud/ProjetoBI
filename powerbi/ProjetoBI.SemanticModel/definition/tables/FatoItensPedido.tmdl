@@ -135,14 +135,24 @@ table FatoItensPedido
 
 		annotation SummarizationSetBy = Automatic
 
+	column item_discount_amount
+		dataType: decimal
+		lineageTag: 24f84c60-9cb4-5157-b7e0-7aa6dc94d27b
+		summarizeBy: none
+		sourceColumn: item_discount_amount
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
 	partition FatoItensPedido = m
 		mode: import
 		source =
 				let
 					Source = PostgreSQL.Database("127.0.0.1:5432", "projeto_bi"),
-					items_query = "SELECT items.*, (orders.placed_at AT TIME ZONE 'America/Sao_Paulo')::date AS order_date, orders.customer_id, orders.store_id, orders.sales_channel_id FROM sales.sales_order_items AS items LEFT JOIN sales.sales_orders AS orders USING (sales_order_id)",
+					items_query = "WITH item_discount AS (SELECT sales_order_id, sales_order_item_id, sum(amount) AS item_discount_amount FROM sales.applied_discounts GROUP BY sales_order_id, sales_order_item_id) SELECT items.*, coalesce(discounts.item_discount_amount, 0::numeric) AS item_discount_amount, (orders.placed_at AT TIME ZONE 'America/Sao_Paulo')::date AS order_date, orders.customer_id, orders.store_id, orders.sales_channel_id FROM sales.sales_order_items AS items LEFT JOIN sales.sales_orders AS orders USING (sales_order_id) LEFT JOIN item_discount AS discounts USING (sales_order_id, sales_order_item_id)",
 					sales_order_items = Value.NativeQuery(Source, items_query, null, [EnableFolding = true]),
-					money_as_fixed_decimal = Table.TransformColumnTypes(sales_order_items, {{"unit_sale_price", Currency.Type}})
+					money_as_fixed_decimal = Table.TransformColumnTypes(sales_order_items, {{"unit_sale_price", Currency.Type}, {"item_discount_amount", Currency.Type}})
 				in
 					money_as_fixed_decimal
 

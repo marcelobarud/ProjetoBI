@@ -11,7 +11,7 @@ annotation __PBI_TimeIntelligenceEnabled = 0
 
 annotation PBI_ProTooling = ["DevMode","TMDLView_Desktop"]
 
-annotation PBI_QueryOrder = ["DimCalendario","DimCanal","DimCliente","DimLoja","DimProduto","FatoItensPedido","FatoPedidos"]
+annotation PBI_QueryOrder = ["DimCalendario","DimCanal","DimCliente","DimLoja","DimProduto","FatoItensPedido","FatoPedidos","FatoCustoFulfillment","FatoDevolucoes"]
 
 ref table DimProduto
 ref table DimLoja
@@ -21,5 +21,7 @@ ref table FatoItensPedido
 ref table FatoPedidos
 ref table DimCalendario
 ref table _Medidas
+ref table FatoDevolucoes
+ref table FatoCustoFulfillment
 
 ref cultureInfo pt-BR
