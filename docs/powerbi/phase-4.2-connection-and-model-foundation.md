@@ -1,6 +1,6 @@
 # Fase 4.2 — conexão PostgreSQL e fundação do modelo analítico
 
-**Estado:** PARTIAL — role PostgreSQL read-only criada e validada; conexão/importação no Power BI Desktop e reabertura após refresh pendentes.
+**Estado:** CONCLUÍDA — conexão read-only, importação das sete tabelas, reconciliação, refresh e reabertura do PBIP validados.
 
 **Data:** 2026-10-12.
 
@@ -13,41 +13,44 @@
 - Privilégios concedidos à role: `CONNECT` em `projeto_bi`, `USAGE` somente nos schemas `sales`, `catalog`, `crm` e `core`; `SELECT` explícito somente nas sete tabelas relacionadas abaixo. Não recebeu `CREATE` em schemas nem privilégios de escrita, truncamento ou alteração nas tabelas. Não há concessão em sequences.
 - `default_transaction_read_only=on` foi configurado para essa role nessa database como proteção adicional. As restrições efetivas de ACL foram verificadas em conexão autenticada separada e continuam sendo a barreira principal.
 - `TEMP` na database aparece efetivo por causa da ACL padrão `PUBLIC` do PostgreSQL; não foi concedido diretamente à role. Isso permite somente objetos temporários de sessão, não escrita nas tabelas/esquemas do projeto. Remover a ACL pública afetaria outros usuários e ficou fora do escopo aprovado.
-- A senha forte foi gerada localmente, não foi impressa nem gravada no repositório e foi guardada no Windows Credential Manager deste usuário. Nenhum segredo ou string de conexão foi adicionado ao PBIP, TMDL, Power Query, `.env` ou Git.
+- Após tentativas de autenticação, a senha da role foi redefinida no PostgreSQL com autorização expressa do usuário e sincronizada manualmente no Windows Credential Manager. O valor não foi exibido nem registrado no repositório. Nenhum segredo ou string de conexão com credenciais foi adicionado ao PBIP, TMDL, Power Query ou Git.
 - A conexão de verificação executou consultas SELECT nas sete tabelas e confirmou `current_database() = projeto_bi`, `current_user = projetobi_pbi_ro` e `transaction_read_only = on`. Para cada tabela, `SELECT=true` e `INSERT/UPDATE/DELETE/TRUNCATE/REFERENCES/TRIGGER=false`; nos quatro schemas, `USAGE=true` e `CREATE=false`.
 - A database, seus dados, schemas e migrations foram preservados. As verificações ocorreram em transações somente leitura; não houve carga, DDL operacional, migration, view nem alteração de dados comerciais.
 
 ## 2. Inspeção e primeira seleção
 
-As contagens a seguir foram executadas como a role read-only por SQL direto no PostgreSQL. Elas são a referência para reconciliar o Power Query depois que a importação estiver disponível.
+As contagens do PostgreSQL foram executadas como a role read-only e comparadas com consultas DAX ao modelo semântico aberto no Power BI Desktop após refresh e reabertura. Todas as sete contagens coincidiram:
 
 | Tabela | Grão confirmado | PostgreSQL | Power BI | Estado |
 |---|---|---:|---:|---|
-| `sales.sales_orders` | Uma linha por pedido | 120.000 | N/A | Importação pendente |
-| `sales.sales_order_items` | Uma linha por item de pedido | 241.637 | N/A | Importação pendente |
-| `catalog.products` | Um SKU/produto | 1.000 | N/A | Importação pendente |
-| `catalog.categories` | Uma categoria | 42 | N/A | Importação pendente |
-| `crm.customers` | Uma identidade de cliente identificada | 45.000 | N/A | Importação pendente |
-| `core.stores` | Uma loja | 10 | N/A | Importação pendente |
-| `sales.sales_channels` | Um canal | 4 | N/A | Importação pendente |
+| `sales.sales_orders` | Uma linha por pedido | 120.000 | 120.000 | Coincide |
+| `sales.sales_order_items` | Uma linha por item de pedido | 241.637 | 241.637 | Coincide |
+| `catalog.products` | Um SKU/produto | 1.000 | 1.000 | Coincide |
+| `catalog.categories` | Uma categoria | 42 | 42 | Coincide |
+| `crm.customers` | Uma identidade de cliente identificada | 45.000 | 45.000 | Coincide |
+| `core.stores` | Uma loja | 10 | 10 | Coincide |
+| `sales.sales_channels` | Um canal | 4 | 4 | Coincide |
 
 As FKs confirmadas no catálogo são: `sales_orders.customer_id → crm.customers.customer_id` (opcional); `sales_orders.store_id → core.stores.store_id` (opcional); `sales_orders.sales_channel_id` e `channel_type → sales_channels.sales_channel_id` e `channel_type` pela FK composta; `sales_order_items.sales_order_id → sales_orders.sales_order_id`; `sales_order_items.product_id → products.product_id`; e `products.category_id → categories.category_id`. A PK de cada dimensão candidata é única. Há FKs adicionais do pedido para endereço e funcionário, que não serão importados nesta etapa.
+
+No modelo semântico foram criadas seis relações de negócio: categorias→produtos; produtos→itens; lojas→pedidos; clientes→pedidos; canais→pedidos; pedidos→itens. Além delas, o Desktop criou 17 relações auxiliares entre colunas de data e tabelas locais de inteligência automática de tempo. A unicidade das chaves no lado 1 foi verificada no PostgreSQL. A chave de canal é única e a validação da FK composta (`sales_channel_id`, `channel_type`) não encontrou órfãos. O grafo das seis relações de negócio não apresenta caminhos alternativos entre as tabelas selecionadas. A relação entre pedidos e itens liga grãos diferentes; manter medidas de cabeçalho separadas de somas por item para evitar fanout.
 
 Não há FK nula nas linhas de item nem em `products.category_id`. Existem 19.829 pedidos anônimos sem `customer_id` e 57.420 pedidos sem `store_id`; os nulos serão preservados, sem imputar clientes ou lojas. `sales_orders` contém 116.305 `completed`, 3.265 `cancelled` e 430 `confirmed` no estado atual da base.
 
 ## 3. Estado do Power BI Desktop, PBIP, TMDL e refresh
 
 - O projeto oficial permanece `powerbi/ProjetoBI.pbip`; Desktop instalado: `2.158.1177.0` (26.09). O processo Desktop já estava aberto com o projeto `ProjetoBI` quando esta fase começou.
-- O conector PostgreSQL do Desktop foi aberto e configurado para `127.0.0.1:5432`, database `projeto_bi`, em modo Import. A caixa de credenciais Database está aberta e aguarda o usuário inserir localmente o usuário `projetobi_pbi_ro` e a senha armazenada no Windows Credential Manager; credenciais não foram automatizadas nem expostas.
-- Nenhuma tabela foi importada nesta execução. As contagens Power BI, os tipos vistos no preview, nulos no Power Query, refresh e reabertura após refresh estão **pendentes**; não declarar PASS para esses gates.
-- O modelo TMDL no disco ainda não contém tabelas nem relações. O relatório PBIR permanece o arquivo de definição existente. As alterações locais iniciais — inclusive `queryLimitOption` no `report.json` e as diferenças de whitespace em TMDL — foram preservadas integralmente e não fazem parte desta fase.
+- O conector PostgreSQL do Desktop foi configurado para `127.0.0.1:5432`, database `projeto_bi`, em modo Import. O usuário inseriu as credenciais localmente; nenhuma credencial foi automatizada nem exposta.
+- As sete tabelas da seleção foram carregadas e salvas no PBIP. Depois do refresh, o arquivo foi fechado e reaberto no Desktop; consultas DAX executadas no mecanismo local confirmaram que o modelo estava disponível e que as contagens coincidiam com a origem.
+- O TMDL contém as sete tabelas importadas e seis relações correspondentes ao grafo de FKs selecionado. O relatório PBIR existente foi preservado; alterações locais preexistentes no início da fase não foram descartadas.
 - O modo previsto para o primeiro refresh é **Import**; DirectQuery e importação automática das 41 tabelas não foram usados.
+- Foram incluídas somente as sete tabelas aprovadas. A validação do mecanismo semântico após reabertura retornou 120.000 pedidos, 241.637 itens, 1.000 produtos, 42 categorias, 45.000 clientes, 10 lojas e 4 canais. O intervalo de `placed_at` no modelo foi 2023-01-02 09:00–2026-09-29 09:00; nulos em `customer_id` e `store_id` foram preservados (19.829 e 57.420).
 
 ### Tipos e política temporal para a importação
 
 - Chaves PostgreSQL `BIGINT` devem permanecer inteiros de 64 bits (`Int64.Type` / Whole number); `INTEGER` também inteiro. Não converter IDs para decimal nem para texto.
-- Valores PostgreSQL `NUMERIC(19,2)` não devem ser arredondados durante ingestão. Preferir Fixed decimal/Currency no modelo, conferindo que o limite observado caiba nessa representação; os registros consultados têm `sales_orders.total_amount` máximo de R$ 81.462,08 e soma de R$ 980.010.657,75. Não trocar silenciosamente para ponto flutuante quando a exatidão monetária for necessária.
-- `DATE` permanece Date. `TIMESTAMPTZ` deve ser tratado primeiro como instante com zona e só depois convertido de modo explícito para a data comercial `America/Sao_Paulo`. O intervalo de `placed_at` confirmado após essa conversão vai de 2023-01-02 09:00 a 2026-09-29 09:00; não usar conversão implícita pela timezone da máquina nem alterar o instante UTC sem necessidade. A visualização/coluna de data comercial deve seguir a política de `readiness.md`.
+- As cinco colunas monetárias `sales_orders.subtotal_amount`, `discount_amount`, `shipping_amount`, `total_amount` e `sales_order_items.unit_sale_price` usam Fixed decimal (`Currency.Type`) na consulta M e `decimal` no TMDL, evitando ponto flutuante. Após refresh, `total_amount` máximo foi 81.462,08, soma 980.010.657,75 e `unit_sale_price` máximo 18.797,57; os valores observados cabem na representação.
+- `DATE` permanece Date. `TIMESTAMPTZ` (`placed_at`) foi importado como DateTime, com valores observados entre 2023-01-02 09:00 e 2026-09-29 09:00 no modelo. A conversão explícita para data comercial `America/Sao_Paulo` e a coluna calendário ficam para a modelagem autorizada; não usar conversão implícita pela timezone da máquina nem alterar o instante UTC sem necessidade.
 - Quantidades PostgreSQL `BIGINT` permanecem inteiras. Flags `BOOLEAN` permanecem booleanas; status/códigos permanecem categóricos. `JSONB specifications` é nulo e opcional, mas não faz parte da seleção inicial.
 - A cultura do modelo já existente é `pt-BR`; a cultura de origem/interpretação deve ser definida explicitamente quando necessária, independentemente do idioma inglês do Desktop.
 
@@ -105,8 +108,8 @@ Esta sequência começa no núcleo com FKs comprovadas, adiciona primeiro as ent
 
 ## 7. Limitações e próximo passo
 
-- **Ação manual necessária:** autenticar na caixa aberta do Desktop como `projetobi_pbi_ro`; depois importar apenas as sete tabelas listadas, validar preview/tipos e contagens contra esta referência, atualizar, salvar pelo Desktop e reabrir o PBIP. Então documentar os resultados e reconciliar o diff sem descartar as alterações locais preexistentes.
+- A importação da fase está concluída. O Desktop também gerou 16 tabelas locais `LocalDateTable_*`, uma `DateTableTemplate_*` e 17 relações auxiliares de inteligência automática de tempo; são objetos auxiliares do modelo, não tabelas carregadas do PostgreSQL. Revisar/substituir esse comportamento ao implementar o calendário comercial numa fase autorizada.
 - Reavaliar se o conector requer driver/componente; nenhuma instalação ou configuração global foi feita.
 - Não avançar para implementação do modelo dimensional completo sem autorização da fase correspondente.
 
-**Classificação:** **FASE 4.2 PARTIAL — MANUAL CREDENTIAL ENTRY REQUIRED**. A role read-only está pronta e validada pelo cliente PostgreSQL; a autenticação no Desktop, importação e validação pelo Power BI ainda são gates pendentes.
+**Classificação:** **FASE 4.2 CONCLUÍDA — NÚCLEO COMERCIAL IMPORTADO E RECONCILIADO**. O modelo dimensional, calendário comercial, medidas DAX definitivas e relatórios continuam fora desta fase e dependem da autorização correspondente.

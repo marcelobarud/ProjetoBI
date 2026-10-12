@@ -7,9 +7,101 @@
         "x": 0,
         "y": 0
       },
-      "nodes": [],
+      "nodes": [
+        {
+          "location": {
+            "x": 1295.2715385834706,
+            "y": 516.88735640496861
+          },
+          "nodeIndex": "catalog categories",
+          "nodeLineageTag": "c186c213-9b1f-4994-8e14-161d6b483739",
+          "size": {
+            "height": 248,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 1011.0628658140499,
+            "y": 388.58462875264115
+          },
+          "nodeIndex": "catalog products",
+          "nodeLineageTag": "0598c8e9-978a-47e5-9052-85600bd9c597",
+          "size": {
+            "height": 300,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 50,
+            "y": 264.88685906422268
+          },
+          "nodeIndex": "core stores",
+          "nodeLineageTag": "669a4726-ee9e-42e6-b350-9e4075eec7c6",
+          "size": {
+            "height": 300,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 463.00850001767026,
+            "y": -50
+          },
+          "nodeIndex": "crm customers",
+          "nodeLineageTag": "9bd5d1e3-3991-479f-ba0c-b07c5ee6d587",
+          "size": {
+            "height": 272,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 147.45666514240452,
+            "y": 621.66445685093527
+          },
+          "nodeIndex": "sales sales_channels",
+          "nodeLineageTag": "ffb23fac-fa49-47cb-a76e-a6a18742c15c",
+          "size": {
+            "height": 248,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 726.8014767880893,
+            "y": 279.11555894061894
+          },
+          "nodeIndex": "sales sales_order_items",
+          "nodeLineageTag": "e83360ca-57e1-43a8-b295-027ad9a5c50b",
+          "size": {
+            "height": 300,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 437.32253169523165,
+            "y": 279.00404530137615
+          },
+          "nodeIndex": "sales sales_orders",
+          "nodeLineageTag": "efd0a0ac-dd19-409c-b92a-9e7ab450dbf1",
+          "size": {
+            "height": 300,
+            "width": 234
+          },
+          "zIndex": 0
+        }
+      ],
       "name": "Todas as tabelas",
-      "zoomValue": 100,
+      "zoomValue": 40.0525547248832,
       "pinKeyFieldsToTop": false,
       "showExtraHeaderInfo": false,
       "hideKeyFieldsWhenCollapsed": false,

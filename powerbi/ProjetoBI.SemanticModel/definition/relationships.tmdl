@@ -1,0 +1,104 @@
+relationship 1143d30d-e4c1-4b3a-9107-7c5f3c28dbf1
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'catalog categories'.created_at
+	toColumn: LocalDateTable_8c912390-890d-4177-86e5-60841abf5384.Date
+
+relationship a91c3b30-043a-4834-9d44-7eff08419ed9
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'catalog categories'.updated_at
+	toColumn: LocalDateTable_ed3c50ed-22da-4d8f-8955-8d83f364586e.Date
+
+relationship ac928993-8a61-43e1-8f5d-ef913d2c2cee
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'catalog products'.created_at
+	toColumn: LocalDateTable_f89382fa-3017-42ac-a1d0-e344ea4b436d.Date
+
+relationship 45dfe076-1e50-44b3-9ad9-89e95217cd79
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'catalog products'.updated_at
+	toColumn: LocalDateTable_b8cc4df7-a703-4855-9254-f00078921a6f.Date
+
+relationship 1a61bd92-ebba-4a71-927e-0ab2d30af839
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'core stores'.opened_on
+	toColumn: LocalDateTable_b5525d62-7afd-40c8-a1f9-764be5dd113f.Date
+
+relationship c4da929b-006d-4f90-864d-e07117174976
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'core stores'.closed_on
+	toColumn: LocalDateTable_fac95c55-fba5-4f24-a5c9-10f60f1a1203.Date
+
+relationship 99df85f4-f9c3-4ce0-8150-52310e11d2da
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'core stores'.created_at
+	toColumn: LocalDateTable_4305061e-3380-4ad4-985d-1044fd07f591.Date
+
+relationship cfb85714-74db-4cb7-82eb-d873317c365d
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'core stores'.updated_at
+	toColumn: LocalDateTable_15f10066-3ca9-46d8-a9e2-e65d69742383.Date
+
+relationship b96e9a25-8eae-4a22-b019-20703e011891
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'crm customers'.created_at
+	toColumn: LocalDateTable_b53ff64a-a392-49ae-bc2d-c279e8f4d30a.Date
+
+relationship 427f2efa-3884-4514-9716-83413dee0f64
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'crm customers'.updated_at
+	toColumn: LocalDateTable_b73fd3b2-07e3-4f8a-9a12-04128b285bc2.Date
+
+relationship d667e7d3-47ab-4531-ad02-cbf951cc03e0
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'sales sales_channels'.created_at
+	toColumn: LocalDateTable_3017983f-fe80-496c-91f2-7bbe8b2ce9bb.Date
+
+relationship 69696af4-48d9-494b-a84b-a4d58b9a03fc
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'sales sales_channels'.updated_at
+	toColumn: LocalDateTable_b0c2e692-c981-46ca-966e-8d8a24b1a6b7.Date
+
+relationship 2f1b35f0-1775-48c8-b4a3-ff7590812c4f
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'sales sales_order_items'.created_at
+	toColumn: LocalDateTable_6c4b847d-f137-4c20-bd22-43e3414687e4.Date
+
+relationship 7664f44b-b23b-4097-9161-0632fae61e92
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'sales sales_orders'.placed_at
+	toColumn: LocalDateTable_2b7ac737-c46f-4066-94c6-9b91f6f1afe5.Date
+
+relationship 70443c04-e22f-434b-8c58-86e92dcef843
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'sales sales_orders'.created_at
+	toColumn: LocalDateTable_ea0dba17-bebb-465b-b3c1-eda2150b7d3b.Date
+
+relationship a64317d0-0ebc-429b-8ae3-4a39c279344f
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'sales sales_orders'.updated_at
+	toColumn: LocalDateTable_b130861c-2fb4-48e6-9cdc-003132c84e5f.Date
+
+relationship AutoDetected_674fb39e-4217-4cf0-a174-a46f5b50a29d
+	fromColumn: 'catalog products'.category_id
+	toColumn: 'catalog categories'.category_id
+
+relationship AutoDetected_280b81cf-57e9-4f49-9220-3dfb269ba78b
+	fromColumn: 'sales sales_order_items'.product_id
+	toColumn: 'catalog products'.product_id
+
+relationship AutoDetected_c41a6352-cbac-4e3a-b1a4-b35d10c780d0
+	fromColumn: 'sales sales_orders'.store_id
+	toColumn: 'core stores'.store_id
+
+relationship AutoDetected_dc8587df-7a53-49e4-aad9-cb6c196b6acb
+	fromColumn: 'sales sales_orders'.customer_id
+	toColumn: 'crm customers'.customer_id
+
+relationship AutoDetected_cc647d2c-4906-458c-b123-980253dd3405
+	fromColumn: 'sales sales_orders'.sales_channel_id
+	toColumn: 'sales sales_channels'.sales_channel_id
+
+relationship AutoDetected_3c20e82e-8cbc-4379-bf05-3f003016a728
+	fromColumn: 'sales sales_order_items'.sales_order_id
+	toColumn: 'sales sales_orders'.sales_order_id
+

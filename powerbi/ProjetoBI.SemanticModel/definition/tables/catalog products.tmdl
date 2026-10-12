@@ -1,0 +1,119 @@
+table 'catalog products'
+	lineageTag: 0598c8e9-978a-47e5-9052-85600bd9c597
+
+	column product_id
+		dataType: int64
+		formatString: 0
+		lineageTag: c8770d81-c164-441c-8295-7572f391269e
+		summarizeBy: none
+		sourceColumn: product_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column sku
+		dataType: string
+		lineageTag: 45617597-d52c-487e-b216-8f51e16391fe
+		summarizeBy: none
+		sourceColumn: sku
+
+		annotation SummarizationSetBy = Automatic
+
+	column category_id
+		dataType: int64
+		formatString: 0
+		lineageTag: c2f76d28-ee0a-4723-a753-3221468007c1
+		summarizeBy: none
+		sourceColumn: category_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column brand_id
+		dataType: int64
+		formatString: 0
+		lineageTag: 171a0458-e1c2-4426-936f-ef6a8a529caa
+		summarizeBy: sum
+		sourceColumn: brand_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column name
+		dataType: string
+		lineageTag: b9dac85e-495c-4d81-a449-2eb1a5eb7a8a
+		summarizeBy: none
+		sourceColumn: name
+
+		annotation SummarizationSetBy = Automatic
+
+	column description
+		dataType: string
+		lineageTag: 435211b3-e5dc-4e11-8919-2815c380bb3d
+		summarizeBy: none
+		sourceColumn: description
+
+		annotation SummarizationSetBy = Automatic
+
+	column specifications
+		dataType: string
+		lineageTag: 5ce9c190-456e-4276-8782-4bfe5d96ad99
+		summarizeBy: none
+		sourceColumn: specifications
+
+		annotation SummarizationSetBy = Automatic
+
+	column unit_of_measure
+		dataType: string
+		lineageTag: a06e96ac-1a7e-48e0-9a10-2279bb2895b4
+		summarizeBy: none
+		sourceColumn: unit_of_measure
+
+		annotation SummarizationSetBy = Automatic
+
+	column status
+		dataType: string
+		lineageTag: 5d3a479f-3bad-4d1b-84ba-92e941290017
+		summarizeBy: none
+		sourceColumn: status
+
+		annotation SummarizationSetBy = Automatic
+
+	column created_at
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 8cbbf65d-cf15-4eee-b611-2a3dfc0c13b4
+		summarizeBy: none
+		sourceColumn: created_at
+
+		variation Variation
+			isDefault
+			relationship: ac928993-8a61-43e1-8f5d-ef913d2c2cee
+			defaultHierarchy: LocalDateTable_f89382fa-3017-42ac-a1d0-e344ea4b436d.'Hierarquia de datas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column updated_at
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 582743b0-3f5a-482e-9e66-b67afc9be01a
+		summarizeBy: none
+		sourceColumn: updated_at
+
+		variation Variation
+			isDefault
+			relationship: 45dfe076-1e50-44b3-9ad9-89e95217cd79
+			defaultHierarchy: LocalDateTable_b8cc4df7-a703-4855-9254-f00078921a6f.'Hierarquia de datas'
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'catalog products' = m
+		mode: import
+		source =
+				let
+				    Source = PostgreSQL.Database("127.0.0.1:5432", "projeto_bi"),
+				    catalog_products = Source{[Schema="catalog",Item="products"]}[Data]
+				in
+				    catalog_products
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

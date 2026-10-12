@@ -1,0 +1,120 @@
+table 'sales sales_order_items'
+	lineageTag: e83360ca-57e1-43a8-b295-027ad9a5c50b
+
+	column sales_order_item_id
+		dataType: int64
+		formatString: 0
+		lineageTag: c221e6fa-553e-4e98-831a-a23a9707ad7e
+		summarizeBy: sum
+		sourceColumn: sales_order_item_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column sales_order_id
+		dataType: int64
+		formatString: 0
+		lineageTag: e8eacd2b-d2d5-4c26-8615-01f6d2465997
+		summarizeBy: none
+		sourceColumn: sales_order_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column line_number
+		dataType: int64
+		formatString: 0
+		lineageTag: 005387dd-282b-4ed0-b8ba-95ff7632db59
+		summarizeBy: sum
+		sourceColumn: line_number
+
+		annotation SummarizationSetBy = Automatic
+
+	column product_id
+		dataType: int64
+		formatString: 0
+		lineageTag: c77a37ba-0e35-4b4c-852f-8956067b3a26
+		summarizeBy: none
+		sourceColumn: product_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column sku_snapshot
+		dataType: string
+		lineageTag: b59bbd12-8835-44ed-bcd9-6f24c9782799
+		summarizeBy: none
+		sourceColumn: sku_snapshot
+
+		annotation SummarizationSetBy = Automatic
+
+	column product_name_snapshot
+		dataType: string
+		lineageTag: 158f022a-4d9d-4222-939f-9cad5207ac7f
+		summarizeBy: none
+		sourceColumn: product_name_snapshot
+
+		annotation SummarizationSetBy = Automatic
+
+	column quantity
+		dataType: int64
+		formatString: 0
+		lineageTag: ee8ef44d-0865-48d6-8fa1-6e40309347bf
+		summarizeBy: sum
+		sourceColumn: quantity
+
+		annotation SummarizationSetBy = Automatic
+
+	column unit_sale_price
+		dataType: decimal
+		lineageTag: 9fbab380-ca39-49a9-9f96-50ae912b7b0a
+		summarizeBy: sum
+		sourceColumn: unit_sale_price
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column created_at
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: f305820f-a1ae-4cf6-bc3d-fb33258bc3d8
+		summarizeBy: none
+		sourceColumn: created_at
+
+		variation Variation
+			isDefault
+			relationship: 2f1b35f0-1775-48c8-b4a3-ff7590812c4f
+			defaultHierarchy: LocalDateTable_6c4b847d-f137-4c20-bd22-43e3414687e4.'Hierarquia de datas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column fulfilled_quantity
+		dataType: int64
+		formatString: 0
+		lineageTag: b00ed993-3c20-48de-8718-4397d132c216
+		summarizeBy: sum
+		sourceColumn: fulfilled_quantity
+
+		annotation SummarizationSetBy = Automatic
+
+	column cancelled_quantity
+		dataType: int64
+		formatString: 0
+		lineageTag: 638e0b80-133e-463a-9297-c6411d360a1a
+		summarizeBy: sum
+		sourceColumn: cancelled_quantity
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'sales sales_order_items' = m
+		mode: import
+		source =
+				let
+				    Source = PostgreSQL.Database("127.0.0.1:5432", "projeto_bi"),
+				    sales_sales_order_items = Source{[Schema="sales",Item="sales_order_items"]}[Data],
+				    money_as_fixed_decimal = Table.TransformColumnTypes(sales_sales_order_items, {{"unit_sale_price", Currency.Type}})
+				in
+				    money_as_fixed_decimal
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

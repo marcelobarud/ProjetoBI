@@ -1,6 +1,6 @@
 # Projeto Power BI
 
-O projeto oficial PBIP é aberto pelo Power BI Desktop em [`ProjetoBI.pbip`](ProjetoBI.pbip), com relatório PBIR e modelo semântico TMDL. O checkpoint inicial da Fase 4.1 era vazio. Na Fase 4.2 foi criada e validada a role PostgreSQL `projetobi_pbi_ro`, mas a conexão pelo Desktop e a importação controlada das sete tabelas ainda aguardam validação interativa. Consulte [`phase-4.2-connection-and-model-foundation.md`](../docs/powerbi/phase-4.2-connection-and-model-foundation.md) para o estado atual, contagens e arquitetura proposta.
+O projeto oficial PBIP é aberto pelo Power BI Desktop em [`ProjetoBI.pbip`](ProjetoBI.pbip), com relatório PBIR e modelo semântico TMDL. O checkpoint inicial da Fase 4.1 era vazio. Na Fase 4.2, a role PostgreSQL `projetobi_pbi_ro` foi validada, as sete tabelas comerciais foram importadas em modo Import, reconciliadas com o PostgreSQL e o PBIP foi salvo, reaberto e atualizado. Consulte [`phase-4.2-connection-and-model-foundation.md`](../docs/powerbi/phase-4.2-connection-and-model-foundation.md) para evidências, limites e arquitetura proposta.
 
 ## Fluxo de trabalho
 
@@ -10,4 +10,4 @@ O projeto oficial PBIP é aberto pelo Power BI Desktop em [`ProjetoBI.pbip`](Pro
 4. Se uma definição textual for alterada externamente, revise o diff e reabra/atualize o projeto no Desktop para validar antes de commit.
 5. Versione o `.pbip`, as pastas `.Report` e `.SemanticModel` e seus arquivos de definição. A pasta `.pbi/` guarda cache e estado local do Desktop e é ignorada pelo Git.
 
-Não coloque senhas, tokens ou connection strings com credenciais nas definições do projeto. A senha read-only está guardada no Windows Credential Manager local. O Power BI ainda precisa autenticar e fazer o primeiro refresh; não considerar a importação concluída até reconciliar contagens e tipos e reabrir o PBIP.
+Não coloque senhas, tokens ou connection strings com credenciais nas definições do projeto. A senha read-only está guardada no Windows Credential Manager local. A autenticação, importação, reconciliação das contagens e tipos, refresh e reabertura do PBIP foram concluídos nesta fase.

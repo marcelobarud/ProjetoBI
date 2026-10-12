@@ -1,0 +1,273 @@
+table 'sales sales_orders'
+	lineageTag: efd0a0ac-dd19-409c-b92a-9e7ab450dbf1
+
+	column sales_order_id
+		dataType: int64
+		formatString: 0
+		lineageTag: d0e329ff-c874-4410-931c-f03593ec6ad4
+		summarizeBy: none
+		sourceColumn: sales_order_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column order_number
+		dataType: string
+		lineageTag: 56585717-6d6b-4428-8d81-4b31fad97411
+		summarizeBy: none
+		sourceColumn: order_number
+
+		annotation SummarizationSetBy = Automatic
+
+	column sales_channel_id
+		dataType: int64
+		formatString: 0
+		lineageTag: e9f599d7-e916-4fca-8cad-795f65f5e880
+		summarizeBy: none
+		sourceColumn: sales_channel_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column channel_type
+		dataType: string
+		lineageTag: df4835f8-3c25-499b-babd-ad1208b8b12d
+		summarizeBy: none
+		sourceColumn: channel_type
+
+		annotation SummarizationSetBy = Automatic
+
+	column customer_id
+		dataType: int64
+		formatString: 0
+		lineageTag: 443eae07-b639-40ec-a861-1cc8b494c5ad
+		summarizeBy: none
+		sourceColumn: customer_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column store_id
+		dataType: int64
+		formatString: 0
+		lineageTag: 61c3330b-b7fd-435b-be5a-2d03a3c04dde
+		summarizeBy: none
+		sourceColumn: store_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column salesperson_employee_id
+		dataType: int64
+		formatString: 0
+		lineageTag: ab4b9937-1ad4-407d-9ca0-234e321f7b08
+		summarizeBy: sum
+		sourceColumn: salesperson_employee_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column customer_address_id
+		dataType: int64
+		formatString: 0
+		lineageTag: 31d6c2a7-58ca-406c-80b2-3361d98f81c9
+		summarizeBy: sum
+		sourceColumn: customer_address_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column order_status
+		dataType: string
+		lineageTag: 17de1a1e-e39f-4853-aa06-d4fe04fa4181
+		summarizeBy: none
+		sourceColumn: order_status
+
+		annotation SummarizationSetBy = Automatic
+
+	column placed_at
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: f59a164e-1652-452c-b5e7-0e87b06e6a73
+		summarizeBy: none
+		sourceColumn: placed_at
+
+		variation Variation
+			isDefault
+			relationship: 7664f44b-b23b-4097-9161-0632fae61e92
+			defaultHierarchy: LocalDateTable_2b7ac737-c46f-4066-94c6-9b91f6f1afe5.'Hierarquia de datas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column currency_code
+		dataType: string
+		lineageTag: 598f1aad-1120-43d1-9a36-1f9422a513de
+		summarizeBy: none
+		sourceColumn: currency_code
+
+		annotation SummarizationSetBy = Automatic
+
+	column subtotal_amount
+		dataType: decimal
+		lineageTag: 9494ffdf-f727-4a36-8be9-add32b642045
+		summarizeBy: sum
+		sourceColumn: subtotal_amount
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column discount_amount
+		dataType: decimal
+		lineageTag: c719f60a-7637-412e-a019-6bc78b65a5ee
+		summarizeBy: sum
+		sourceColumn: discount_amount
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column shipping_amount
+		dataType: decimal
+		lineageTag: c08c2e28-fb9c-4dcf-a643-7a0e58007959
+		summarizeBy: sum
+		sourceColumn: shipping_amount
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column total_amount
+		dataType: decimal
+		lineageTag: 605b7bff-5df6-4f42-bb7f-121994d336d1
+		summarizeBy: sum
+		sourceColumn: total_amount
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column recipient_name
+		dataType: string
+		lineageTag: 3b7e90fb-dc32-4fbd-8c7f-2d8219196770
+		summarizeBy: none
+		sourceColumn: recipient_name
+
+		annotation SummarizationSetBy = Automatic
+
+	column postal_code_snapshot
+		dataType: string
+		lineageTag: 4c335c7a-67b9-4f09-b4ba-8bfa9af14554
+		summarizeBy: none
+		sourceColumn: postal_code_snapshot
+
+		annotation SummarizationSetBy = Automatic
+
+	column street_snapshot
+		dataType: string
+		lineageTag: e86c2fce-5348-41bf-8815-b49f1a93a09d
+		summarizeBy: none
+		sourceColumn: street_snapshot
+
+		annotation SummarizationSetBy = Automatic
+
+	column street_number_snapshot
+		dataType: string
+		lineageTag: 6b0b532e-581c-476c-b89d-03013073ea96
+		summarizeBy: none
+		sourceColumn: street_number_snapshot
+
+		annotation SummarizationSetBy = Automatic
+
+	column complement_snapshot
+		dataType: string
+		lineageTag: da49a056-be9f-4bd5-a77e-6c3f1334adea
+		summarizeBy: none
+		sourceColumn: complement_snapshot
+
+		annotation SummarizationSetBy = Automatic
+
+	column district_snapshot
+		dataType: string
+		lineageTag: 954eec58-59ac-41a2-8498-7fda4fc612ad
+		summarizeBy: none
+		sourceColumn: district_snapshot
+
+		annotation SummarizationSetBy = Automatic
+
+	column city_snapshot
+		dataType: string
+		lineageTag: 247c9dc7-6756-456a-a429-5f253600894b
+		summarizeBy: none
+		sourceColumn: city_snapshot
+
+		annotation SummarizationSetBy = Automatic
+
+	column state_code_snapshot
+		dataType: string
+		lineageTag: 8d3ca35e-646f-468c-9860-55969181c070
+		summarizeBy: none
+		sourceColumn: state_code_snapshot
+
+		annotation SummarizationSetBy = Automatic
+
+	column country_code_snapshot
+		dataType: string
+		lineageTag: cca5bc13-c2bc-4405-9e07-195ca0e7a434
+		summarizeBy: none
+		sourceColumn: country_code_snapshot
+
+		annotation SummarizationSetBy = Automatic
+
+	column external_reference
+		dataType: string
+		lineageTag: cbcf8eb9-5ddc-4a04-9fe3-010a4dea1830
+		summarizeBy: none
+		sourceColumn: external_reference
+
+		annotation SummarizationSetBy = Automatic
+
+	column created_at
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: fc98662f-e720-448b-935f-b40628da2409
+		summarizeBy: none
+		sourceColumn: created_at
+
+		variation Variation
+			isDefault
+			relationship: 70443c04-e22f-434b-8c58-86e92dcef843
+			defaultHierarchy: LocalDateTable_ea0dba17-bebb-465b-b3c1-eda2150b7d3b.'Hierarquia de datas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column updated_at
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 442c48c1-5d8b-4ce5-bca0-6d34b1819c43
+		summarizeBy: none
+		sourceColumn: updated_at
+
+		variation Variation
+			isDefault
+			relationship: a64317d0-0ebc-429b-8ae3-4a39c279344f
+			defaultHierarchy: LocalDateTable_b130861c-2fb4-48e6-9cdc-003132c84e5f.'Hierarquia de datas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column notes
+		dataType: string
+		lineageTag: d1623d8e-c336-4823-bba9-cc634549454b
+		summarizeBy: none
+		sourceColumn: notes
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'sales sales_orders' = m
+		mode: import
+		source =
+				let
+				    Source = PostgreSQL.Database("127.0.0.1:5432", "projeto_bi"),
+				    sales_sales_orders = Source{[Schema="sales",Item="sales_orders"]}[Data],
+				    money_as_fixed_decimal = Table.TransformColumnTypes(sales_sales_orders, {{"subtotal_amount", Currency.Type}, {"discount_amount", Currency.Type}, {"shipping_amount", Currency.Type}, {"total_amount", Currency.Type}})
+				in
+				    money_as_fixed_decimal
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

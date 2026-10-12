@@ -1,0 +1,86 @@
+table 'sales sales_channels'
+	lineageTag: ffb23fac-fa49-47cb-a76e-a6a18742c15c
+
+	column sales_channel_id
+		dataType: int64
+		formatString: 0
+		lineageTag: 3d179406-54de-4f66-89a0-8fcd1a49558a
+		summarizeBy: none
+		sourceColumn: sales_channel_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column channel_code
+		dataType: string
+		lineageTag: 01d22580-8188-44ce-9363-7d4c7cb7f26c
+		summarizeBy: none
+		sourceColumn: channel_code
+
+		annotation SummarizationSetBy = Automatic
+
+	column name
+		dataType: string
+		lineageTag: 3b52f4ef-c982-4a8a-86fc-45f258f52f58
+		summarizeBy: none
+		sourceColumn: name
+
+		annotation SummarizationSetBy = Automatic
+
+	column channel_type
+		dataType: string
+		lineageTag: 652f59ea-c29c-4733-b9ff-dbf3247f70b7
+		summarizeBy: none
+		sourceColumn: channel_type
+
+		annotation SummarizationSetBy = Automatic
+
+	column is_active
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: 58fc87cf-2f70-4f60-ab52-38010b71b160
+		summarizeBy: none
+		sourceColumn: is_active
+
+		annotation SummarizationSetBy = Automatic
+
+	column created_at
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 0e2bb7cd-90d3-44ad-94c9-274d7f62d314
+		summarizeBy: none
+		sourceColumn: created_at
+
+		variation Variation
+			isDefault
+			relationship: d667e7d3-47ab-4531-ad02-cbf951cc03e0
+			defaultHierarchy: LocalDateTable_3017983f-fe80-496c-91f2-7bbe8b2ce9bb.'Hierarquia de datas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column updated_at
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: b463ea5f-b2ac-4f96-84b8-e50ae8f031c3
+		summarizeBy: none
+		sourceColumn: updated_at
+
+		variation Variation
+			isDefault
+			relationship: 69696af4-48d9-494b-a84b-a4d58b9a03fc
+			defaultHierarchy: LocalDateTable_b0c2e692-c981-46ca-966e-8d8a24b1a6b7.'Hierarquia de datas'
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'sales sales_channels' = m
+		mode: import
+		source =
+				let
+				    Source = PostgreSQL.Database("127.0.0.1:5432", "projeto_bi"),
+				    sales_sales_channels = Source{[Schema="sales",Item="sales_channels"]}[Data]
+				in
+				    sales_sales_channels
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

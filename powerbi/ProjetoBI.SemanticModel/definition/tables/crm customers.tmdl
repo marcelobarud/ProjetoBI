@@ -1,0 +1,93 @@
+table 'crm customers'
+	lineageTag: 9bd5d1e3-3991-479f-ba0c-b07c5ee6d587
+
+	column customer_id
+		dataType: int64
+		formatString: 0
+		lineageTag: da416dfb-3ac3-459d-be4a-c21dd6240b2a
+		summarizeBy: none
+		sourceColumn: customer_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column customer_code
+		dataType: string
+		lineageTag: 9e8551ac-73a5-4f3a-9048-f67814fc4549
+		summarizeBy: none
+		sourceColumn: customer_code
+
+		annotation SummarizationSetBy = Automatic
+
+	column customer_type
+		dataType: string
+		lineageTag: aba1727d-c5db-46f6-8f44-192246fb882c
+		summarizeBy: none
+		sourceColumn: customer_type
+
+		annotation SummarizationSetBy = Automatic
+
+	column display_name
+		dataType: string
+		lineageTag: c37cd55d-576d-4dca-827f-0f4f653f9437
+		summarizeBy: none
+		sourceColumn: display_name
+
+		annotation SummarizationSetBy = Automatic
+
+	column status
+		dataType: string
+		lineageTag: 555cef0f-41ee-4384-9b5c-36f021aaac5b
+		summarizeBy: none
+		sourceColumn: status
+
+		annotation SummarizationSetBy = Automatic
+
+	column created_at
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 7a1364b5-67d9-4926-89d6-e2be21226b8b
+		summarizeBy: none
+		sourceColumn: created_at
+
+		variation Variation
+			isDefault
+			relationship: b96e9a25-8eae-4a22-b019-20703e011891
+			defaultHierarchy: LocalDateTable_b53ff64a-a392-49ae-bc2d-c279e8f4d30a.'Hierarquia de datas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column updated_at
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: ea1cd5e4-5d89-4ef0-831a-687759fea2f1
+		summarizeBy: none
+		sourceColumn: updated_at
+
+		variation Variation
+			isDefault
+			relationship: 427f2efa-3884-4514-9716-83413dee0f64
+			defaultHierarchy: LocalDateTable_b73fd3b2-07e3-4f8a-9a12-04128b285bc2.'Hierarquia de datas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column notes
+		dataType: string
+		lineageTag: 7a92bbe2-763f-47a4-aa84-65ced0d09815
+		summarizeBy: none
+		sourceColumn: notes
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'crm customers' = m
+		mode: import
+		source =
+				let
+				    Source = PostgreSQL.Database("127.0.0.1:5432", "projeto_bi"),
+				    crm_customers = Source{[Schema="crm",Item="customers"]}[Data]
+				in
+				    crm_customers
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

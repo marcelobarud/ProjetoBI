@@ -1,0 +1,197 @@
+table 'core stores'
+	lineageTag: 669a4726-ee9e-42e6-b350-9e4075eec7c6
+
+	column store_id
+		dataType: int64
+		formatString: 0
+		lineageTag: 81b7ce25-0eef-4f61-857c-adc011665503
+		summarizeBy: none
+		sourceColumn: store_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column store_code
+		dataType: string
+		lineageTag: 7733c7f8-feec-4f9b-9d46-541b00d94e44
+		summarizeBy: none
+		sourceColumn: store_code
+
+		annotation SummarizationSetBy = Automatic
+
+	column name
+		dataType: string
+		lineageTag: 1951a822-7b9f-4c9b-af2b-cf3febdf4893
+		summarizeBy: none
+		sourceColumn: name
+
+		annotation SummarizationSetBy = Automatic
+
+	column status
+		dataType: string
+		lineageTag: 8eb75cd6-a5e4-44e5-a6d3-fdb6b4672612
+		summarizeBy: none
+		sourceColumn: status
+
+		annotation SummarizationSetBy = Automatic
+
+	column opened_on
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 19048e8c-a546-4513-8e01-286112ad3757
+		summarizeBy: none
+		sourceColumn: opened_on
+
+		variation Variation
+			isDefault
+			relationship: 1a61bd92-ebba-4a71-927e-0ab2d30af839
+			defaultHierarchy: LocalDateTable_b5525d62-7afd-40c8-a1f9-764be5dd113f.'Hierarquia de datas'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column closed_on
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 8a84a66e-d2ca-4448-8e37-022ed3257705
+		summarizeBy: none
+		sourceColumn: closed_on
+
+		variation Variation
+			isDefault
+			relationship: c4da929b-006d-4f90-864d-e07117174976
+			defaultHierarchy: LocalDateTable_fac95c55-fba5-4f24-a5c9-10f60f1a1203.'Hierarquia de datas'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column phone
+		dataType: string
+		lineageTag: a3a4c7ce-4d18-4268-8464-c6a6a4d4125e
+		summarizeBy: none
+		sourceColumn: phone
+
+		annotation SummarizationSetBy = Automatic
+
+	column email
+		dataType: string
+		lineageTag: d079e06b-4ab8-48ea-8dcc-bf2389923fbf
+		summarizeBy: none
+		sourceColumn: email
+
+		annotation SummarizationSetBy = Automatic
+
+	column created_at
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 10240c73-ec2b-40f8-be16-fb5ddc7c8b02
+		summarizeBy: none
+		sourceColumn: created_at
+
+		variation Variation
+			isDefault
+			relationship: 99df85f4-f9c3-4ce0-8150-52310e11d2da
+			defaultHierarchy: LocalDateTable_4305061e-3380-4ad4-985d-1044fd07f591.'Hierarquia de datas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column updated_at
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 96b14730-8470-4c03-9d9e-fbd93f6ef54b
+		summarizeBy: none
+		sourceColumn: updated_at
+
+		variation Variation
+			isDefault
+			relationship: cfb85714-74db-4cb7-82eb-d873317c365d
+			defaultHierarchy: LocalDateTable_15f10066-3ca9-46d8-a9e2-e65d69742383.'Hierarquia de datas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column notes
+		dataType: string
+		lineageTag: 85f9ed94-2e5e-4886-a92a-c9ea5960cc3a
+		summarizeBy: none
+		sourceColumn: notes
+
+		annotation SummarizationSetBy = Automatic
+
+	column postal_code
+		dataType: string
+		lineageTag: 175b2a22-90d7-488e-b848-5cbbc49fe66e
+		summarizeBy: none
+		sourceColumn: postal_code
+
+		annotation SummarizationSetBy = Automatic
+
+	column street
+		dataType: string
+		lineageTag: b4ee3b74-e8fd-449c-9ab1-d532e450f3cf
+		summarizeBy: none
+		sourceColumn: street
+
+		annotation SummarizationSetBy = Automatic
+
+	column street_number
+		dataType: string
+		lineageTag: c59e1ae9-4c09-4ffa-aa64-20e0b549f861
+		summarizeBy: none
+		sourceColumn: street_number
+
+		annotation SummarizationSetBy = Automatic
+
+	column complement
+		dataType: string
+		lineageTag: 5ad43416-396c-4423-a13e-0fc493a26e15
+		summarizeBy: none
+		sourceColumn: complement
+
+		annotation SummarizationSetBy = Automatic
+
+	column district
+		dataType: string
+		lineageTag: b0476da3-c386-4851-be23-763ee258b2ed
+		summarizeBy: none
+		sourceColumn: district
+
+		annotation SummarizationSetBy = Automatic
+
+	column city
+		dataType: string
+		lineageTag: 2987b5d9-2f98-4090-884b-0954ae920a7f
+		summarizeBy: none
+		sourceColumn: city
+
+		annotation SummarizationSetBy = Automatic
+
+	column state_code
+		dataType: string
+		lineageTag: 200353c9-ce9c-4991-a5b3-fbd444e4556e
+		summarizeBy: none
+		sourceColumn: state_code
+
+		annotation SummarizationSetBy = Automatic
+
+	column country_code
+		dataType: string
+		lineageTag: 6200cfa5-e890-4188-afa3-56c76b926e6f
+		summarizeBy: none
+		sourceColumn: country_code
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'core stores' = m
+		mode: import
+		source =
+				let
+				    Source = PostgreSQL.Database("127.0.0.1:5432", "projeto_bi"),
+				    core_stores = Source{[Schema="core",Item="stores"]}[Data]
+				in
+				    core_stores
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+
