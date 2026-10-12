@@ -1,6 +1,6 @@
 # ProjetoBI — Plano Mestre de Conclusão e Preparação para Power BI
 
-**Status:** M5 PASS — Portfolio persistido e reconciliado; Fases 4.2–4.5B PASS; Fase 4.5A.1 regularizada
+**Status:** M5 PASS — Portfolio persistido e reconciliado; Fases 4.2–4.5C PASS.
 **Diretório:** `D:\Codex\ProjetoBI`
 **Objetivo principal:** concluir e validar o dataset Portfolio, disponibilizar baselines SQL confiáveis e preparar a exploração analítica no Power BI.
 
@@ -491,6 +491,7 @@ O objetivo completo será alcançado quando:
 | Fase 4.5A.1 — formatação DAX em TMDL | BLOCKED | O Desktop reformatou oito expressões simples para a mesma linha da declaração ao salvar; ver `docs/powerbi/phase-4.5a1-dax-formatting.md`. |
 | Fase 4.5A.1 — regularização da serialização nativa | PASS | O commit `74ca3be` registra apenas as oito normalizações de formatação do Desktop; as 28 medidas e seus metadados foram verificados equivalentes. |
 | Fase 4.5B — fundação financeira e de devoluções | PASS | Grãos e relações validados; grants mínimos, refresh e reabertura aprovados; somas `Int64` escaladas, amostras por canal/categoria/período e regressão comercial reconciliadas SQL × DAX. Nenhuma medida financeira definitiva foi criada. Ver `docs/powerbi/phase-4.5b-financial-model-foundation.md`. |
+| Fase 4.5C — medidas DAX financeiras e margem analítica | PASS | 27 medidas novas (55 no total), refresh Desktop, erro DAX zero, persistência, fechamento e reabertura sem erro; reconciliações PostgreSQL × DAX por 1.000 produtos, 144 combinações canal/categoria/ano, 45 meses, destinos, datas operacionais/coorte e YTD passaram. Ver `docs/powerbi/phase-4.5c-financial-dax-measures.md`. |
 
 ### Execução definitiva M5 — 2026-10-10
 

@@ -331,6 +331,230 @@ table _Medidas
 		displayFolder: 07 | Indicadores Percentuais
 		lineageTag: 07845f27-8750-4bae-b491-2f9f9cb1b42f
 
+	/// Grão: uma linha em FatoDevolucoes; unidade: itens. Usa a data de recebimento ativa; itens sem recebimento permanecem no total sem filtro de data e ficam fora de períodos de evento. Respeita dimensões conformadas; BLANK quando não há linhas. Baseline 09_returns.sql.
+	measure 'Itens de Devolução' = COUNTROWS ( 'FatoDevolucoes' )
+		formatString: #,0
+		displayFolder: 08 | Devoluções
+		lineageTag: 1162de3d-46f7-46a1-985e-3b1c4ddb71bc
+
+	/// Grão: quantity_received por return_item_id; unidade: unidades recebidas. Perspectiva de evento pela data de recebimento ativa; quantidade zero não é devolução efetivada. Respeita destino e dimensões; BLANK sem recebimentos. Baseline 09_returns.sql.
+	measure 'Unidades Recebidas em Devolução' = SUM ( 'FatoDevolucoes'[quantity_received] )
+		formatString: #,0
+		displayFolder: 08 | Devoluções
+		lineageTag: 8fed3fa0-b2b2-401f-a927-022809237bf5
+
+	/// Grão: return_item_id recebido e pedido completed; unidade: BRL. Perspectiva de evento pela data de recebimento ativa. Soma primeiro os inteiros escalados por 10^8 e converte após agregar. Filtros de destino e dimensões preservados; BLANK sem valor. Baseline 09_returns.sql e 11_cost_and_margin.sql.
+	measure 'Valor Comercial Devolvido — Data do Recebimento' = DIVIDE ( SUM ( 'FatoDevolucoes'[returned_commercial_value_x1e8] ), 100000000 )
+		formatString: $ #,##0.00;($ #,##0.00);$ 0.00
+		displayFolder: 08 | Devoluções
+		lineageTag: 489d279f-563e-4984-b6ea-733b95c3b6b7
+
+	/// Grão: return_item_id recebido e pedido completed; unidade: BRL. Perspectiva de coorte: USERELATIONSHIP ativa order_date e substitui a data de recebimento. Soma inteiros x10^8 antes da conversão; BLANK sem valor. Baseline 09_returns.sql e 11_cost_and_margin.sql.
+	measure 'Valor Comercial Devolvido — Data do Pedido' =
+			CALCULATE (
+				[Valor Comercial Devolvido — Data do Recebimento],
+				USERELATIONSHIP ( 'FatoDevolucoes'[order_date], 'DimCalendario'[Data] )
+			)
+		formatString: $ #,##0.00;($ #,##0.00);$ 0.00
+		displayFolder: 08 | Devoluções
+		lineageTag: 3fa8c584-0eb7-4fbb-8899-6137da1b3335
+
+	/// Grão: return_item_id; unidade: BRL. Quarantine, repair ou discard pela data de recebimento ativa; indicador informativo que permanece no COGS analítico, sem dedução adicional. Preserva filtros dimensionais; BLANK sem perda. Baseline 11_cost_and_margin.sql.
+	measure 'Perda Non-Sellable — Data do Recebimento' = DIVIDE ( SUM ( 'FatoDevolucoes'[non_sellable_loss_x1e8] ), 100000000 )
+		formatString: $ #,##0.00;($ #,##0.00);$ 0.00
+		displayFolder: 09 | Custos e COGS
+		lineageTag: 21bd234f-76dc-4295-a0d2-d684d06f3a28
+
+	/// Grão: return_item_id; unidade: BRL. Coorte do pedido de origem, substitui a data de recebimento. Soma inteiros x10^8 antes da conversão; perda informativa incluída no COGS ajustado. BLANK sem perda. Baseline 11_cost_and_margin.sql.
+	measure 'Perda Non-Sellable — Data do Pedido' =
+			CALCULATE (
+				[Perda Non-Sellable — Data do Recebimento],
+				USERELATIONSHIP ( 'FatoDevolucoes'[order_date], 'DimCalendario'[Data] )
+			)
+		formatString: $ #,##0.00;($ #,##0.00);$ 0.00
+		displayFolder: 09 | Custos e COGS
+		lineageTag: d561259c-dcad-470d-8983-8b04c6d21d6d
+
+	/// Grão: stock_movement_id; unidade: BRL. Custo canônico escalado por 10^8, sem restrição de status, pela data de movimento ativa. Mantém filtros dimensionais; BLANK sem movimentos. Baseline 11_cost_and_margin.sql.
+	measure 'COGS de Fulfillment — Data do Movimento' = DIVIDE ( SUM ( 'FatoCustoFulfillment'[fulfillment_cogs_x1e8] ), 100000000 )
+		formatString: $ #,##0.00;($ #,##0.00);$ 0.00
+		displayFolder: 09 | Custos e COGS
+		lineageTag: e0847158-adbe-4c0c-bb8c-8edafa7f22a6
+
+	/// Grão: stock_movement_id completed; unidade: BRL. Perspectiva operacional pela data do movimento. Mantém filtros de status com KEEPFILTERS; agrega x10^8 antes de converter; BLANK sem custo elegível. Baseline 11_cost_and_margin.sql.
+	measure 'COGS Original Concluído — Data do Movimento' =
+			CALCULATE (
+				[COGS de Fulfillment — Data do Movimento],
+				KEEPFILTERS ( 'FatoCustoFulfillment'[order_status] = "completed" )
+			)
+		formatString: $ #,##0.00;($ #,##0.00);$ 0.00
+		displayFolder: 09 | Custos e COGS
+		lineageTag: 0d60d968-da5a-4920-9941-de87e3b881a2
+
+	/// Grão: stock_movement_id completed; unidade: BRL. Coorte do pedido: USERELATIONSHIP ativa order_date e substitui movement_date. Agrega x10^8 antes de converter; BLANK sem custo elegível. Baseline 11_cost_and_margin.sql.
+	measure 'COGS Original Concluído — Data do Pedido' =
+			CALCULATE (
+				[COGS de Fulfillment — Data do Movimento],
+				KEEPFILTERS ( 'FatoCustoFulfillment'[order_status] = "completed" ),
+				USERELATIONSHIP ( 'FatoCustoFulfillment'[order_date], 'DimCalendario'[Data] )
+			)
+		formatString: $ #,##0.00;($ #,##0.00);$ 0.00
+		displayFolder: 09 | Custos e COGS
+		lineageTag: 8ed8b98f-109e-4add-94cb-26c56dd12b93
+
+	/// Grão: return_item sellable reintegrado; unidade: BRL. Perspectiva de evento pela data de recebimento. Agrega inteiros x10^8; não inclui destinos não vendáveis; BLANK sem reversões. Baseline 11_cost_and_margin.sql.
+	measure 'Reversão COGS Sellable — Data do Recebimento' = DIVIDE ( SUM ( 'FatoDevolucoes'[sellable_cogs_reversal_x1e8] ), 100000000 )
+		formatString: $ #,##0.00;($ #,##0.00);$ 0.00
+		displayFolder: 09 | Custos e COGS
+		lineageTag: a326a6dd-d41c-451f-afb9-d864d79a6c7f
+
+	/// Grão: return_item sellable reintegrado; unidade: BRL. Perspectiva de coorte por order_date, substitui a data de recebimento. Soma inteiros x10^8; BLANK sem reversões. Baseline 11_cost_and_margin.sql.
+	measure 'Reversão COGS Sellable — Data do Pedido' =
+			CALCULATE (
+				[Reversão COGS Sellable — Data do Recebimento],
+				USERELATIONSHIP ( 'FatoDevolucoes'[order_date], 'DimCalendario'[Data] )
+			)
+		formatString: $ #,##0.00;($ #,##0.00);$ 0.00
+		displayFolder: 09 | Custos e COGS
+		lineageTag: 179137cd-cbca-477b-abb5-1b3d1af6611e
+
+	/// Grão: linha comercial atendida em pedido completed; unidade: BRL. Preço histórico líquido do desconto atribuído ao item multiplicado pelas unidades atendidas. Coorte pela order_date; TREATAS seleciona pedidos completed sem relação entre fatos. Respeita produto/categoria, canal, cliente e loja; BLANK sem itens. Baseline 05_sales_by_category.sql, 06_product_performance.sql e 11_cost_and_margin.sql.
+	measure 'Receita de Produtos — Antes de Devoluções (Itens)' =
+			VAR PedidosConcluidos =
+				CALCULATETABLE (
+					VALUES ( 'FatoPedidos'[sales_order_id] ),
+					KEEPFILTERS ( 'FatoPedidos'[order_status] = "completed" )
+				)
+			RETURN
+				CALCULATE (
+					SUMX (
+						'FatoItensPedido',
+						'FatoItensPedido'[fulfilled_quantity]
+							* (
+								'FatoItensPedido'[unit_sale_price]
+									- DIVIDE ( 'FatoItensPedido'[item_discount_amount], 'FatoItensPedido'[quantity], 0 )
+							)
+					),
+					TREATAS ( PedidosConcluidos, 'FatoItensPedido'[sales_order_id] )
+				)
+		formatString: $ #,##0.00;($ #,##0.00);$ 0.00
+		displayFolder: 10 | Lucro e Margem
+		lineageTag: c8139fae-1000-46e0-b03e-1d0c12f4ceb9
+
+	/// Grão: item atendido menos devoluções recebidas; unidade: BRL. Receita por produto após devoluções = receita atribuída ao item antes das devoluções menos valor devolvido recebido. Todos os componentes usam coorte do pedido; preserva produto/categoria e dimensões; BLANK sem receita. Baseline 11_cost_and_margin.sql.
+	measure 'Receita Analítica Após Devoluções' =
+			VAR ReceitaAntes = [Receita de Produtos — Antes de Devoluções (Itens)]
+			VAR ValorDevolvido = [Valor Comercial Devolvido — Data do Pedido]
+			RETURN
+				IF ( ISBLANK ( ReceitaAntes ), BLANK (), ReceitaAntes - COALESCE ( ValorDevolvido, 0 ) )
+		formatString: $ #,##0.00;($ #,##0.00);$ 0.00
+		displayFolder: 10 | Lucro e Margem
+		lineageTag: 8f3c4901-f129-4073-b30c-6a3fbf1609e7
+
+	/// Grão: movimentos fulfillment completed menos return_item sellable reintegrado; unidade: BRL. Ambos por coorte do pedido. A perda non-sellable permanece no COGS e não é subtraída de novo. Inteiros x10^8 antes de converter; BLANK sem COGS. Baseline 11_cost_and_margin.sql.
+	measure 'COGS Analítico Ajustado' =
+			VAR COGSOriginal = [COGS Original Concluído — Data do Pedido]
+			VAR ReversaoSellable = [Reversão COGS Sellable — Data do Pedido]
+			RETURN
+				IF ( ISBLANK ( COGSOriginal ), BLANK (), COGSOriginal - COALESCE ( ReversaoSellable, 0 ) )
+		formatString: $ #,##0.00;($ #,##0.00);$ 0.00
+		displayFolder: 09 | Custos e COGS
+		lineageTag: d7229704-aa76-478f-9534-bfdb4d5a1581
+
+	/// Grão: universo completed por produto; unidade: BRL. Receita líquida após devoluções menos COGS ajustado por coorte; exclui frete e não deduz perdas non-sellable novamente. BLANK sem receita ou custo. Baseline 11_cost_and_margin.sql.
+	measure 'Lucro Bruto Analítico' =
+			VAR Receita = [Receita Analítica Após Devoluções]
+			VAR COGS = [COGS Analítico Ajustado]
+			RETURN
+				IF ( ISBLANK ( Receita ) || ISBLANK ( COGS ), BLANK (), Receita - COGS )
+		formatString: $ #,##0.00;($ #,##0.00);$ 0.00
+		displayFolder: 10 | Lucro e Margem
+		lineageTag: 7c102aef-f5c4-4ea9-8872-64ce1aaa509a
+
+	/// Grão: universo completed por produto; unidade: percentual. Lucro analítico dividido pela receita após devoluções, ambos por coorte. DIVIDE retorna BLANK sem denominador; filtros dimensionais preservados. Baseline 11_cost_and_margin.sql.
+	measure 'Margem Bruta Analítica' = DIVIDE ( [Lucro Bruto Analítico], [Receita Analítica Após Devoluções] )
+		formatString: 0.00%;-0.00%;0.00%
+		displayFolder: 10 | Lucro e Margem
+		lineageTag: 6a0f3041-d3ae-49a4-adf2-356a6cd4cd6f
+
+	/// Grão: universo completed por produto; unidade: percentual. COGS ajustado por coorte dividido pela receita pós-devoluções; DIVIDE retorna BLANK sem denominador; filtros dimensionais são comuns. Baseline 11_cost_and_margin.sql.
+	measure 'Participação do COGS Ajustado na Receita' = DIVIDE ( [COGS Analítico Ajustado], [Receita Analítica Após Devoluções] )
+		formatString: 0.00%;-0.00%;0.00%
+		displayFolder: 10 | Lucro e Margem
+		lineageTag: 648a7251-090e-4886-b673-2fe9ec489fbf
+
+	/// Grão: return_item recebido; unidade: percentual da receita atribuída antes de devoluções. Ambos por coorte; DIVIDE retorna BLANK sem receita; filtros dimensionais preservados. Baseline 11_cost_and_margin.sql.
+	measure 'Percentual de Devoluções Comerciais' = DIVIDE ( [Valor Comercial Devolvido — Data do Pedido], [Receita de Produtos — Antes de Devoluções (Itens)] )
+		formatString: 0.00%;-0.00%;0.00%
+		displayFolder: 10 | Lucro e Margem
+		lineageTag: 1aa24d43-14d8-41d3-aa4c-e40d13a42855
+
+	/// Grão: custo reintegrado sellable; unidade: percentual do COGS completed. Ambos por coorte; quarantine/repair/discard fora do numerador; DIVIDE retorna BLANK sem custo. Baseline 11_cost_and_margin.sql.
+	measure 'Participação da Reversão Sellable no COGS' = DIVIDE ( [Reversão COGS Sellable — Data do Pedido], [COGS Original Concluído — Data do Pedido] )
+		formatString: 0.00%;-0.00%;0.00%
+		displayFolder: 10 | Lucro e Margem
+		lineageTag: f8e1e8d6-cd04-45bd-9c58-5627c7c57555
+
+	/// Grão: perdas em destinos non-sellable; unidade: percentual do COGS ajustado. Ambos por coorte. Perda permanece dentro do COGS e não é nova dedução; DIVIDE retorna BLANK sem custo. Baseline 11_cost_and_margin.sql.
+	measure 'Participação Non-Sellable no COGS Ajustado' = DIVIDE ( [Perda Non-Sellable — Data do Pedido], [COGS Analítico Ajustado] )
+		formatString: 0.00%;-0.00%;0.00%
+		displayFolder: 10 | Lucro e Margem
+		lineageTag: 20db82de-1d7a-4e36-a392-16ebe8ab3cc0
+
+	/// Grão: coorte comercial de pedidos no YTD; unidade: BRL. DATESYTD no calendário do pedido, sem TODAY(); componentes preservam a data comercial. BLANK sem receita. Baseline 12_yoy_ytd.sql.
+	measure 'Receita Analítica YTD' = CALCULATE ( [Receita Analítica Após Devoluções], DATESYTD ( 'DimCalendario'[Data] ) )
+		formatString: $ #,##0.00;($ #,##0.00);$ 0.00
+		displayFolder: 11 | Análise Financeira Temporal
+		lineageTag: 5e555bc7-6896-41a9-9212-43093d3b9b73
+
+	/// Grão: coorte no YTD equivalente do ano anterior; unidade: BRL. Requer contexto de calendário, desloca a janela YTD sem TODAY(); BLANK sem período comparável. Baseline 12_yoy_ytd.sql.
+	measure 'Receita Analítica YTD Ano Anterior' =
+			IF (
+				NOT ISFILTERED ( 'DimCalendario' ),
+				BLANK (),
+				CALCULATE (
+					[Receita Analítica Após Devoluções],
+					DATEADD ( DATESYTD ( 'DimCalendario'[Data] ), -1, YEAR )
+				)
+			)
+		formatString: $ #,##0.00;($ #,##0.00);$ 0.00
+		displayFolder: 11 | Análise Financeira Temporal
+		lineageTag: 0d20643a-922c-4540-8626-61d6d33897e0
+
+	/// Grão: janela YTD contra o mesmo período anterior; unidade: percentual. Usa receita pós-devoluções por coorte; DIVIDE retorna BLANK sem receita anterior. Baseline 12_yoy_ytd.sql.
+	measure 'Variação Percentual de Receita Analítica YTD' = DIVIDE ( [Variação Absoluta de Receita Analítica YTD], [Receita Analítica YTD Ano Anterior] )
+		formatString: 0.00%;-0.00%;0.00%
+		displayFolder: 11 | Análise Financeira Temporal
+		lineageTag: 6a003bcb-af33-4664-bc2f-cd8c70610f08
+
+	/// Grão: diferença da receita analítica acumulada na janela atual e anterior; unidade: BRL. BLANK sem uma das janelas; ambos preservam a coorte comercial. Baseline 12_yoy_ytd.sql.
+	measure 'Variação Absoluta de Receita Analítica YTD' =
+			VAR Atual = [Receita Analítica YTD]
+			VAR Anterior = [Receita Analítica YTD Ano Anterior]
+			RETURN
+				IF ( ISBLANK ( Atual ) || ISBLANK ( Anterior ), BLANK (), Atual - Anterior )
+		formatString: $ #,##0.00;($ #,##0.00);$ 0.00
+		displayFolder: 11 | Análise Financeira Temporal
+		lineageTag: 7872cfdb-c77c-4bb4-8fd0-b58ed9667e8d
+
+	/// Grão: COGS ajustado acumulado no YTD da coorte comercial; unidade: BRL. DATESYTD no calendário do pedido, sem TODAY(); usa order_date nos fatos de custo e devolução. BLANK sem custo. Baseline 12_yoy_ytd.sql.
+	measure 'COGS Analítico Ajustado YTD' = CALCULATE ( [COGS Analítico Ajustado], DATESYTD ( 'DimCalendario'[Data] ) )
+		formatString: $ #,##0.00;($ #,##0.00);$ 0.00
+		displayFolder: 11 | Análise Financeira Temporal
+		lineageTag: d76f8bb3-9901-4370-a2c1-ecd98bccf347
+
+	/// Grão: lucro bruto analítico acumulado no YTD por coorte; unidade: BRL. Receita, devolução e custo usam a data do pedido; BLANK sem receita/custo; não deduz perdas outra vez. Baseline 12_yoy_ytd.sql.
+	measure 'Lucro Bruto Analítico YTD' = CALCULATE ( [Lucro Bruto Analítico], DATESYTD ( 'DimCalendario'[Data] ) )
+		formatString: $ #,##0.00;($ #,##0.00);$ 0.00
+		displayFolder: 11 | Análise Financeira Temporal
+		lineageTag: 5f6f2cd7-b100-4d48-834b-66fc9713ad0d
+
+	/// Grão: coorte de pedidos acumulada no YTD; unidade: percentual. Lucro acumulado dividido pela receita acumulada; nunca soma nem média percentuais mensais. DIVIDE retorna BLANK sem denominador. Baseline 12_yoy_ytd.sql.
+	measure 'Margem Bruta Analítica YTD' = DIVIDE ( [Lucro Bruto Analítico YTD], [Receita Analítica YTD] )
+		formatString: 0.00%;-0.00%;0.00%
+		displayFolder: 11 | Análise Financeira Temporal
+		lineageTag: 49b6da4a-16a6-4bd9-9c8a-3ae2e983f6f1
+
 	column _Apoio
 		isHidden
 		lineageTag: 53774f27-39b1-42a1-8160-254efbc5075a
