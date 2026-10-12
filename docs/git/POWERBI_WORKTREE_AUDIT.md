@@ -110,3 +110,7 @@ O protocolo concentra o esforço nos mecanismos observados: serialização após
 ## 7. Commit e estado posterior
 
 O commit de Fase 4.6 contém exclusivamente relatórios e atualizações documentais desta fase. As 15 alterações anteriores permanecem fora do commit. Não houve push, merge, rebase, descarte de mudanças, alteração de configuração Git, alteração da base PostgreSQL nem limpeza da working tree.
+
+### Atualização posterior — Fase 4.6.1
+
+A autorização de regularização foi concedida numa fase separada. O resultado parcial, as mudanças seguras, as diferenças residuais e as verificações estão registrados em [POWERBI_WORKTREE_REGULARIZATION.md](POWERBI_WORKTREE_REGULARIZATION.md). Esta atualização não reescreve a classificação histórica nem o estado de entrada descrito acima.

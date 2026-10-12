@@ -98,6 +98,45 @@
             "width": 270
           },
           "zIndex": 6
+        },
+        {
+          "location": {
+            "x": 1620,
+            "y": 235
+          },
+          "nodeIndex": "_Medidas",
+          "nodeLineageTag": "f7c8fdce-971a-4906-847e-1e8b96afaafc",
+          "size": {
+            "height": 300,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 1904,
+            "y": 235
+          },
+          "nodeIndex": "FatoCustoFulfillment",
+          "nodeLineageTag": "5d333d48-a609-53b8-8544-c0a4c35d2792",
+          "size": {
+            "height": 300,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 2188,
+            "y": 235
+          },
+          "nodeIndex": "FatoDevolucoes",
+          "nodeLineageTag": "0dab837c-3c08-513f-9e6e-0afec6e953fd",
+          "size": {
+            "height": 300,
+            "width": 234
+          },
+          "zIndex": 0
         }
       ],
       "name": "Modelo estrela comercial",
