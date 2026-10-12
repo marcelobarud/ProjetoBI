@@ -1,6 +1,6 @@
 # ProjetoBI — Plano Mestre de Conclusão e Preparação para Power BI
 
-**Status:** M5 PASS — Portfolio persistido e reconciliado; ProjetoBI pronto para iniciar Power BI
+**Status:** M5 PASS — Portfolio persistido e reconciliado; Fase 4.2 PARTIAL — role read-only pronta, importação no Power BI Desktop pendente
 **Diretório:** `D:\Codex\ProjetoBI`
 **Objetivo principal:** concluir e validar o dataset Portfolio, disponibilizar baselines SQL confiáveis e preparar a exploração analítica no Power BI.
 
@@ -63,7 +63,7 @@ M1 homologou safety 3× e transferências automáticas desligadas no profile; a 
 
 1. M5 está concluído: os 120.000 pedidos foram persistidos, conferidos em nova conexão e os 13 baselines SQL foram aprovados e reconciliados.
 2. A Fase 4.0 concluiu backup lógico e preparação documental; a Fase 4.1 criou e reabriu o projeto inicial PBIP com TMDL e PBIR, sem carregar dados.
-3. A seleção/importação de tabelas, conexão PostgreSQL, modelo dimensional, Power Query, medidas DAX e relatórios não foram iniciados e permanecem para fase própria.
+3. A Fase 4.2 criou e validou `projetobi_pbi_ro` com SELECT em sete tabelas escolhidas e confirmou seus volumes. O conector PostgreSQL, Import, refresh e reabertura no Power BI Desktop ainda não foram validados. Modelo dimensional completo, medidas DAX e relatórios permanecem fora deste escopo.
 
 ## 3. Regras de execução
 
@@ -484,6 +484,7 @@ O objetivo completo será alcançado quando:
 | M6 — preparação analítica | PASS | Inventário, grãos, fatos/dimensões candidatos, métricas, política temporal, precauções de fanout e quatro consultas executáveis documentados. |
 | Fase 4.0 — backup e preparação PBIP/TMDL | PASS documental | Backup lógico custom verificado em `D:\Backups\ProjetoBI`; hash, limites de verificação, estrutura PBIP proposta e pendências analíticas estão documentados. Nenhum projeto Power BI foi criado. |
 | Fase 4.1 — projeto inicial PBIP/TMDL/PBIR | PASS | Desktop 2.158.1177.0 gerou `powerbi/ProjetoBI.pbip`; o modelo usa TMDL, o relatório usa PBIR, o projeto foi reaberto e não contém tabelas nem conexão. Detalhes em `docs/powerbi/phase-4.1-initial-project.md`. |
+| Fase 4.2 — conexão e fundação do modelo | PARTIAL — autenticação manual pendente | Role read-only validada e contagens PostgreSQL confirmadas para sete tabelas. O conector PostgreSQL foi aberto no Desktop em modo Import; a tela de credenciais aguarda entrada manual antes de carregar qualquer tabela. Ver `docs/powerbi/phase-4.2-connection-and-model-foundation.md`. |
 
 ### Execução definitiva M5 — 2026-10-10
 
@@ -517,3 +518,12 @@ O objetivo completo será alcançado quando:
 - **Preservação:** nenhuma conexão ao PostgreSQL, consulta ao banco, importação de tabelas, alteração de dados, credencial ou mudança no backup foi feita nesta fase. A referência documentada do banco permanece 120.000 pedidos e 3.894.457 linhas.
 - **Versionamento/documentação:** `.gitignore` ignora `**/.pbi/` (cache e estado local) sem excluir definições PBIP/TMDL/PBIR. `powerbi/README.md` descreve o fluxo Desktop, VS Code e Codex. Ver `docs/powerbi/phase-4.1-initial-project.md`.
 - **Limite:** esta fase não define modelo dimensional, consultas Power Query, medidas DAX ou dashboards; interromper após o checkpoint Git local desta fase.
+
+### Fase 4.2 — conexão PostgreSQL e fundação do modelo analítico (2026-10-12)
+
+- **Git de entrada:** branch `main`, HEAD `38740b36d77e32704e0a6186385a6fe0a469f004`; a worktree já continha quatro alterações locais em definições PBIR/TMDL, preservadas integralmente.
+- **PostgreSQL:** conexão read-only confirmou `projeto_bi`, PostgreSQL 18.6, schemas previstos e role ausente antes da criação. `projetobi_pbi_ro` foi criada com atributos mínimos, CONNECT, USAGE em quatro schemas e SELECT somente nas sete tabelas da seleção comercial; sem CREATE em schemas ou privilégios de escrita nas tabelas. `default_transaction_read_only=on` é proteção complementar. A senha foi guardada somente no Windows Credential Manager.
+- **Verificação independente:** login como a nova role, conexão à database correta, transação read-only, SELECT nas sete tabelas e verificação de cada privilégio efetivo passaram. Contagens: pedidos 120.000; itens 241.637; produtos 1.000; categorias 42; clientes 45.000; lojas 10; canais 4. Datas de pedido locais verificadas entre 2023-01-02 e 2026-09-29; pedidos sem cliente 19.829 e sem loja 57.420.
+- **Power BI:** `PBIDesktop.exe` versão 2.158.1177.0 estava aberto com `ProjetoBI`. O conector PostgreSQL foi selecionado em modo Import e a tela de credenciais da fonte local está aguardando entrada manual; nenhum segredo foi automatizado ou exibido. Para preservar consistência PBIP/TMDL, não foi editado o modelo por fora do Desktop. Nenhuma tabela foi importada; comparação Power BI×PostgreSQL, preview de tipos, refresh e reabertura não passaram/não foram testados.
+- **Arquitetura:** grãos, FKs confirmadas, proposta de fatos/dimensões, cardinalidades, direção de filtro, nulos, fanout e contratos M5 estão em `docs/powerbi/phase-4.2-connection-and-model-foundation.md`. O modelo dimensional e medidas continuam sem implementação.
+- **Resultado:** `FASE 4.2 PARTIAL — MANUAL CREDENTIAL ENTRY REQUIRED`. Após o usuário concluir a autenticação no Desktop, retomar a importação limitada às sete tabelas, reconciliar tipos/contagens e validar salvamento e reabertura antes de declarar a fundação pronta.
