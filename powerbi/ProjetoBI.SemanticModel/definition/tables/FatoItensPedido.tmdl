@@ -1,34 +1,6 @@
 table FatoItensPedido
 	lineageTag: e83360ca-57e1-43a8-b295-027ad9a5c50b
 
-	/// Contagem de linhas comerciais no grão sales_order_item_id. Responde a produto/categoria e às
-	/// dimensões conformadas disponíveis.
-	measure 'Total de Linhas de Itens' = COUNTROWS ( 'FatoItensPedido' )
-		formatString: #,0
-		displayFolder: 05 | Produtos e Itens
-
-	/// Soma da quantidade originalmente pedida nos itens. Não equivale necessariamente a unidades
-	/// atendidas, vendidas após cancelamento ou líquidas de devoluções.
-	measure 'Unidades Pedidas' = SUM ( 'FatoItensPedido'[quantity] )
-		formatString: #,0
-		displayFolder: 05 | Produtos e Itens
-
-	/// Contagem distinta de pedidos representados pelas linhas de item no contexto de produto/categoria.
-	/// Não é o total de pedidos do cabeçalho.
-	measure 'Pedidos Distintos com Itens no Contexto' = DISTINCTCOUNT ( 'FatoItensPedido'[sales_order_id] )
-		formatString: #,0
-		displayFolder: 05 | Produtos e Itens
-
-	/// Unidades pedidas para produto/categoria divididas pelas unidades em todos os produtos, preservando
-	/// calendário, canal, cliente e loja. Em branco sem unidades no denominador.
-	measure 'Participação de Unidades no Contexto de Produto' =
-			DIVIDE (
-				[Unidades Pedidas],
-				CALCULATE ( [Unidades Pedidas], REMOVEFILTERS ( 'DimProduto' ) )
-			)
-		formatString: 0.00%;-0.00%;0.00%
-		displayFolder: 07 | Indicadores Percentuais
-
 	column sales_order_item_id
 		dataType: int64
 		formatString: 0

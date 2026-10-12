@@ -1,0 +1,341 @@
+table _Medidas
+	lineageTag: f7c8fdce-971a-4906-847e-1e8b96afaafc
+
+	/// Contagem distinta de pedidos no grão do cabeçalho. Respeita data, canal, cliente e loja; retorna em
+	/// branco sob filtro de produto/categoria para evitar atribuição indevida.
+	measure 'Total de Pedidos' =
+			IF (
+				ISFILTERED ( 'DimProduto' ),
+				BLANK (),
+				DISTINCTCOUNT ( 'FatoPedidos'[sales_order_id] )
+			)
+		formatString: #,0
+		displayFolder: 01 | Pedidos
+		lineageTag: b3aa7829-f66b-42a3-854a-9674d61a5150
+
+	/// Contagem distinta de pedidos cujo status atual/final é completed; não representa reconstrução
+	/// histórica do status.
+	measure 'Pedidos Concluídos' =
+			IF (
+				ISFILTERED ( 'DimProduto' ),
+				BLANK (),
+				CALCULATE (
+					DISTINCTCOUNT ( 'FatoPedidos'[sales_order_id] ),
+					KEEPFILTERS ( 'FatoPedidos'[order_status] = "completed" )
+				)
+			)
+		formatString: #,0
+		displayFolder: 01 | Pedidos
+		lineageTag: 1eb7688e-9b39-4309-862c-f745a3b0131b
+
+	/// Contagem distinta de pedidos cujo status atual/final é cancelled.
+	measure 'Pedidos Cancelados' =
+			IF (
+				ISFILTERED ( 'DimProduto' ),
+				BLANK (),
+				CALCULATE (
+					DISTINCTCOUNT ( 'FatoPedidos'[sales_order_id] ),
+					KEEPFILTERS ( 'FatoPedidos'[order_status] = "cancelled" )
+				)
+			)
+		formatString: #,0
+		displayFolder: 01 | Pedidos
+		lineageTag: f53795d4-5b9f-413d-aa85-91bc96b6938d
+
+	/// Contagem distinta de pedidos cujo status atual/final é confirmed.
+	measure 'Pedidos Confirmados' =
+			IF (
+				ISFILTERED ( 'DimProduto' ),
+				BLANK (),
+				CALCULATE (
+					DISTINCTCOUNT ( 'FatoPedidos'[sales_order_id] ),
+					KEEPFILTERS ( 'FatoPedidos'[order_status] = "confirmed" )
+				)
+			)
+		formatString: #,0
+		displayFolder: 01 | Pedidos
+		lineageTag: 2e1f9bd1-e2ae-47ef-82bb-8d340fe972db
+
+	/// Pedidos completed divididos pelo total de pedidos no mesmo contexto. Retorna em branco quando não há
+	/// denominador.
+	measure 'Taxa de Conclusão' = DIVIDE ( [Pedidos Concluídos], [Total de Pedidos] )
+		formatString: 0.00%;-0.00%;0.00%
+		displayFolder: 07 | Indicadores Percentuais
+		lineageTag: 78da4146-8b35-422c-8089-ea285d722c4d
+
+	/// Pedidos cancelled divididos pelo total de pedidos no mesmo contexto. Retorna em branco quando não há
+	/// denominador.
+	measure 'Taxa de Cancelamento' = DIVIDE ( [Pedidos Cancelados], [Total de Pedidos] )
+		formatString: 0.00%;-0.00%;0.00%
+		displayFolder: 07 | Indicadores Percentuais
+		lineageTag: 7840c400-e42f-4ff4-b679-6931d4e9d9ad
+
+	/// Participação do status atual/final no total de pedidos preservando data, canal, cliente e loja. O
+	/// denominador remove somente o filtro de status; não usar como participação de canal ou produto.
+	measure 'Participação de Pedidos por Status' =
+			DIVIDE (
+				[Total de Pedidos],
+				CALCULATE (
+					[Total de Pedidos],
+					REMOVEFILTERS ( 'FatoPedidos'[order_status] )
+				)
+			)
+		formatString: 0.00%;-0.00%;0.00%
+		displayFolder: 07 | Indicadores Percentuais
+		lineageTag: bf976b07-2df5-4477-8abd-00b28b962ef0
+
+	/// Soma total_amount para todos os status, incluindo frete. É valor comercial de cabeçalho, não
+	/// faturamento realizado, caixa ou receita líquida após devoluções.
+	measure 'Valor Total dos Pedidos — Todos os Status' =
+			IF (
+				ISFILTERED ( 'DimProduto' ),
+				BLANK (),
+				CALCULATE (
+					SUM ( 'FatoPedidos'[total_amount] ),
+					REMOVEFILTERS ( 'FatoPedidos'[order_status] )
+				)
+			)
+		formatString: $ #,##0.00;($ #,##0.00);$ 0.00
+		displayFolder: 02 | Faturamento
+		lineageTag: 6959479a-6a8e-4e6e-a167-d58df4643919
+
+	/// Soma subtotal_amount de pedidos completed antes de descontos, no grão do cabeçalho.
+	measure 'Valor Bruto de Produtos — Pedidos Concluídos' =
+			IF (
+				ISFILTERED ( 'DimProduto' ),
+				BLANK (),
+				CALCULATE (
+					SUM ( 'FatoPedidos'[subtotal_amount] ),
+					KEEPFILTERS ( 'FatoPedidos'[order_status] = "completed" )
+				)
+			)
+		formatString: $ #,##0.00;($ #,##0.00);$ 0.00
+		displayFolder: 02 | Faturamento
+		lineageTag: 17f26cae-ad0f-4d24-b3d7-0d5c1553a20c
+
+	/// Soma discount_amount de pedidos completed; é desconto de cabeçalho, não desconto rateado por item.
+	measure 'Descontos — Pedidos Concluídos' =
+			IF (
+				ISFILTERED ( 'DimProduto' ),
+				BLANK (),
+				CALCULATE (
+					SUM ( 'FatoPedidos'[discount_amount] ),
+					KEEPFILTERS ( 'FatoPedidos'[order_status] = "completed" )
+				)
+			)
+		formatString: $ #,##0.00;($ #,##0.00);$ 0.00
+		displayFolder: 03 | Descontos
+		lineageTag: 82b82c1d-43bc-44d6-bdf2-756434280071
+
+	/// Valor bruto de produtos completed menos descontos de cabeçalho completed. Ainda não desconta
+	/// devoluções recebidas e não representa receita analítica pós-devolução.
+	measure 'Receita Líquida de Produtos — Antes de Devoluções' =
+			VAR ValorBruto = [Valor Bruto de Produtos — Pedidos Concluídos]
+			VAR Descontos = [Descontos — Pedidos Concluídos]
+			RETURN
+				IF (
+					ISBLANK ( ValorBruto ) && ISBLANK ( Descontos ),
+					BLANK (),
+					ValorBruto - Descontos
+				)
+		formatString: $ #,##0.00;($ #,##0.00);$ 0.00
+		displayFolder: 02 | Faturamento
+		lineageTag: d30fcb92-8f44-43a7-9a24-af740973f81a
+
+	/// Soma shipping_amount de pedidos completed, separada do valor líquido de produtos.
+	measure 'Frete Cobrado — Pedidos Concluídos' =
+			IF (
+				ISFILTERED ( 'DimProduto' ),
+				BLANK (),
+				CALCULATE (
+					SUM ( 'FatoPedidos'[shipping_amount] ),
+					KEEPFILTERS ( 'FatoPedidos'[order_status] = "completed" )
+				)
+			)
+		formatString: $ #,##0.00;($ #,##0.00);$ 0.00
+		displayFolder: 02 | Faturamento
+		lineageTag: 1d814362-30eb-4c00-b1d7-a468d6cefb5d
+
+	/// Soma total_amount de pedidos completed, incluindo frete. Não equivale a pagamentos capturados nem a
+	/// valor após devoluções.
+	measure 'Valor Total — Pedidos Concluídos' =
+			IF (
+				ISFILTERED ( 'DimProduto' ),
+				BLANK (),
+				CALCULATE (
+					SUM ( 'FatoPedidos'[total_amount] ),
+					KEEPFILTERS ( 'FatoPedidos'[order_status] = "completed" )
+				)
+			)
+		formatString: $ #,##0.00;($ #,##0.00);$ 0.00
+		displayFolder: 02 | Faturamento
+		lineageTag: fc10a320-c740-4a2c-897b-26ec81e95c79
+
+	/// Valor total de pedidos completed, incluindo frete, dividido pela contagem de pedidos completed. Em
+	/// branco sem denominador.
+	measure 'Ticket Médio — Pedidos Concluídos' = DIVIDE ( [Valor Total — Pedidos Concluídos], [Pedidos Concluídos] )
+		formatString: $ #,##0.00;($ #,##0.00);$ 0.00
+		displayFolder: 04 | Ticket Médio
+		lineageTag: 92713f59-c44c-41f9-b176-26dc8668413b
+
+	/// Total de pedidos do período equivalente no ano anterior, pelo estado atual/final, somente quando há
+	/// contexto de calendário.
+	measure 'Pedidos no Ano Anterior' =
+			IF (
+				NOT ISFILTERED ( 'DimCalendario' ),
+				BLANK (),
+				CALCULATE ( [Total de Pedidos], DATEADD ( 'DimCalendario'[Data], -1, YEAR ) )
+			)
+		formatString: #,0
+		displayFolder: 06 | Inteligência Temporal
+		lineageTag: e07ddd09-2e1b-4770-80e7-11d951142504
+
+	/// Diferença entre pedidos do contexto atual e do período equivalente no ano anterior. Em branco quando
+	/// não há período anterior disponível.
+	measure 'Variação Absoluta de Pedidos YoY' =
+			VAR PedidosAnoAnterior = [Pedidos no Ano Anterior]
+			RETURN
+				IF (
+					ISBLANK ( PedidosAnoAnterior ) || ISBLANK ( [Total de Pedidos] ),
+					BLANK (),
+					[Total de Pedidos] - PedidosAnoAnterior
+				)
+		formatString: #,0;(#,0);0
+		displayFolder: 06 | Inteligência Temporal
+		lineageTag: 72349db9-f2ca-407e-b896-24165fcbca1f
+
+	/// Variação absoluta de pedidos YoY dividida pelos pedidos do ano anterior. Em branco sem período ou
+	/// denominador válido.
+	measure 'Variação Percentual de Pedidos YoY' = DIVIDE ( [Variação Absoluta de Pedidos YoY], [Pedidos no Ano Anterior] )
+		formatString: 0.00%;-0.00%;0.00%
+		displayFolder: 06 | Inteligência Temporal
+		lineageTag: 54d90c0e-3624-4c8a-b526-d50677829c54
+
+	/// Total de pedidos acumulados desde janeiro até a última data do contexto no ano comercial, sem usar
+	/// TODAY().
+	measure 'Pedidos YTD' = CALCULATE ( [Total de Pedidos], DATESYTD ( 'DimCalendario'[Data] ) )
+		formatString: #,0
+		displayFolder: 06 | Inteligência Temporal
+		lineageTag: 8ebcb69a-f0a9-4d7a-b26f-2f518ea05552
+
+	/// Receita líquida de produtos antes de devoluções no período equivalente do ano anterior. Em branco
+	/// sem contexto de calendário ou período comparável.
+	measure 'Receita de Produtos no Ano Anterior — Antes de Devoluções' =
+			IF (
+				NOT ISFILTERED ( 'DimCalendario' ),
+				BLANK (),
+				CALCULATE (
+					[Receita Líquida de Produtos — Antes de Devoluções],
+					DATEADD ( 'DimCalendario'[Data], -1, YEAR )
+				)
+			)
+		formatString: $ #,##0.00;($ #,##0.00);$ 0.00
+		displayFolder: 06 | Inteligência Temporal
+		lineageTag: 8ed5159c-6aee-4438-9e4e-d0fff0eace32
+
+	/// Diferença de receita líquida de produtos antes de devoluções contra o período equivalente do ano
+	/// anterior.
+	measure 'Variação Absoluta de Receita YoY — Antes de Devoluções' =
+			VAR ReceitaAnoAnterior = [Receita de Produtos no Ano Anterior — Antes de Devoluções]
+			RETURN
+				IF (
+					ISBLANK ( ReceitaAnoAnterior ) || ISBLANK ( [Receita Líquida de Produtos — Antes de Devoluções] ),
+					BLANK (),
+					[Receita Líquida de Produtos — Antes de Devoluções] - ReceitaAnoAnterior
+				)
+		formatString: $ #,##0.00;($ #,##0.00);$ 0.00
+		displayFolder: 06 | Inteligência Temporal
+		lineageTag: a279f7a7-b8be-4f9d-ad6e-88d546dfc297
+
+	/// Variação absoluta da receita YoY dividida pela receita do ano anterior. Em branco sem período ou
+	/// denominador válido.
+	measure 'Variação Percentual de Receita YoY — Antes de Devoluções' =
+			DIVIDE (
+				[Variação Absoluta de Receita YoY — Antes de Devoluções],
+				[Receita de Produtos no Ano Anterior — Antes de Devoluções]
+			)
+		formatString: 0.00%;-0.00%;0.00%
+		displayFolder: 06 | Inteligência Temporal
+		lineageTag: fb8ada42-d397-466d-8009-ec560afcedbe
+
+	/// Receita líquida de produtos antes de devoluções acumulada desde janeiro até a última data
+	/// selecionada no ano comercial.
+	measure 'Receita YTD — Antes de Devoluções' =
+			CALCULATE (
+				[Receita Líquida de Produtos — Antes de Devoluções],
+				DATESYTD ( 'DimCalendario'[Data] )
+			)
+		formatString: $ #,##0.00;($ #,##0.00);$ 0.00
+		displayFolder: 06 | Inteligência Temporal
+		lineageTag: eafaf163-841d-4356-91bb-d142c0deb2f4
+
+	/// Receita líquida acumulada no mesmo intervalo YTD do ano anterior. Para dataset 2026, comparar
+	/// janeiro–setembro de 2026 com janeiro–setembro de 2025.
+	measure 'Receita YTD Ano Anterior — Antes de Devoluções' =
+			IF (
+				NOT ISFILTERED ( 'DimCalendario' ),
+				BLANK (),
+				CALCULATE (
+					[Receita Líquida de Produtos — Antes de Devoluções],
+					DATEADD ( DATESYTD ( 'DimCalendario'[Data] ), -1, YEAR )
+				)
+			)
+		formatString: $ #,##0.00;($ #,##0.00);$ 0.00
+		displayFolder: 06 | Inteligência Temporal
+		lineageTag: e34c0415-1423-4a78-bab9-845504b46710
+
+	/// Variação percentual do YTD contra a mesma janela do ano anterior. Em branco quando a janela ou
+	/// denominador anterior não está disponível.
+	measure 'Variação Percentual de Receita YTD YoY — Antes de Devoluções' =
+			VAR ReceitaYtdAnoAnterior = [Receita YTD Ano Anterior — Antes de Devoluções]
+			VAR ReceitaYtdAtual = [Receita YTD — Antes de Devoluções]
+			RETURN
+				IF (
+					ISBLANK ( ReceitaYtdAnoAnterior ) || ISBLANK ( ReceitaYtdAtual ),
+					BLANK (),
+					DIVIDE ( ReceitaYtdAtual - ReceitaYtdAnoAnterior, ReceitaYtdAnoAnterior )
+				)
+		formatString: 0.00%;-0.00%;0.00%
+		displayFolder: 06 | Inteligência Temporal
+		lineageTag: 8f244398-987d-45c3-ab36-ed01bb98e5ad
+
+	/// Contagem de linhas comerciais no grão sales_order_item_id. Responde a produto/categoria e às
+	/// dimensões conformadas disponíveis.
+	measure 'Total de Linhas de Itens' = COUNTROWS ( 'FatoItensPedido' )
+		formatString: #,0
+		displayFolder: 05 | Produtos e Itens
+		lineageTag: f7ae700c-8918-4bc2-b211-0a73c11553c8
+
+	/// Soma da quantidade originalmente pedida nos itens. Não equivale necessariamente a unidades
+	/// atendidas, vendidas após cancelamento ou líquidas de devoluções.
+	measure 'Unidades Pedidas' = SUM ( 'FatoItensPedido'[quantity] )
+		formatString: #,0
+		displayFolder: 05 | Produtos e Itens
+		lineageTag: 7f84aa04-997c-469d-92c3-37e309511949
+
+	/// Contagem distinta de pedidos representados pelas linhas de item no contexto de produto/categoria.
+	/// Não é o total de pedidos do cabeçalho.
+	measure 'Pedidos Distintos com Itens no Contexto' = DISTINCTCOUNT ( 'FatoItensPedido'[sales_order_id] )
+		formatString: #,0
+		displayFolder: 05 | Produtos e Itens
+		lineageTag: 4e1ea9c2-ec1e-41d0-8706-1333c79aeb46
+
+	/// Unidades pedidas para produto/categoria divididas pelas unidades em todos os produtos, preservando
+	/// calendário, canal, cliente e loja. Em branco sem unidades no denominador.
+	measure 'Participação de Unidades no Contexto de Produto' =
+			DIVIDE (
+				[Unidades Pedidas],
+				CALCULATE ( [Unidades Pedidas], REMOVEFILTERS ( 'DimProduto' ) )
+			)
+		formatString: 0.00%;-0.00%;0.00%
+		displayFolder: 07 | Indicadores Percentuais
+		lineageTag: 07845f27-8750-4bae-b491-2f9f9cb1b42f
+
+	column _Apoio
+		isHidden
+		lineageTag: 53774f27-39b1-42a1-8160-254efbc5075a
+		sourceColumn: [_Apoio]
+
+	partition _Medidas = calculated
+		mode: import
+		source = ROW ( "_Apoio", BLANK () )

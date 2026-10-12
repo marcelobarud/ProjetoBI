@@ -20,5 +20,6 @@ ref table DimCanal
 ref table FatoItensPedido
 ref table FatoPedidos
 ref table DimCalendario
+ref table _Medidas
 
 ref cultureInfo pt-BR
