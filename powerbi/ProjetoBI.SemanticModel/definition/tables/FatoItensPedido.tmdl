@@ -1,11 +1,11 @@
-table 'sales sales_order_items'
+table FatoItensPedido
 	lineageTag: e83360ca-57e1-43a8-b295-027ad9a5c50b
 
 	column sales_order_item_id
 		dataType: int64
 		formatString: 0
 		lineageTag: c221e6fa-553e-4e98-831a-a23a9707ad7e
-		summarizeBy: sum
+		summarizeBy: none
 		sourceColumn: sales_order_item_id
 
 		annotation SummarizationSetBy = Automatic
@@ -79,11 +79,6 @@ table 'sales sales_order_items'
 		summarizeBy: none
 		sourceColumn: created_at
 
-		variation Variation
-			isDefault
-			relationship: 2f1b35f0-1775-48c8-b4a3-ff7590812c4f
-			defaultHierarchy: LocalDateTable_6c4b847d-f137-4c20-bd22-43e3414687e4.'Hierarquia de datas'
-
 		annotation SummarizationSetBy = Automatic
 
 	column fulfilled_quantity
@@ -104,17 +99,53 @@ table 'sales sales_order_items'
 
 		annotation SummarizationSetBy = Automatic
 
-	partition 'sales sales_order_items' = m
+	column order_date
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: e959a346-04ea-4442-bed8-d80655ec1730
+		summarizeBy: none
+		sourceColumn: order_date
+
+		annotation SummarizationSetBy = Automatic
+
+	column customer_id
+		dataType: int64
+		formatString: 0
+		lineageTag: a55019d7-51fc-4201-85af-22547441c0d9
+		summarizeBy: none
+		sourceColumn: customer_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column store_id
+		dataType: int64
+		formatString: 0
+		lineageTag: 7789612e-8a7a-47b9-8281-0bc63f1462cf
+		summarizeBy: none
+		sourceColumn: store_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column sales_channel_id
+		dataType: int64
+		formatString: 0
+		lineageTag: 4c14cd5c-662d-4087-bd53-e4a4e9832a05
+		summarizeBy: none
+		sourceColumn: sales_channel_id
+
+		annotation SummarizationSetBy = Automatic
+
+	partition FatoItensPedido = m
 		mode: import
 		source =
 				let
-				    Source = PostgreSQL.Database("127.0.0.1:5432", "projeto_bi"),
-				    sales_sales_order_items = Source{[Schema="sales",Item="sales_order_items"]}[Data],
-				    money_as_fixed_decimal = Table.TransformColumnTypes(sales_sales_order_items, {{"unit_sale_price", Currency.Type}})
+					Source = PostgreSQL.Database("127.0.0.1:5432", "projeto_bi"),
+					items_query = "SELECT items.*, (orders.placed_at AT TIME ZONE 'America/Sao_Paulo')::date AS order_date, orders.customer_id, orders.store_id, orders.sales_channel_id FROM sales.sales_order_items AS items LEFT JOIN sales.sales_orders AS orders USING (sales_order_id)",
+					sales_order_items = Value.NativeQuery(Source, items_query, null, [EnableFolding = true]),
+					money_as_fixed_decimal = Table.TransformColumnTypes(sales_order_items, {{"unit_sale_price", Currency.Type}})
 				in
-				    money_as_fixed_decimal
+					money_as_fixed_decimal
 
 	annotation PBI_NavigationStepName = Navigation
 
 	annotation PBI_ResultType = Table
-

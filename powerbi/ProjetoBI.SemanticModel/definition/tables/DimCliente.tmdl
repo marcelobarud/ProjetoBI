@@ -1,4 +1,4 @@
-table 'crm customers'
+table DimCliente
 	lineageTag: 9bd5d1e3-3991-479f-ba0c-b07c5ee6d587
 
 	column customer_id
@@ -49,11 +49,6 @@ table 'crm customers'
 		summarizeBy: none
 		sourceColumn: created_at
 
-		variation Variation
-			isDefault
-			relationship: b96e9a25-8eae-4a22-b019-20703e011891
-			defaultHierarchy: LocalDateTable_b53ff64a-a392-49ae-bc2d-c279e8f4d30a.'Hierarquia de datas'
-
 		annotation SummarizationSetBy = Automatic
 
 	column updated_at
@@ -62,11 +57,6 @@ table 'crm customers'
 		lineageTag: ea1cd5e4-5d89-4ef0-831a-687759fea2f1
 		summarizeBy: none
 		sourceColumn: updated_at
-
-		variation Variation
-			isDefault
-			relationship: 427f2efa-3884-4514-9716-83413dee0f64
-			defaultHierarchy: LocalDateTable_b73fd3b2-07e3-4f8a-9a12-04128b285bc2.'Hierarquia de datas'
 
 		annotation SummarizationSetBy = Automatic
 
@@ -78,7 +68,7 @@ table 'crm customers'
 
 		annotation SummarizationSetBy = Automatic
 
-	partition 'crm customers' = m
+	partition DimCliente = m
 		mode: import
 		source =
 				let
@@ -90,4 +80,3 @@ table 'crm customers'
 	annotation PBI_NavigationStepName = Navigation
 
 	annotation PBI_ResultType = Table
-

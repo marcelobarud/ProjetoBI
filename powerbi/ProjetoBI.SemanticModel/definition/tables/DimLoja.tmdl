@@ -1,4 +1,4 @@
-table 'core stores'
+table DimLoja
 	lineageTag: 669a4726-ee9e-42e6-b350-9e4075eec7c6
 
 	column store_id
@@ -41,11 +41,6 @@ table 'core stores'
 		summarizeBy: none
 		sourceColumn: opened_on
 
-		variation Variation
-			isDefault
-			relationship: 1a61bd92-ebba-4a71-927e-0ab2d30af839
-			defaultHierarchy: LocalDateTable_b5525d62-7afd-40c8-a1f9-764be5dd113f.'Hierarquia de datas'
-
 		annotation SummarizationSetBy = Automatic
 
 		annotation UnderlyingDateTimeDataType = Date
@@ -56,11 +51,6 @@ table 'core stores'
 		lineageTag: 8a84a66e-d2ca-4448-8e37-022ed3257705
 		summarizeBy: none
 		sourceColumn: closed_on
-
-		variation Variation
-			isDefault
-			relationship: c4da929b-006d-4f90-864d-e07117174976
-			defaultHierarchy: LocalDateTable_fac95c55-fba5-4f24-a5c9-10f60f1a1203.'Hierarquia de datas'
 
 		annotation SummarizationSetBy = Automatic
 
@@ -89,11 +79,6 @@ table 'core stores'
 		summarizeBy: none
 		sourceColumn: created_at
 
-		variation Variation
-			isDefault
-			relationship: 99df85f4-f9c3-4ce0-8150-52310e11d2da
-			defaultHierarchy: LocalDateTable_4305061e-3380-4ad4-985d-1044fd07f591.'Hierarquia de datas'
-
 		annotation SummarizationSetBy = Automatic
 
 	column updated_at
@@ -102,11 +87,6 @@ table 'core stores'
 		lineageTag: 96b14730-8470-4c03-9d9e-fbd93f6ef54b
 		summarizeBy: none
 		sourceColumn: updated_at
-
-		variation Variation
-			isDefault
-			relationship: cfb85714-74db-4cb7-82eb-d873317c365d
-			defaultHierarchy: LocalDateTable_15f10066-3ca9-46d8-a9e2-e65d69742383.'Hierarquia de datas'
 
 		annotation SummarizationSetBy = Automatic
 
@@ -182,7 +162,7 @@ table 'core stores'
 
 		annotation SummarizationSetBy = Automatic
 
-	partition 'core stores' = m
+	partition DimLoja = m
 		mode: import
 		source =
 				let
@@ -194,4 +174,3 @@ table 'core stores'
 	annotation PBI_NavigationStepName = Navigation
 
 	annotation PBI_ResultType = Table
-

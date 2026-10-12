@@ -1,4 +1,4 @@
-table 'catalog products'
+table DimProduto
 	lineageTag: 0598c8e9-978a-47e5-9052-85600bd9c597
 
 	column product_id
@@ -31,7 +31,7 @@ table 'catalog products'
 		dataType: int64
 		formatString: 0
 		lineageTag: 171a0458-e1c2-4426-936f-ef6a8a529caa
-		summarizeBy: sum
+		summarizeBy: none
 		sourceColumn: brand_id
 
 		annotation SummarizationSetBy = Automatic
@@ -83,11 +83,6 @@ table 'catalog products'
 		summarizeBy: none
 		sourceColumn: created_at
 
-		variation Variation
-			isDefault
-			relationship: ac928993-8a61-43e1-8f5d-ef913d2c2cee
-			defaultHierarchy: LocalDateTable_f89382fa-3017-42ac-a1d0-e344ea4b436d.'Hierarquia de datas'
-
 		annotation SummarizationSetBy = Automatic
 
 	column updated_at
@@ -97,23 +92,68 @@ table 'catalog products'
 		summarizeBy: none
 		sourceColumn: updated_at
 
-		variation Variation
-			isDefault
-			relationship: 45dfe076-1e50-44b3-9ad9-89e95217cd79
-			defaultHierarchy: LocalDateTable_b8cc4df7-a703-4855-9254-f00078921a6f.'Hierarquia de datas'
+		annotation SummarizationSetBy = Automatic
+
+	column category_code
+		dataType: string
+		lineageTag: 77c707f1-b5c6-4402-9e8b-7cea3cecf990
+		summarizeBy: none
+		sourceColumn: category_code
 
 		annotation SummarizationSetBy = Automatic
 
-	partition 'catalog products' = m
+	column category_name
+		dataType: string
+		lineageTag: 05190126-a811-4dce-b777-a661aa8880bb
+		summarizeBy: none
+		sourceColumn: category_name
+
+		annotation SummarizationSetBy = Automatic
+
+	column parent_category_id
+		dataType: int64
+		formatString: 0
+		lineageTag: 4f07765d-ff85-4f66-9e91-f823007e344b
+		summarizeBy: none
+		sourceColumn: parent_category_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column parent_category_code
+		dataType: string
+		lineageTag: 476e7c92-0267-4dd1-9ef3-38d4e74960a4
+		summarizeBy: none
+		sourceColumn: parent_category_code
+
+		annotation SummarizationSetBy = Automatic
+
+	column parent_category_name
+		dataType: string
+		lineageTag: 3c86b1dd-e654-4297-a973-72eb80bebe87
+		summarizeBy: none
+		sourceColumn: parent_category_name
+
+		annotation SummarizationSetBy = Automatic
+
+	column category_is_active
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: 5ab2005b-03e4-4a48-85d2-a3418c20fa0d
+		summarizeBy: none
+		sourceColumn: category_is_active
+
+		annotation SummarizationSetBy = Automatic
+
+	partition DimProduto = m
 		mode: import
 		source =
 				let
-				    Source = PostgreSQL.Database("127.0.0.1:5432", "projeto_bi"),
-				    catalog_products = Source{[Schema="catalog",Item="products"]}[Data]
+					Source = PostgreSQL.Database("127.0.0.1:5432", "projeto_bi"),
+					products_query = "SELECT p.*, c.category_code, c.name AS category_name, c.parent_category_id, parent.category_code AS parent_category_code, parent.name AS parent_category_name, c.is_active AS category_is_active FROM catalog.products AS p LEFT JOIN catalog.categories AS c ON c.category_id = p.category_id LEFT JOIN catalog.categories AS parent ON parent.category_id = c.parent_category_id",
+					products_with_categories = Value.NativeQuery(Source, products_query, null, [EnableFolding = true])
 				in
-				    catalog_products
+				products_with_categories
 
 	annotation PBI_NavigationStepName = Navigation
 
 	annotation PBI_ResultType = Table
-

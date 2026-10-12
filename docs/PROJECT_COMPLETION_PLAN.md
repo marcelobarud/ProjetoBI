@@ -1,6 +1,6 @@
 # ProjetoBI — Plano Mestre de Conclusão e Preparação para Power BI
 
-**Status:** M5 PASS — Portfolio persistido e reconciliado; Fase 4.2 PARTIAL — role read-only pronta, importação no Power BI Desktop pendente
+**Status:** M5 PASS — Portfolio persistido e reconciliado; Fases 4.2 e 4.3 PASS — modelo estrela comercial validado no Power BI Desktop
 **Diretório:** `D:\Codex\ProjetoBI`
 **Objetivo principal:** concluir e validar o dataset Portfolio, disponibilizar baselines SQL confiáveis e preparar a exploração analítica no Power BI.
 
@@ -63,7 +63,7 @@ M1 homologou safety 3× e transferências automáticas desligadas no profile; a 
 
 1. M5 está concluído: os 120.000 pedidos foram persistidos, conferidos em nova conexão e os 13 baselines SQL foram aprovados e reconciliados.
 2. A Fase 4.0 concluiu backup lógico e preparação documental; a Fase 4.1 criou e reabriu o projeto inicial PBIP com TMDL e PBIR, sem carregar dados.
-3. A Fase 4.2 criou e validou `projetobi_pbi_ro` com SELECT em sete tabelas escolhidas e confirmou seus volumes. O conector PostgreSQL, Import, refresh e reabertura no Power BI Desktop ainda não foram validados. Modelo dimensional completo, medidas DAX e relatórios permanecem fora deste escopo.
+3. A Fase 4.2 criou e validou `projetobi_pbi_ro`; as sete fontes homologadas foram importadas e reconciliadas. A Fase 4.3 estruturou e validou duas fatos, cinco dimensões, calendário comercial e nove relações unidirecionais no Desktop. Medidas definitivas e relatórios permanecem fora desta fase.
 
 ## 3. Regras de execução
 
@@ -484,7 +484,8 @@ O objetivo completo será alcançado quando:
 | M6 — preparação analítica | PASS | Inventário, grãos, fatos/dimensões candidatos, métricas, política temporal, precauções de fanout e quatro consultas executáveis documentados. |
 | Fase 4.0 — backup e preparação PBIP/TMDL | PASS documental | Backup lógico custom verificado em `D:\Backups\ProjetoBI`; hash, limites de verificação, estrutura PBIP proposta e pendências analíticas estão documentados. Nenhum projeto Power BI foi criado. |
 | Fase 4.1 — projeto inicial PBIP/TMDL/PBIR | PASS | Desktop 2.158.1177.0 gerou `powerbi/ProjetoBI.pbip`; o modelo usa TMDL, o relatório usa PBIR, o projeto foi reaberto e não contém tabelas nem conexão. Detalhes em `docs/powerbi/phase-4.1-initial-project.md`. |
-| Fase 4.2 — conexão e fundação do modelo | PARTIAL — autenticação manual pendente | Role read-only validada e contagens PostgreSQL confirmadas para sete tabelas. O conector PostgreSQL foi aberto no Desktop em modo Import; a tela de credenciais aguarda entrada manual antes de carregar qualquer tabela. Ver `docs/powerbi/phase-4.2-connection-and-model-foundation.md`. |
+| Fase 4.2 — conexão e fundação do modelo | PASS | Role read-only validada, sete fontes importadas e reconciliadas, PBIP salvo/reaberto e refresh concluído. Ver `docs/powerbi/phase-4.2-connection-and-model-foundation.md`. |
+| Fase 4.3 — modelo estrela comercial | PASS | Refresh/reabertura no Desktop; 120.000 pedidos, 241.637 itens, dimensões e calendário reconciliados; filtros por ano, canal e categoria e preservação de membro em branco verificados. Ver `docs/powerbi/phase-4.3-commercial-star-model.md`. |
 
 ### Execução definitiva M5 — 2026-10-10
 

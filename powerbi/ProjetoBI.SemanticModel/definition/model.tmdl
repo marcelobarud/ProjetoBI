@@ -7,35 +7,18 @@ model Model
 		legacyRedirects
 		returnErrorValuesAsNull
 
-annotation __PBI_TimeIntelligenceEnabled = 1
+annotation __PBI_TimeIntelligenceEnabled = 0
 
-annotation PBI_ProTooling = ["DevMode"]
+annotation PBI_ProTooling = ["DevMode","TMDLView_Desktop"]
 
-annotation PBI_QueryOrder = ["catalog categories","catalog products","core stores","crm customers","sales sales_channels","sales sales_order_items","sales sales_orders"]
+annotation PBI_QueryOrder = ["DimCalendario","DimCanal","DimCliente","DimLoja","DimProduto","FatoItensPedido","FatoPedidos"]
 
-ref table 'catalog categories'
-ref table DateTableTemplate_7add95e8-b47f-43f9-9162-b1f34219801a
-ref table LocalDateTable_8c912390-890d-4177-86e5-60841abf5384
-ref table LocalDateTable_ed3c50ed-22da-4d8f-8955-8d83f364586e
-ref table 'catalog products'
-ref table LocalDateTable_f89382fa-3017-42ac-a1d0-e344ea4b436d
-ref table LocalDateTable_b8cc4df7-a703-4855-9254-f00078921a6f
-ref table 'core stores'
-ref table LocalDateTable_b5525d62-7afd-40c8-a1f9-764be5dd113f
-ref table LocalDateTable_fac95c55-fba5-4f24-a5c9-10f60f1a1203
-ref table LocalDateTable_4305061e-3380-4ad4-985d-1044fd07f591
-ref table LocalDateTable_15f10066-3ca9-46d8-a9e2-e65d69742383
-ref table 'crm customers'
-ref table LocalDateTable_b53ff64a-a392-49ae-bc2d-c279e8f4d30a
-ref table LocalDateTable_b73fd3b2-07e3-4f8a-9a12-04128b285bc2
-ref table 'sales sales_channels'
-ref table LocalDateTable_3017983f-fe80-496c-91f2-7bbe8b2ce9bb
-ref table LocalDateTable_b0c2e692-c981-46ca-966e-8d8a24b1a6b7
-ref table 'sales sales_order_items'
-ref table LocalDateTable_6c4b847d-f137-4c20-bd22-43e3414687e4
-ref table 'sales sales_orders'
-ref table LocalDateTable_2b7ac737-c46f-4066-94c6-9b91f6f1afe5
-ref table LocalDateTable_ea0dba17-bebb-465b-b3c1-eda2150b7d3b
-ref table LocalDateTable_b130861c-2fb4-48e6-9cdc-003132c84e5f
+ref table DimProduto
+ref table DimLoja
+ref table DimCliente
+ref table DimCanal
+ref table FatoItensPedido
+ref table FatoPedidos
+ref table DimCalendario
 
 ref cultureInfo pt-BR

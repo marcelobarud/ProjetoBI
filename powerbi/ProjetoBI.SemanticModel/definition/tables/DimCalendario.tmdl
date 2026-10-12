@@ -1,0 +1,166 @@
+table DimCalendario
+	lineageTag: 5278c52b-d13e-4ebd-acbb-f26b012aa16f
+	dataCategory: Time
+
+	column Data
+		dataType: dateTime
+		isKey
+		formatString: Long Date
+		lineageTag: 15e58083-7268-4bd9-9c2d-d4c34c75de77
+		summarizeBy: none
+		sourceColumn: Data
+
+		annotation UnderlyingDateTimeDataType = Date
+
+		annotation SummarizationSetBy = Automatic
+
+	column Ano
+		dataType: int64
+		formatString: 0
+		lineageTag: 300a613d-453e-433b-81ae-7b83e0603c2a
+		summarizeBy: none
+		sourceColumn: Ano
+
+		annotation SummarizationSetBy = Automatic
+
+	column MesNumero
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 4ec65908-f108-46ba-92a2-8a9271b55232
+		summarizeBy: none
+		sourceColumn: MesNumero
+
+		annotation SummarizationSetBy = Automatic
+
+	column NomeMes
+		dataType: string
+		lineageTag: c5ee309e-0b87-42a4-b0df-e46a17e746ed
+		summarizeBy: none
+		sourceColumn: NomeMes
+		sortByColumn: MesNumero
+
+		annotation SummarizationSetBy = Automatic
+
+	column AnoMes
+		dataType: string
+		lineageTag: 13a40add-ca59-43f4-ae6d-31454778ba3f
+		summarizeBy: none
+		sourceColumn: AnoMes
+		sortByColumn: AnoMesOrdem
+
+		annotation SummarizationSetBy = Automatic
+
+	column AnoMesOrdem
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 4ea8cb82-5427-4507-9c87-adc2d9ce0540
+		summarizeBy: none
+		sourceColumn: AnoMesOrdem
+
+		annotation SummarizationSetBy = Automatic
+
+	column Trimestre
+		dataType: string
+		lineageTag: 7592e481-89c1-4456-9087-a5ffb8fdbdf0
+		summarizeBy: none
+		sourceColumn: Trimestre
+		sortByColumn: TrimestreNumero
+
+		annotation SummarizationSetBy = Automatic
+
+	column TrimestreNumero
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 6dd9f389-603a-4b88-88a8-7b8ccbe65b38
+		summarizeBy: none
+		sourceColumn: TrimestreNumero
+
+		annotation SummarizationSetBy = Automatic
+
+	column AnoTrimestre
+		dataType: string
+		lineageTag: 822058b2-9ace-4a9b-aab3-d364071dfcf2
+		summarizeBy: none
+		sourceColumn: AnoTrimestre
+		sortByColumn: AnoTrimestreOrdem
+
+		annotation SummarizationSetBy = Automatic
+
+	column AnoTrimestreOrdem
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: c5a8e9d0-e37f-4780-897c-32d75c0878fb
+		summarizeBy: none
+		sourceColumn: AnoTrimestreOrdem
+
+		annotation SummarizationSetBy = Automatic
+
+	column DiaNumero
+		dataType: int64
+		formatString: 0
+		lineageTag: 9bc5c63d-f3cc-4f41-8270-9edb21d23dfa
+		summarizeBy: none
+		sourceColumn: DiaNumero
+
+		annotation SummarizationSetBy = Automatic
+
+	column DiaSemanaNumero
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 3f3b8e4e-8fd2-46d5-834f-a187f7c7615f
+		summarizeBy: none
+		sourceColumn: DiaSemanaNumero
+
+		annotation SummarizationSetBy = Automatic
+
+	column NomeDiaSemana
+		dataType: string
+		lineageTag: 50a4300e-224c-4d2e-964b-9db8b701198d
+		summarizeBy: none
+		sourceColumn: NomeDiaSemana
+		sortByColumn: DiaSemanaNumero
+
+		annotation SummarizationSetBy = Automatic
+
+	column FimDeSemana
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: 39b385d1-919a-4d33-a6f9-4ad355f8a637
+		summarizeBy: none
+		sourceColumn: FimDeSemana
+
+		annotation SummarizationSetBy = Automatic
+
+	partition DimCalendario = m
+		mode: import
+		source =
+				let
+					DataInicial = #date(2023, 1, 1),
+					DataFinal = #date(2026, 9, 30),
+					ListaDatas = List.Dates(DataInicial, Duration.Days(DataFinal - DataInicial) + 1, #duration(1, 0, 0, 0)),
+					Base = Table.FromColumns({ListaDatas}, {"Data"}),
+					Tipos = Table.TransformColumnTypes(Base, {{"Data", type date}}, "pt-BR"),
+					ComAno = Table.AddColumn(Tipos, "Ano", each Date.Year([Data]), Int64.Type),
+					ComMesNumero = Table.AddColumn(ComAno, "MesNumero", each Date.Month([Data]), Int64.Type),
+					ComNomeMes = Table.AddColumn(ComMesNumero, "NomeMes", each Date.ToText([Data], [Format = "MMMM", Culture = "pt-BR"]), type text),
+					ComAnoMes = Table.AddColumn(ComNomeMes, "AnoMes", each Date.ToText([Data], [Format = "yyyy-MM", Culture = "en-US"]), type text),
+					ComAnoMesOrdem = Table.AddColumn(ComAnoMes, "AnoMesOrdem", each [Ano] * 100 + [MesNumero], Int64.Type),
+					ComTrimestreNumero = Table.AddColumn(ComAnoMesOrdem, "TrimestreNumero", each Number.RoundUp([MesNumero] / 3), Int64.Type),
+					ComTrimestre = Table.AddColumn(ComTrimestreNumero, "Trimestre", each "T" & Text.From([TrimestreNumero], "en-US"), type text),
+					ComAnoTrimestre = Table.AddColumn(ComTrimestre, "AnoTrimestre", each Text.From([Ano], "en-US") & "-" & [Trimestre], type text),
+					ComAnoTrimestreOrdem = Table.AddColumn(ComAnoTrimestre, "AnoTrimestreOrdem", each [Ano] * 10 + [TrimestreNumero], Int64.Type),
+					ComDiaNumero = Table.AddColumn(ComAnoTrimestreOrdem, "DiaNumero", each Date.Day([Data]), Int64.Type),
+					ComDiaSemanaNumero = Table.AddColumn(ComDiaNumero, "DiaSemanaNumero", each Date.DayOfWeek([Data], Day.Monday) + 1, Int64.Type),
+					ComNomeDiaSemana = Table.AddColumn(ComDiaSemanaNumero, "NomeDiaSemana", each Date.ToText([Data], [Format = "dddd", Culture = "pt-BR"]), type text),
+					ComFimDeSemana = Table.AddColumn(ComNomeDiaSemana, "FimDeSemana", each [DiaSemanaNumero] >= 6, type logical)
+				in
+					ComFimDeSemana
+
+	annotation PBI_NavigationStepName = List.Dates
+
+	annotation PBI_ResultType = Table

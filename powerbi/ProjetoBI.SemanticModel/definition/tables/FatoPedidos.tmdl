@@ -1,4 +1,4 @@
-table 'sales sales_orders'
+table FatoPedidos
 	lineageTag: efd0a0ac-dd19-409c-b92a-9e7ab450dbf1
 
 	column sales_order_id
@@ -55,18 +55,20 @@ table 'sales sales_orders'
 
 	column salesperson_employee_id
 		dataType: int64
+		isHidden
 		formatString: 0
 		lineageTag: ab4b9937-1ad4-407d-9ca0-234e321f7b08
-		summarizeBy: sum
+		summarizeBy: none
 		sourceColumn: salesperson_employee_id
 
 		annotation SummarizationSetBy = Automatic
 
 	column customer_address_id
 		dataType: int64
+		isHidden
 		formatString: 0
 		lineageTag: 31d6c2a7-58ca-406c-80b2-3361d98f81c9
-		summarizeBy: sum
+		summarizeBy: none
 		sourceColumn: customer_address_id
 
 		annotation SummarizationSetBy = Automatic
@@ -85,11 +87,6 @@ table 'sales sales_orders'
 		lineageTag: f59a164e-1652-452c-b5e7-0e87b06e6a73
 		summarizeBy: none
 		sourceColumn: placed_at
-
-		variation Variation
-			isDefault
-			relationship: 7664f44b-b23b-4097-9161-0632fae61e92
-			defaultHierarchy: LocalDateTable_2b7ac737-c46f-4066-94c6-9b91f6f1afe5.'Hierarquia de datas'
 
 		annotation SummarizationSetBy = Automatic
 
@@ -228,11 +225,6 @@ table 'sales sales_orders'
 		summarizeBy: none
 		sourceColumn: created_at
 
-		variation Variation
-			isDefault
-			relationship: 70443c04-e22f-434b-8c58-86e92dcef843
-			defaultHierarchy: LocalDateTable_ea0dba17-bebb-465b-b3c1-eda2150b7d3b.'Hierarquia de datas'
-
 		annotation SummarizationSetBy = Automatic
 
 	column updated_at
@@ -241,11 +233,6 @@ table 'sales sales_orders'
 		lineageTag: 442c48c1-5d8b-4ce5-bca0-6d34b1819c43
 		summarizeBy: none
 		sourceColumn: updated_at
-
-		variation Variation
-			isDefault
-			relationship: a64317d0-0ebc-429b-8ae3-4a39c279344f
-			defaultHierarchy: LocalDateTable_b130861c-2fb4-48e6-9cdc-003132c84e5f.'Hierarquia de datas'
 
 		annotation SummarizationSetBy = Automatic
 
@@ -257,17 +244,26 @@ table 'sales sales_orders'
 
 		annotation SummarizationSetBy = Automatic
 
-	partition 'sales sales_orders' = m
+	column order_date
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 9b642a9f-1913-4da1-aaa6-055b7d1b5a61
+		summarizeBy: none
+		sourceColumn: order_date
+
+		annotation SummarizationSetBy = Automatic
+
+	partition FatoPedidos = m
 		mode: import
 		source =
 				let
-				    Source = PostgreSQL.Database("127.0.0.1:5432", "projeto_bi"),
-				    sales_sales_orders = Source{[Schema="sales",Item="sales_orders"]}[Data],
-				    money_as_fixed_decimal = Table.TransformColumnTypes(sales_sales_orders, {{"subtotal_amount", Currency.Type}, {"discount_amount", Currency.Type}, {"shipping_amount", Currency.Type}, {"total_amount", Currency.Type}})
+					Source = PostgreSQL.Database("127.0.0.1:5432", "projeto_bi"),
+					orders_query = "SELECT orders.*, (orders.placed_at AT TIME ZONE 'America/Sao_Paulo')::date AS order_date FROM sales.sales_orders AS orders",
+					sales_orders = Value.NativeQuery(Source, orders_query, null, [EnableFolding = true]),
+					money_as_fixed_decimal = Table.TransformColumnTypes(sales_orders, {{"subtotal_amount", Currency.Type}, {"discount_amount", Currency.Type}, {"shipping_amount", Currency.Type}, {"total_amount", Currency.Type}})
 				in
-				    money_as_fixed_decimal
+					money_as_fixed_decimal
 
 	annotation PBI_NavigationStepName = Navigation
 
 	annotation PBI_ResultType = Table
-

@@ -36,7 +36,7 @@ O banco operacional deverá representar um ecossistema empresarial coerente, e n
 
 ## Estado atual
 
-**M0–M6, M5, Fase 4.0 e Fase 4.1 concluídos.** O Portfolio de 120.000 pedidos foi persistido no PostgreSQL 18.6 e validado em conexão somente leitura; os 13 baselines SQL foram reconciliados. O backup custom-format verificado está fora do Git em `D:\Backups\ProjetoBI`; detalhes, hash e limites da verificação estão em [`docs/database/backup-and-restore.md`](docs/database/backup-and-restore.md). O projeto inicial do Desktop está em [`powerbi/ProjetoBI.pbip`](powerbi/ProjetoBI.pbip), com TMDL e PBIR, sem tabelas carregadas nem conexão configurada. Consulte [`docs/powerbi/phase-4.0-preparation.md`](docs/powerbi/phase-4.0-preparation.md), [`docs/powerbi/phase-4.1-initial-project.md`](docs/powerbi/phase-4.1-initial-project.md), [`powerbi/README.md`](powerbi/README.md), [`docs/PROJECT_COMPLETION_PLAN.md`](docs/PROJECT_COMPLETION_PLAN.md), [`docs/powerbi/readiness.md`](docs/powerbi/readiness.md), [`docs/data-generation/implementation.md`](docs/data-generation/implementation.md) e [`docs/data-generation/portfolio-validation.md`](docs/data-generation/portfolio-validation.md). A modelagem dimensional, Power Query, DAX e relatórios seguem pendentes de fase própria.
+**M0–M6, M5 e Fases 4.0–4.3 concluídos.** O Portfolio sintético de 120.000 pedidos está persistido no PostgreSQL 18.6, validado em conexão somente leitura e conciliado com os 13 baselines SQL. O PBIP [`powerbi/ProjetoBI.pbip`](powerbi/ProjetoBI.pbip) contém o modelo estrela comercial da Fase 4.3, atualizado, reconciliado e reaberto com sucesso. Medidas definitivas e dashboards ainda não foram implementados. Consulte [`docs/powerbi/phase-4.3-commercial-star-model.md`](docs/powerbi/phase-4.3-commercial-star-model.md), [`powerbi/README.md`](powerbi/README.md), [`docs/PROJECT_COMPLETION_PLAN.md`](docs/PROJECT_COMPLETION_PLAN.md) e [`docs/data-generation/portfolio-validation.md`](docs/data-generation/portfolio-validation.md).
 
 ## Fases previstas
 
@@ -44,7 +44,7 @@ O banco operacional deverá representar um ecossistema empresarial coerente, e n
 2. Implementar e validar o esquema operacional no PostgreSQL 18 (Fases 2B, 2B.1 e 2B.2 concluídas; o dataset Portfolio foi persistido depois, na Fase M5).
 3. Planejar e desenvolver a geração de dados sintéticos consistentes em Python. Fases 3A–3E.1 e M0–M5 concluídos; o Portfolio foi carregado e os baselines reconciliados. O registro operacional está em [`portfolio-validation.md`](docs/data-generation/portfolio-validation.md) e no [`plano mestre`](docs/PROJECT_COMPLETION_PLAN.md).
 4. Explorar e selecionar os dados que farão parte da camada analítica.
-5. Construir as transformações, o modelo semântico e as medidas no Power BI.
+5. Construir e validar o modelo semântico comercial no Power BI (Fase 4.3 em validação); definir medidas em fase posterior autorizada.
 6. Desenvolver e revisar os relatórios, mantendo documentação e versionamento alinhados.
 
 As fases são uma visão de alto nível; decisões detalhadas serão registradas quando cada etapa for iniciada.
