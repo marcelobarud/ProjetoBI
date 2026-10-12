@@ -25,7 +25,7 @@ O banco operacional deverá representar um ecossistema empresarial coerente, e n
 | `database/tests/` | Verificações estruturais e smoke tests SQL transacionais. |
 | `data-generator/src/` | Pacote Python de configuração, geração, validação e smoke transacional reversível. |
 | `data-generator/tests/` | Testes unitários e teste de integração PostgreSQL com `ROLLBACK`. |
-| `powerbi/` | Futuros arquivos do Power BI, incluindo o formato Power BI Project quando a fase correspondente começar. |
+| `powerbi/` | Projeto Power BI Desktop em PBIP, com modelo TMDL e relatório PBIR; fluxo documentado em [`powerbi/README.md`](powerbi/README.md). |
 | `docs/architecture/` | Documentação conceitual de arquitetura. |
 | `docs/business/` | Escopo, regras e conceitos do domínio empresarial. |
 | `docs/database/` | Documentação futura do banco de dados. |
@@ -36,7 +36,7 @@ O banco operacional deverá representar um ecossistema empresarial coerente, e n
 
 ## Estado atual
 
-**M0–M6, M5 e Fase 4.0 concluídos.** O Portfolio de 120.000 pedidos foi persistido no PostgreSQL 18.6 e validado em conexão somente leitura; os 13 baselines SQL foram reconciliados. O backup custom-format verificado está fora do Git em `D:\Backups\ProjetoBI`; detalhes, hash e limites da verificação estão em [`docs/database/backup-and-restore.md`](docs/database/backup-and-restore.md). A preparação PBIP/TMDL e o impacto das entidades vazias estão em [`docs/powerbi/phase-4.0-preparation.md`](docs/powerbi/phase-4.0-preparation.md). Nenhum projeto PBIP foi criado; sua construção, conexão Power BI e DAX aguardam a próxima fase aprovada. Consulte [`docs/PROJECT_COMPLETION_PLAN.md`](docs/PROJECT_COMPLETION_PLAN.md), [`docs/powerbi/readiness.md`](docs/powerbi/readiness.md), [`docs/data-generation/implementation.md`](docs/data-generation/implementation.md) e [`docs/data-generation/portfolio-validation.md`](docs/data-generation/portfolio-validation.md).
+**M0–M6, M5, Fase 4.0 e Fase 4.1 concluídos.** O Portfolio de 120.000 pedidos foi persistido no PostgreSQL 18.6 e validado em conexão somente leitura; os 13 baselines SQL foram reconciliados. O backup custom-format verificado está fora do Git em `D:\Backups\ProjetoBI`; detalhes, hash e limites da verificação estão em [`docs/database/backup-and-restore.md`](docs/database/backup-and-restore.md). O projeto inicial do Desktop está em [`powerbi/ProjetoBI.pbip`](powerbi/ProjetoBI.pbip), com TMDL e PBIR, sem tabelas carregadas nem conexão configurada. Consulte [`docs/powerbi/phase-4.0-preparation.md`](docs/powerbi/phase-4.0-preparation.md), [`docs/powerbi/phase-4.1-initial-project.md`](docs/powerbi/phase-4.1-initial-project.md), [`powerbi/README.md`](powerbi/README.md), [`docs/PROJECT_COMPLETION_PLAN.md`](docs/PROJECT_COMPLETION_PLAN.md), [`docs/powerbi/readiness.md`](docs/powerbi/readiness.md), [`docs/data-generation/implementation.md`](docs/data-generation/implementation.md) e [`docs/data-generation/portfolio-validation.md`](docs/data-generation/portfolio-validation.md). A modelagem dimensional, Power Query, DAX e relatórios seguem pendentes de fase própria.
 
 ## Fases previstas
 

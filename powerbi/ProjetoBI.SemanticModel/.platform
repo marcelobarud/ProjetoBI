@@ -1,0 +1,11 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "SemanticModel",
+    "displayName": "ProjetoBI"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "2c354500-a3cb-428e-bdc9-6e6773e3c2cc"
+  }
+}

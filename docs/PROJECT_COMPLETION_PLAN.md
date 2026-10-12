@@ -59,11 +59,11 @@ As transferências tiveram ganho marginal no ensaio e não devem ser ativadas de
 
 M1 homologou safety 3× e transferências automáticas desligadas no profile; a integração PostgreSQL da configuração aprovada passou em M4 com rollback. A integração 10k da candidata experimental com transferências também passou anteriormente.
 
-### Próxima fase
+### Estado Power BI
 
 1. M5 está concluído: os 120.000 pedidos foram persistidos, conferidos em nova conexão e os 13 baselines SQL foram aprovados e reconciliados.
-2. A Fase 4.0 concluiu backup lógico e preparação documental para PBIP/TMDL. A criação do projeto de Desktop e a seleção/importação das tabelas aguardam uma fase Power BI autorizada.
-3. Não iniciar automaticamente PBIP, modelo semântico, Power Query, medidas DAX ou relatórios nesta etapa.
+2. A Fase 4.0 concluiu backup lógico e preparação documental; a Fase 4.1 criou e reabriu o projeto inicial PBIP com TMDL e PBIR, sem carregar dados.
+3. A seleção/importação de tabelas, conexão PostgreSQL, modelo dimensional, Power Query, medidas DAX e relatórios não foram iniciados e permanecem para fase própria.
 
 ## 3. Regras de execução
 
@@ -483,6 +483,7 @@ O objetivo completo será alcançado quando:
 | M5 — persistência/baselines | PASS | COMMIT único em 2026-10-10; 120.000 pedidos, 41 tabelas conferidas em nova conexão read-only, zero falhas críticas/distributivas e 13 baselines SQL reconciliados. Ver `docs/data-generation/portfolio-validation.md`. |
 | M6 — preparação analítica | PASS | Inventário, grãos, fatos/dimensões candidatos, métricas, política temporal, precauções de fanout e quatro consultas executáveis documentados. |
 | Fase 4.0 — backup e preparação PBIP/TMDL | PASS documental | Backup lógico custom verificado em `D:\Backups\ProjetoBI`; hash, limites de verificação, estrutura PBIP proposta e pendências analíticas estão documentados. Nenhum projeto Power BI foi criado. |
+| Fase 4.1 — projeto inicial PBIP/TMDL/PBIR | PASS | Desktop 2.158.1177.0 gerou `powerbi/ProjetoBI.pbip`; o modelo usa TMDL, o relatório usa PBIR, o projeto foi reaberto e não contém tabelas nem conexão. Detalhes em `docs/powerbi/phase-4.1-initial-project.md`. |
 
 ### Execução definitiva M5 — 2026-10-10
 
@@ -506,3 +507,13 @@ O objetivo completo será alcançado quando:
 - **Entidades vazias:** cancelamentos por linha (0) e transferências/itens de transferência (0) documentados com seus limites analíticos. O relatório não permite provar qual guarda de elegibilidade/cutoff impediu as 12 transferências estruturais declaradas; não foram inventados dados nem alterada a base.
 - **Documentação:** README, plano mestre, implementação do gerador, prontidão analítica e `.gitignore` atualizados. Veja `docs/database/backup-and-restore.md` e `docs/powerbi/phase-4.0-preparation.md`.
 - **Próxima fase:** interromper aqui. A construção do projeto Power BI e qualquer acesso interativo permanecem para solicitação/aprovação específica.
+
+### Fase 4.1 — projeto inicial PBIP/TMDL/PBIR (2026-10-12)
+
+- **Git de entrada:** branch `main`, HEAD `bdfd009db6986ed1d955a9698bba368a90b02379` presente; working tree limpa antes da fase.
+- **Desktop:** instalação local em `D:\Apps\Microsoft Power BI Desktop`; versão `2.158.1177.0` (ProductVersion `2.158.1177.0 (26.09)`). As opções PBIP, TMDL e PBIR já estavam habilitadas em Recursos de visualização; nenhuma configuração foi alterada.
+- **Projeto gerado pelo Desktop:** `powerbi/ProjetoBI.pbip`, `powerbi/ProjetoBI.SemanticModel/` com definição TMDL e `powerbi/ProjetoBI.Report/` com definição PBIR. O modelo está vazio (zero tabelas); há uma página padrão em branco e nenhuma fonte/conexão de dados configurada.
+- **Reabertura:** o PBIP foi aberto pelo próprio Desktop; a janela exibiu `ProjetoBI` e o painel Dados informou que nenhum dado foi carregado.
+- **Preservação:** nenhuma conexão ao PostgreSQL, consulta ao banco, importação de tabelas, alteração de dados, credencial ou mudança no backup foi feita nesta fase. A referência documentada do banco permanece 120.000 pedidos e 3.894.457 linhas.
+- **Versionamento/documentação:** `.gitignore` ignora `**/.pbi/` (cache e estado local) sem excluir definições PBIP/TMDL/PBIR. `powerbi/README.md` descreve o fluxo Desktop, VS Code e Codex. Ver `docs/powerbi/phase-4.1-initial-project.md`.
+- **Limite:** esta fase não define modelo dimensional, consultas Power Query, medidas DAX ou dashboards; interromper após o checkpoint Git local desta fase.

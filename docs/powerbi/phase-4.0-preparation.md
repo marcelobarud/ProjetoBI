@@ -1,33 +1,33 @@
 # Fase 4.0 — preparação para PBIP/TMDL
 
-**Estado:** PASS documental; nenhum projeto Power BI foi criado nesta fase.
-**Verificação local:** 2026-10-10. Power BI Desktop não foi localizado por comando, pacote Windows nem nos diretórios padrão consultados; portanto não havia uma instância local disponível para salvar e validar um projeto inicial.
+**Estado:** PASS documental (concluída em 2026-10-10; histórico da fase preservado). A Fase 4.1 criou depois o projeto inicial PBIP/TMDL/PBIR; veja [`phase-4.1-initial-project.md`](phase-4.1-initial-project.md).
+**Verificação local:** 2026-10-10. Power BI Desktop não foi localizado por comando, pacote Windows nem nos diretórios padrão consultados; portanto não havia uma instância local disponível para salvar e validar um projeto inicial naquela fase. O Desktop foi localizado na Fase 4.1.
 
 ## Decisões registradas
 
 - Formato versionado oficial: Power BI Project (`.pbip`).
 - Modelo semântico: TMDL.
 - Relatório: PBIR aprimorado, quando disponível/compatível na versão instalada; confirmar a opção do Desktop ao iniciar o projeto.
-- Repositório: arquivos de definição legíveis e necessários ao projeto são versionáveis. Ignorar `**/.pbi/cache.abf` e `**/.pbi/localSettings.json`; o `.gitignore` existente foi ajustado para essas exclusões específicas.
+- Repositório: arquivos de definição legíveis e necessários ao projeto são versionáveis. Na Fase 4.0, `.gitignore` recebeu exclusões específicas para cache e configurações locais; na Fase 4.1, elas foram consolidadas para ignorar toda a pasta `**/.pbi/`.
 - Fonte: PostgreSQL `projeto_bi`, exclusivamente read-only. Não reutilizar a credencial de escrita do gerador no Power BI; antes da conexão, provisionar e validar credencial separada com privilégios de leitura aprovados.
 - Armazenamento inicial recomendado: Import, condicionado a avaliação de memória, duração de atualização, granularidade e dimensões selecionadas. A decisão final de modo de armazenamento depende dessa validação.
 - Não importar automaticamente todas as 41 tabelas. Começar somente com um conjunto selecionado que sustente grãos e métricas aprovados.
 
-## Estrutura proposta para uma fase posterior
+## Estrutura-base planejada na Fase 4.0 e criada na Fase 4.1
 
 ```text
 powerbi/
   ProjetoBI.pbip
   ProjetoBI.Report/
     definition.pbir
-    definition/                 # PBIR, se suportado
+    definition/                 # definições PBIR
   ProjetoBI.SemanticModel/
     definition.pbism
-    definition/                 # TMDL
+    definition/                 # definições TMDL
   README.md                     # instruções de abertura/atualização do projeto
 ```
 
-Power BI Desktop deve gerar e validar os arquivos de definição. Não criar manualmente arquivos `.pbip`, `.pbism`, `.pbir` ou TMDL incompletos. Após gerar o primeiro projeto em Desktop, abrir novamente, confirmar que modelo e relatório carregam e revisar o diff antes de versionar.
+Power BI Desktop deve gerar e validar os arquivos de definição. Não criar manualmente arquivos `.pbip`, `.pbism`, `.pbir` ou TMDL incompletos. Na Fase 4.1, o Desktop gerou o primeiro projeto, que foi reaberto e validado; o estado e a estrutura estão em [`phase-4.1-initial-project.md`](phase-4.1-initial-project.md).
 
 ## Inventário M6 e escopo analítico candidato
 
@@ -55,4 +55,4 @@ O profile homologado mantém `supply_transfer_enabled=0` e declara 12 transferê
 - [Pasta de relatório de projeto e PBIR](https://learn.microsoft.com/en-us/power-bi/developer/projects/projects-report).
 - [Formato aprimorado PBIR](https://learn.microsoft.com/en-us/power-bi/developer/embedded/projects-enhanced-report-format).
 
-As páginas oficiais descrevem PBIP com definições textuais adequadas a controle de versão, TMDL para o modelo semântico e PBIR para definições detalhadas do relatório. A compatibilidade e as opções disponíveis devem ser verificadas no Power BI Desktop instalado quando a fase de modelagem for autorizada.
+As páginas oficiais descrevem PBIP com definições textuais adequadas a controle de versão, TMDL para o modelo semântico e PBIR para definições detalhadas do relatório. A Fase 4.1 confirmou que a versão instalada gera os três formatos para o projeto inicial; compatibilidade de recursos de modelagem continua a ser avaliada na fase correspondente.
