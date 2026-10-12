@@ -58,14 +58,16 @@ table _Medidas
 
 	/// Pedidos completed divididos pelo total de pedidos no mesmo contexto. Retorna em branco quando não há
 	/// denominador.
-	measure 'Taxa de Conclusão' = DIVIDE ( [Pedidos Concluídos], [Total de Pedidos] )
+	measure 'Taxa de Conclusão' =
+			DIVIDE ( [Pedidos Concluídos], [Total de Pedidos] )
 		formatString: 0.00%;-0.00%;0.00%
 		displayFolder: 07 | Indicadores Percentuais
 		lineageTag: 78da4146-8b35-422c-8089-ea285d722c4d
 
 	/// Pedidos cancelled divididos pelo total de pedidos no mesmo contexto. Retorna em branco quando não há
 	/// denominador.
-	measure 'Taxa de Cancelamento' = DIVIDE ( [Pedidos Cancelados], [Total de Pedidos] )
+	measure 'Taxa de Cancelamento' =
+			DIVIDE ( [Pedidos Cancelados], [Total de Pedidos] )
 		formatString: 0.00%;-0.00%;0.00%
 		displayFolder: 07 | Indicadores Percentuais
 		lineageTag: 7840c400-e42f-4ff4-b679-6931d4e9d9ad
@@ -173,7 +175,8 @@ table _Medidas
 
 	/// Valor total de pedidos completed, incluindo frete, dividido pela contagem de pedidos completed. Em
 	/// branco sem denominador.
-	measure 'Ticket Médio — Pedidos Concluídos' = DIVIDE ( [Valor Total — Pedidos Concluídos], [Pedidos Concluídos] )
+	measure 'Ticket Médio — Pedidos Concluídos' =
+			DIVIDE ( [Valor Total — Pedidos Concluídos], [Pedidos Concluídos] )
 		formatString: $ #,##0.00;($ #,##0.00);$ 0.00
 		displayFolder: 04 | Ticket Médio
 		lineageTag: 92713f59-c44c-41f9-b176-26dc8668413b
@@ -206,14 +209,16 @@ table _Medidas
 
 	/// Variação absoluta de pedidos YoY dividida pelos pedidos do ano anterior. Em branco sem período ou
 	/// denominador válido.
-	measure 'Variação Percentual de Pedidos YoY' = DIVIDE ( [Variação Absoluta de Pedidos YoY], [Pedidos no Ano Anterior] )
+	measure 'Variação Percentual de Pedidos YoY' =
+			DIVIDE ( [Variação Absoluta de Pedidos YoY], [Pedidos no Ano Anterior] )
 		formatString: 0.00%;-0.00%;0.00%
 		displayFolder: 06 | Inteligência Temporal
 		lineageTag: 54d90c0e-3624-4c8a-b526-d50677829c54
 
 	/// Total de pedidos acumulados desde janeiro até a última data do contexto no ano comercial, sem usar
 	/// TODAY().
-	measure 'Pedidos YTD' = CALCULATE ( [Total de Pedidos], DATESYTD ( 'DimCalendario'[Data] ) )
+	measure 'Pedidos YTD' =
+			CALCULATE ( [Total de Pedidos], DATESYTD ( 'DimCalendario'[Data] ) )
 		formatString: #,0
 		displayFolder: 06 | Inteligência Temporal
 		lineageTag: 8ebcb69a-f0a9-4d7a-b26f-2f518ea05552
@@ -301,21 +306,24 @@ table _Medidas
 
 	/// Contagem de linhas comerciais no grão sales_order_item_id. Responde a produto/categoria e às
 	/// dimensões conformadas disponíveis.
-	measure 'Total de Linhas de Itens' = COUNTROWS ( 'FatoItensPedido' )
+	measure 'Total de Linhas de Itens' =
+			COUNTROWS ( 'FatoItensPedido' )
 		formatString: #,0
 		displayFolder: 05 | Produtos e Itens
 		lineageTag: f7ae700c-8918-4bc2-b211-0a73c11553c8
 
 	/// Soma da quantidade originalmente pedida nos itens. Não equivale necessariamente a unidades
 	/// atendidas, vendidas após cancelamento ou líquidas de devoluções.
-	measure 'Unidades Pedidas' = SUM ( 'FatoItensPedido'[quantity] )
+	measure 'Unidades Pedidas' =
+			SUM ( 'FatoItensPedido'[quantity] )
 		formatString: #,0
 		displayFolder: 05 | Produtos e Itens
 		lineageTag: 7f84aa04-997c-469d-92c3-37e309511949
 
 	/// Contagem distinta de pedidos representados pelas linhas de item no contexto de produto/categoria.
 	/// Não é o total de pedidos do cabeçalho.
-	measure 'Pedidos Distintos com Itens no Contexto' = DISTINCTCOUNT ( 'FatoItensPedido'[sales_order_id] )
+	measure 'Pedidos Distintos com Itens no Contexto' =
+			DISTINCTCOUNT ( 'FatoItensPedido'[sales_order_id] )
 		formatString: #,0
 		displayFolder: 05 | Produtos e Itens
 		lineageTag: 4e1ea9c2-ec1e-41d0-8706-1333c79aeb46

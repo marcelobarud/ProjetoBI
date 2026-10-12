@@ -1,6 +1,6 @@
 # ProjetoBI — Plano Mestre de Conclusão e Preparação para Power BI
 
-**Status:** M5 PASS — Portfolio persistido e reconciliado; Fases 4.2–4.5A PASS
+**Status:** M5 PASS — Portfolio persistido e reconciliado; Fases 4.2–4.5A PASS; Fase 4.5A.1 BLOCKED
 **Diretório:** `D:\Codex\ProjetoBI`
 **Objetivo principal:** concluir e validar o dataset Portfolio, disponibilizar baselines SQL confiáveis e preparar a exploração analítica no Power BI.
 
@@ -488,6 +488,7 @@ O objetivo completo será alcançado quando:
 | Fase 4.3 — modelo estrela comercial | PASS | Refresh/reabertura no Desktop; 120.000 pedidos, 241.637 itens, dimensões e calendário reconciliados; filtros por ano, canal e categoria e preservação de membro em branco verificados. Ver `docs/powerbi/phase-4.3-commercial-star-model.md`. |
 | Fase 4.4 — medidas DAX comerciais | PASS | 28 medidas em `FatoPedidos` e `FatoItensPedido`; erros DAX/TMDL zerados no mecanismo local, reconciliações comerciais e YTD aprovadas, refresh e reabertura sem erro. Ver `docs/powerbi/phase-4.4-commercial-dax-measures.md`. |
 | Fase 4.5A — centralização das medidas | PASS | 28 medidas movidas para `_Medidas`, validação TMDL/DAX aprovada, confirmação visual das sete pastas e ciclo salvar/fechar/reabrir concluídos sem erro. Ver `docs/powerbi/phase-4.5a-measures-centralization.md`. |
+| Fase 4.5A.1 — formatação DAX em TMDL | BLOCKED | O Desktop reformatou oito expressões simples para a mesma linha da declaração ao salvar; ver `docs/powerbi/phase-4.5a1-dax-formatting.md`. |
 
 ### Execução definitiva M5 — 2026-10-10
 
