@@ -36,7 +36,7 @@ O banco operacional deverá representar um ecossistema empresarial coerente, e n
 
 ## Estado atual
 
-**M0–M6, M5 e Fases 4.0–4.3 concluídos.** O Portfolio sintético de 120.000 pedidos está persistido no PostgreSQL 18.6, validado em conexão somente leitura e conciliado com os 13 baselines SQL. O PBIP [`powerbi/ProjetoBI.pbip`](powerbi/ProjetoBI.pbip) contém o modelo estrela comercial da Fase 4.3, atualizado, reconciliado e reaberto com sucesso. Medidas definitivas e dashboards ainda não foram implementados. Consulte [`docs/powerbi/phase-4.3-commercial-star-model.md`](docs/powerbi/phase-4.3-commercial-star-model.md), [`powerbi/README.md`](powerbi/README.md), [`docs/PROJECT_COMPLETION_PLAN.md`](docs/PROJECT_COMPLETION_PLAN.md) e [`docs/data-generation/portfolio-validation.md`](docs/data-generation/portfolio-validation.md).
+**M0–M6, M5 e Fases 4.0–4.4 concluídos.** O Portfolio sintético de 120.000 pedidos está persistido no PostgreSQL 18.6, validado em conexão somente leitura e conciliado com os 13 baselines SQL. O PBIP [`powerbi/ProjetoBI.pbip`](powerbi/ProjetoBI.pbip) contém o modelo estrela comercial e 28 medidas DAX comerciais; medidas, reconciliações, atualização e reabertura foram validadas no Power BI Desktop. Dashboards, medidas de margem e COGS permanecem fora do escopo atual. Consulte [`docs/powerbi/phase-4.3-commercial-star-model.md`](docs/powerbi/phase-4.3-commercial-star-model.md), [`docs/powerbi/phase-4.4-commercial-dax-measures.md`](docs/powerbi/phase-4.4-commercial-dax-measures.md), [`powerbi/README.md`](powerbi/README.md), [`docs/PROJECT_COMPLETION_PLAN.md`](docs/PROJECT_COMPLETION_PLAN.md) e [`docs/data-generation/portfolio-validation.md`](docs/data-generation/portfolio-validation.md).
 
 ## Fases previstas
 
@@ -44,7 +44,7 @@ O banco operacional deverá representar um ecossistema empresarial coerente, e n
 2. Implementar e validar o esquema operacional no PostgreSQL 18 (Fases 2B, 2B.1 e 2B.2 concluídas; o dataset Portfolio foi persistido depois, na Fase M5).
 3. Planejar e desenvolver a geração de dados sintéticos consistentes em Python. Fases 3A–3E.1 e M0–M5 concluídos; o Portfolio foi carregado e os baselines reconciliados. O registro operacional está em [`portfolio-validation.md`](docs/data-generation/portfolio-validation.md) e no [`plano mestre`](docs/PROJECT_COMPLETION_PLAN.md).
 4. Explorar e selecionar os dados que farão parte da camada analítica.
-5. Construir e validar o modelo semântico comercial no Power BI (Fase 4.3 em validação); definir medidas em fase posterior autorizada.
+5. Construir e validar o modelo semântico comercial e as medidas DAX no Power BI (Fases 4.3 e 4.4 concluídas).
 6. Desenvolver e revisar os relatórios, mantendo documentação e versionamento alinhados.
 
 As fases são uma visão de alto nível; decisões detalhadas serão registradas quando cada etapa for iniciada.

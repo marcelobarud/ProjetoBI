@@ -1,6 +1,280 @@
 table FatoPedidos
 	lineageTag: efd0a0ac-dd19-409c-b92a-9e7ab450dbf1
 
+	/// Contagem distinta de pedidos no grão do cabeçalho. Respeita data, canal, cliente e loja; retorna em
+	/// branco sob filtro de produto/categoria para evitar atribuição indevida.
+	measure 'Total de Pedidos' =
+			IF (
+				ISFILTERED ( 'DimProduto' ),
+				BLANK (),
+				DISTINCTCOUNT ( 'FatoPedidos'[sales_order_id] )
+			)
+		formatString: #,0
+		displayFolder: 01 | Pedidos
+
+	/// Contagem distinta de pedidos cujo status atual/final é completed; não representa reconstrução
+	/// histórica do status.
+	measure 'Pedidos Concluídos' =
+			IF (
+				ISFILTERED ( 'DimProduto' ),
+				BLANK (),
+				CALCULATE (
+					DISTINCTCOUNT ( 'FatoPedidos'[sales_order_id] ),
+					KEEPFILTERS ( 'FatoPedidos'[order_status] = "completed" )
+				)
+			)
+		formatString: #,0
+		displayFolder: 01 | Pedidos
+
+	/// Contagem distinta de pedidos cujo status atual/final é cancelled.
+	measure 'Pedidos Cancelados' =
+			IF (
+				ISFILTERED ( 'DimProduto' ),
+				BLANK (),
+				CALCULATE (
+					DISTINCTCOUNT ( 'FatoPedidos'[sales_order_id] ),
+					KEEPFILTERS ( 'FatoPedidos'[order_status] = "cancelled" )
+				)
+			)
+		formatString: #,0
+		displayFolder: 01 | Pedidos
+
+	/// Contagem distinta de pedidos cujo status atual/final é confirmed.
+	measure 'Pedidos Confirmados' =
+			IF (
+				ISFILTERED ( 'DimProduto' ),
+				BLANK (),
+				CALCULATE (
+					DISTINCTCOUNT ( 'FatoPedidos'[sales_order_id] ),
+					KEEPFILTERS ( 'FatoPedidos'[order_status] = "confirmed" )
+				)
+			)
+		formatString: #,0
+		displayFolder: 01 | Pedidos
+
+	/// Pedidos completed divididos pelo total de pedidos no mesmo contexto. Retorna em branco quando não há
+	/// denominador.
+	measure 'Taxa de Conclusão' = DIVIDE ( [Pedidos Concluídos], [Total de Pedidos] )
+		formatString: 0.00%;-0.00%;0.00%
+		displayFolder: 07 | Indicadores Percentuais
+
+	/// Pedidos cancelled divididos pelo total de pedidos no mesmo contexto. Retorna em branco quando não há
+	/// denominador.
+	measure 'Taxa de Cancelamento' = DIVIDE ( [Pedidos Cancelados], [Total de Pedidos] )
+		formatString: 0.00%;-0.00%;0.00%
+		displayFolder: 07 | Indicadores Percentuais
+
+	/// Participação do status atual/final no total de pedidos preservando data, canal, cliente e loja. O
+	/// denominador remove somente o filtro de status; não usar como participação de canal ou produto.
+	measure 'Participação de Pedidos por Status' =
+			DIVIDE (
+				[Total de Pedidos],
+				CALCULATE (
+					[Total de Pedidos],
+					REMOVEFILTERS ( 'FatoPedidos'[order_status] )
+				)
+			)
+		formatString: 0.00%;-0.00%;0.00%
+		displayFolder: 07 | Indicadores Percentuais
+
+	/// Soma total_amount para todos os status, incluindo frete. É valor comercial de cabeçalho, não
+	/// faturamento realizado, caixa ou receita líquida após devoluções.
+	measure 'Valor Total dos Pedidos — Todos os Status' =
+			IF (
+				ISFILTERED ( 'DimProduto' ),
+				BLANK (),
+				CALCULATE (
+					SUM ( 'FatoPedidos'[total_amount] ),
+					REMOVEFILTERS ( 'FatoPedidos'[order_status] )
+				)
+			)
+		formatString: $ #,##0.00;($ #,##0.00);$ 0.00
+		displayFolder: 02 | Faturamento
+
+	/// Soma subtotal_amount de pedidos completed antes de descontos, no grão do cabeçalho.
+	measure 'Valor Bruto de Produtos — Pedidos Concluídos' =
+			IF (
+				ISFILTERED ( 'DimProduto' ),
+				BLANK (),
+				CALCULATE (
+					SUM ( 'FatoPedidos'[subtotal_amount] ),
+					KEEPFILTERS ( 'FatoPedidos'[order_status] = "completed" )
+				)
+			)
+		formatString: $ #,##0.00;($ #,##0.00);$ 0.00
+		displayFolder: 02 | Faturamento
+
+	/// Soma discount_amount de pedidos completed; é desconto de cabeçalho, não desconto rateado por item.
+	measure 'Descontos — Pedidos Concluídos' =
+			IF (
+				ISFILTERED ( 'DimProduto' ),
+				BLANK (),
+				CALCULATE (
+					SUM ( 'FatoPedidos'[discount_amount] ),
+					KEEPFILTERS ( 'FatoPedidos'[order_status] = "completed" )
+				)
+			)
+		formatString: $ #,##0.00;($ #,##0.00);$ 0.00
+		displayFolder: 03 | Descontos
+
+	/// Valor bruto de produtos completed menos descontos de cabeçalho completed. Ainda não desconta
+	/// devoluções recebidas e não representa receita analítica pós-devolução.
+	measure 'Receita Líquida de Produtos — Antes de Devoluções' =
+			VAR ValorBruto = [Valor Bruto de Produtos — Pedidos Concluídos]
+			VAR Descontos = [Descontos — Pedidos Concluídos]
+			RETURN
+				IF (
+					ISBLANK ( ValorBruto ) && ISBLANK ( Descontos ),
+					BLANK (),
+					ValorBruto - Descontos
+				)
+		formatString: $ #,##0.00;($ #,##0.00);$ 0.00
+		displayFolder: 02 | Faturamento
+
+	/// Soma shipping_amount de pedidos completed, separada do valor líquido de produtos.
+	measure 'Frete Cobrado — Pedidos Concluídos' =
+			IF (
+				ISFILTERED ( 'DimProduto' ),
+				BLANK (),
+				CALCULATE (
+					SUM ( 'FatoPedidos'[shipping_amount] ),
+					KEEPFILTERS ( 'FatoPedidos'[order_status] = "completed" )
+				)
+			)
+		formatString: $ #,##0.00;($ #,##0.00);$ 0.00
+		displayFolder: 02 | Faturamento
+
+	/// Soma total_amount de pedidos completed, incluindo frete. Não equivale a pagamentos capturados nem a
+	/// valor após devoluções.
+	measure 'Valor Total — Pedidos Concluídos' =
+			IF (
+				ISFILTERED ( 'DimProduto' ),
+				BLANK (),
+				CALCULATE (
+					SUM ( 'FatoPedidos'[total_amount] ),
+					KEEPFILTERS ( 'FatoPedidos'[order_status] = "completed" )
+				)
+			)
+		formatString: $ #,##0.00;($ #,##0.00);$ 0.00
+		displayFolder: 02 | Faturamento
+
+	/// Valor total de pedidos completed, incluindo frete, dividido pela contagem de pedidos completed. Em
+	/// branco sem denominador.
+	measure 'Ticket Médio — Pedidos Concluídos' = DIVIDE ( [Valor Total — Pedidos Concluídos], [Pedidos Concluídos] )
+		formatString: $ #,##0.00;($ #,##0.00);$ 0.00
+		displayFolder: 04 | Ticket Médio
+
+	/// Total de pedidos do período equivalente no ano anterior, pelo estado atual/final, somente quando há
+	/// contexto de calendário.
+	measure 'Pedidos no Ano Anterior' =
+			IF (
+				NOT ISFILTERED ( 'DimCalendario' ),
+				BLANK (),
+				CALCULATE ( [Total de Pedidos], DATEADD ( 'DimCalendario'[Data], -1, YEAR ) )
+			)
+		formatString: #,0
+		displayFolder: 06 | Inteligência Temporal
+
+	/// Diferença entre pedidos do contexto atual e do período equivalente no ano anterior. Em branco quando
+	/// não há período anterior disponível.
+	measure 'Variação Absoluta de Pedidos YoY' =
+			VAR PedidosAnoAnterior = [Pedidos no Ano Anterior]
+			RETURN
+				IF (
+					ISBLANK ( PedidosAnoAnterior ) || ISBLANK ( [Total de Pedidos] ),
+					BLANK (),
+					[Total de Pedidos] - PedidosAnoAnterior
+				)
+		formatString: #,0;(#,0);0
+		displayFolder: 06 | Inteligência Temporal
+
+	/// Variação absoluta de pedidos YoY dividida pelos pedidos do ano anterior. Em branco sem período ou
+	/// denominador válido.
+	measure 'Variação Percentual de Pedidos YoY' = DIVIDE ( [Variação Absoluta de Pedidos YoY], [Pedidos no Ano Anterior] )
+		formatString: 0.00%;-0.00%;0.00%
+		displayFolder: 06 | Inteligência Temporal
+
+	/// Total de pedidos acumulados desde janeiro até a última data do contexto no ano comercial, sem usar
+	/// TODAY().
+	measure 'Pedidos YTD' = CALCULATE ( [Total de Pedidos], DATESYTD ( 'DimCalendario'[Data] ) )
+		formatString: #,0
+		displayFolder: 06 | Inteligência Temporal
+
+	/// Receita líquida de produtos antes de devoluções no período equivalente do ano anterior. Em branco
+	/// sem contexto de calendário ou período comparável.
+	measure 'Receita de Produtos no Ano Anterior — Antes de Devoluções' =
+			IF (
+				NOT ISFILTERED ( 'DimCalendario' ),
+				BLANK (),
+				CALCULATE (
+					[Receita Líquida de Produtos — Antes de Devoluções],
+					DATEADD ( 'DimCalendario'[Data], -1, YEAR )
+				)
+			)
+		formatString: $ #,##0.00;($ #,##0.00);$ 0.00
+		displayFolder: 06 | Inteligência Temporal
+
+	/// Diferença de receita líquida de produtos antes de devoluções contra o período equivalente do ano
+	/// anterior.
+	measure 'Variação Absoluta de Receita YoY — Antes de Devoluções' =
+			VAR ReceitaAnoAnterior = [Receita de Produtos no Ano Anterior — Antes de Devoluções]
+			RETURN
+				IF (
+					ISBLANK ( ReceitaAnoAnterior ) || ISBLANK ( [Receita Líquida de Produtos — Antes de Devoluções] ),
+					BLANK (),
+					[Receita Líquida de Produtos — Antes de Devoluções] - ReceitaAnoAnterior
+				)
+		formatString: $ #,##0.00;($ #,##0.00);$ 0.00
+		displayFolder: 06 | Inteligência Temporal
+
+	/// Variação absoluta da receita YoY dividida pela receita do ano anterior. Em branco sem período ou
+	/// denominador válido.
+	measure 'Variação Percentual de Receita YoY — Antes de Devoluções' =
+			DIVIDE (
+				[Variação Absoluta de Receita YoY — Antes de Devoluções],
+				[Receita de Produtos no Ano Anterior — Antes de Devoluções]
+			)
+		formatString: 0.00%;-0.00%;0.00%
+		displayFolder: 06 | Inteligência Temporal
+
+	/// Receita líquida de produtos antes de devoluções acumulada desde janeiro até a última data
+	/// selecionada no ano comercial.
+	measure 'Receita YTD — Antes de Devoluções' =
+			CALCULATE (
+				[Receita Líquida de Produtos — Antes de Devoluções],
+				DATESYTD ( 'DimCalendario'[Data] )
+			)
+		formatString: $ #,##0.00;($ #,##0.00);$ 0.00
+		displayFolder: 06 | Inteligência Temporal
+
+	/// Receita líquida acumulada no mesmo intervalo YTD do ano anterior. Para dataset 2026, comparar
+	/// janeiro–setembro de 2026 com janeiro–setembro de 2025.
+	measure 'Receita YTD Ano Anterior — Antes de Devoluções' =
+			IF (
+				NOT ISFILTERED ( 'DimCalendario' ),
+				BLANK (),
+				CALCULATE (
+					[Receita Líquida de Produtos — Antes de Devoluções],
+					DATEADD ( DATESYTD ( 'DimCalendario'[Data] ), -1, YEAR )
+				)
+			)
+		formatString: $ #,##0.00;($ #,##0.00);$ 0.00
+		displayFolder: 06 | Inteligência Temporal
+
+	/// Variação percentual do YTD contra a mesma janela do ano anterior. Em branco quando a janela ou
+	/// denominador anterior não está disponível.
+	measure 'Variação Percentual de Receita YTD YoY — Antes de Devoluções' =
+			VAR ReceitaYtdAnoAnterior = [Receita YTD Ano Anterior — Antes de Devoluções]
+			VAR ReceitaYtdAtual = [Receita YTD — Antes de Devoluções]
+			RETURN
+				IF (
+					ISBLANK ( ReceitaYtdAnoAnterior ) || ISBLANK ( ReceitaYtdAtual ),
+					BLANK (),
+					DIVIDE ( ReceitaYtdAtual - ReceitaYtdAnoAnterior, ReceitaYtdAnoAnterior )
+				)
+		formatString: 0.00%;-0.00%;0.00%
+		displayFolder: 06 | Inteligência Temporal
+
 	column sales_order_id
 		dataType: int64
 		formatString: 0
