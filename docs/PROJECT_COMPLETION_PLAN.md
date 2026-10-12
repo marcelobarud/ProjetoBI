@@ -1,6 +1,6 @@
 # ProjetoBI — Plano Mestre de Conclusão e Preparação para Power BI
 
-**Status:** M5 PASS — Portfolio persistido e reconciliado; Fases 4.2–4.6 PASS; Fase 4.6.1 PARTIAL. O modelo semântico tem 10 tabelas, 55 medidas e 21 relações; dashboards ainda não foram implementados.
+**Status:** M5 PASS — Portfolio persistido e reconciliado; Fases 4.2–4.6 PASS; Fases 4.6.1–4.6.2 PARTIAL. O modelo semântico tem 10 tabelas, 55 medidas e 21 relações; dashboards ainda não foram implementados. A configuração de limite de consultas permanece pendente: `Auto` não persistiu no ciclo de reabertura da Fase 4.6.2.
 **Diretório:** `D:\Codex\ProjetoBI`
 **Objetivo principal:** concluir e validar o dataset Portfolio, disponibilizar baselines SQL confiáveis e preparar a exploração analítica no Power BI.
 
@@ -494,6 +494,7 @@ O objetivo completo será alcançado quando:
 | Fase 4.5C — medidas DAX financeiras e margem analítica | PASS | 27 medidas novas (55 no total), refresh Desktop, erro DAX zero, persistência, fechamento e reabertura sem erro; reconciliações PostgreSQL × DAX por 1.000 produtos, 144 combinações canal/categoria/ano, 45 meses, destinos, datas operacionais/coorte e YTD passaram. Ver `docs/powerbi/phase-4.5c-financial-dax-measures.md`. |
 | Fase 4.6 — auditoria integrada e working tree | PASS | 10 tabelas, 55 medidas em 11 pastas, 21 relações; validações SQL × DAX, filtros, datas e desempenho concluídas. Working tree inicial de 15 arquivos classificada e preservada, com plano seguro de regularização; dashboard não iniciado. Ver `docs/powerbi/phase-4.6-semantic-model-audit.md` e `docs/git/POWERBI_WORKTREE_AUDIT.md`. |
 | Fase 4.6.1 — regularização PBIP e working tree | PARTIAL | Diagrama preservado, PBIP reaberto, estrutura (10 tabelas, 55 medidas, 11 pastas, 21 relações) e oito regressões DAX verificadas. Auto não persistiu (`queryLimitOption=None`); o Desktop reintroduziu linhas em branco finais nos 13 TMDLs aprovados e em `_Medidas.tmdl`. Ver `docs/git/POWERBI_WORKTREE_REGULARIZATION.md`. |
+| Fase 4.6.2 — estabilização PBIP e serialização TMDL | PARTIAL | Os 14 TMDLs foram hash-estáveis após salvar/fechar/reabrir. `.gitattributes` limita a supressão de `blank-at-eof` aos TMDLs; testes confirmaram que espaços finais continuam detectáveis. Desktop 2.158.1177.0 abriu o modelo (10 tabelas, 55 medidas, 21 relações). A única tentativa de gravar `Auto` apareceu na interface, mas voltou a `No query limits` após reabrir; `report.json` foi restaurado ao original `None` e permanece fora dos commits. Não iniciar dashboards/publicação antes de resolver esse gate numa fase autorizada. Ver `docs/git/POWERBI_WORKTREE_STABILIZATION.md`. |
 
 ### Execução definitiva M5 — 2026-10-10
 
