@@ -1,0 +1,3 @@
+powerbi/ProjetoBI.SemanticModel/definition/*.tmdl whitespace=-blank-at-eof
+powerbi/ProjetoBI.SemanticModel/definition/tables/*.tmdl whitespace=-blank-at-eof
+powerbi/ProjetoBI.SemanticModel/definition/cultures/*.tmdl whitespace=-blank-at-eof

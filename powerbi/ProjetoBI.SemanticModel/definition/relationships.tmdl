@@ -83,3 +83,4 @@ relationship 02a9a43f-5155-572b-bffb-a72e7f685b48
 relationship 2f286926-33ec-5089-bd54-60eef134cf5c
 	fromColumn: FatoDevolucoes.sales_channel_id
 	toColumn: DimCanal.sales_channel_id
+

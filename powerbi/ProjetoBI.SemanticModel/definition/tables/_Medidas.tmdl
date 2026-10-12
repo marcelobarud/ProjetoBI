@@ -563,3 +563,4 @@ table _Medidas
 	partition _Medidas = calculated
 		mode: import
 		source = ROW ( "_Apoio", BLANK () )
+

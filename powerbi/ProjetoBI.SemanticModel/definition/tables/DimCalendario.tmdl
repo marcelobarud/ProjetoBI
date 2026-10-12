@@ -164,3 +164,4 @@ table DimCalendario
 	annotation PBI_NavigationStepName = List.Dates
 
 	annotation PBI_ResultType = Table
+
