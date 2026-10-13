@@ -1,0 +1,265 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.13.0/schema.json",
+  "name": "e5200000000000000001",
+  "position": {
+    "x": 972,
+    "y": 796,
+    "z": 1000,
+    "width": 912,
+    "height": 248,
+    "tabOrder": 16
+  },
+  "visual": {
+    "visualType": "clusteredBarChart",
+    "query": {
+      "queryState": {
+        "Category": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "DimProduto"
+                    }
+                  },
+                  "Property": "category_name"
+                }
+              },
+              "queryRef": "DimProduto.category_name",
+              "nativeQueryRef": "category_name",
+              "active": true,
+              "displayName": "Categoria"
+            }
+          ]
+        },
+        "Y": {
+          "projections": [
+            {
+              "active": true,
+              "displayName": "Lucro bruto",
+              "field": {
+                "Measure": {
+                  "Property": "Lucro Bruto Analítico",
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Medidas"
+                    }
+                  }
+                }
+              },
+              "nativeQueryRef": "Lucro Bruto Analítico",
+              "format": "\"R$\" #,##0.00;-\"R$\" #,##0.00;\"R$\" 0.00",
+              "queryRef": "_Medidas.Lucro Bruto Analítico"
+            }
+          ]
+        },
+        "Tooltips": {
+          "projections": [
+            {
+              "active": true,
+              "displayName": "Receita após devoluções",
+              "field": {
+                "Measure": {
+                  "Property": "Receita Analítica Após Devoluções",
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Medidas"
+                    }
+                  }
+                }
+              },
+              "nativeQueryRef": "Receita Analítica Após Devoluções",
+              "format": "\"R$\" #,##0.00;-\"R$\" #,##0.00;\"R$\" 0.00",
+              "queryRef": "_Medidas.Receita Analítica Após Devoluções"
+            },
+            {
+              "active": true,
+              "displayName": "COGS ajustado",
+              "field": {
+                "Measure": {
+                  "Property": "COGS Analítico Ajustado",
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Medidas"
+                    }
+                  }
+                }
+              },
+              "nativeQueryRef": "COGS Analítico Ajustado",
+              "format": "\"R$\" #,##0.00;-\"R$\" #,##0.00;\"R$\" 0.00",
+              "queryRef": "_Medidas.COGS Analítico Ajustado"
+            },
+            {
+              "active": true,
+              "displayName": "Margem bruta",
+              "field": {
+                "Measure": {
+                  "Property": "Margem Bruta Analítica",
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Medidas"
+                    }
+                  }
+                }
+              },
+              "nativeQueryRef": "Margem Bruta Analítica",
+              "format": "0.00%;-0.00%;0.00%",
+              "queryRef": "_Medidas.Margem Bruta Analítica"
+            }
+          ]
+        }
+      },
+      "sortDefinition": {
+        "sort": [
+          {
+            "field": {
+              "Measure": {
+                "Property": "Lucro Bruto Analítico",
+                "Expression": {
+                  "SourceRef": {
+                    "Entity": "_Medidas"
+                  }
+                }
+              }
+            },
+            "direction": "Descending"
+          }
+        ],
+        "isDefaultSort": true
+      }
+    },
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Lucro bruto analítico por categoria (R$)'"
+                }
+              }
+            },
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "fontFamily": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Segoe UI Semibold'"
+                }
+              }
+            },
+            "fontSize": {
+              "expr": {
+                "Literal": {
+                  "Value": "17D"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "subTitle": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "general": [
+        {
+          "properties": {
+            "altText": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Todas as categorias, ordenadas por lucro bruto analítico; sem filtro Top N. Tooltips mostram receita, COGS e margem. Valores são atribuídos ao grão de item por coorte do pedido.'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true,
+    "objects": {
+      "categoryAxis": [
+        {
+          "properties": {
+            "fontFamily": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Segoe UI'"
+                }
+              }
+            },
+            "fontSize": {
+              "expr": {
+                "Literal": {
+                  "Value": "16D"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "valueAxis": [
+        {
+          "properties": {
+            "fontFamily": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Segoe UI'"
+                }
+              }
+            },
+            "fontSize": {
+              "expr": {
+                "Literal": {
+                  "Value": "14D"
+                }
+              }
+            },
+            "labelDisplayUnits": {
+              "expr": {
+                "Literal": {
+                  "Value": "0D"
+                }
+              }
+            },
+            "labelPrecision": {
+              "expr": {
+                "Literal": {
+                  "Value": "1L"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "general": [
+        {
+          "properties": {
+            "responsive": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

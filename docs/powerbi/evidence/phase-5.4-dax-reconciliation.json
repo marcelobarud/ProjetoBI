@@ -1,0 +1,169 @@
+{
+  "source": "Power BI Desktop local Import model; read-only DAX; captured 2026-10-13",
+  "scenarios": [
+    {
+      "name": "global",
+      "rows": [
+        {
+          "[Revenue]": 922588975.445,
+          "[OriginalCOGS]": 725466564.623508,
+          "[SellableReversal]": 8010914.36386281,
+          "[AdjustedCOGS]": 717455650.2596452,
+          "[GrossProfit]": 205133325.18535483,
+          "[GrossMargin]": 0.22234530288681495,
+          "[NonSellableLoss]": 12296704.23413595
+        }
+      ]
+    },
+    {
+      "name": "jan_sep_2026",
+      "rows": [
+        {
+          "[Revenue]": 228660758.74,
+          "[OriginalCOGS]": 177849100.50072303,
+          "[SellableReversal]": 1778950.41088067,
+          "[AdjustedCOGS]": 176070150.08984238,
+          "[GrossProfit]": 52590608.65015763,
+          "[GrossMargin]": 0.22999402669679792,
+          "[NonSellableLoss]": 2752994.19933278
+        }
+      ]
+    },
+    {
+      "name": "canal_loja_fisica",
+      "rows": [
+        {
+          "[Revenue]": 441335851.64,
+          "[OriginalCOGS]": 355208083.1636446,
+          "[SellableReversal]": 2773843.66181657,
+          "[AdjustedCOGS]": 352434239.501828,
+          "[GrossProfit]": 88901612.13817197,
+          "[GrossMargin]": 0.2014375487688444,
+          "[NonSellableLoss]": 4388214.6235523
+        }
+      ]
+    },
+    {
+      "name": "by_channel",
+      "rows": [
+        {
+          "DimCanal[name]": "Loja física",
+          "[Revenue]": 441335851.64,
+          "[AdjustedCOGS]": 352434239.501828,
+          "[GrossProfit]": 88901612.13817197,
+          "[GrossMargin]": 0.2014375487688444
+        },
+        {
+          "DimCanal[name]": "E-commerce próprio",
+          "[Revenue]": 295528202.29,
+          "[AdjustedCOGS]": 224185205.94570684,
+          "[GrossProfit]": 71342996.34429318,
+          "[GrossMargin]": 0.24140841987826506
+        },
+        {
+          "DimCanal[name]": "Marketplace genérico Horizonte",
+          "[Revenue]": 90348623.35499999,
+          "[AdjustedCOGS]": 67801349.91661443,
+          "[GrossProfit]": 22547273.43838556,
+          "[GrossMargin]": 0.24955857213000657
+        },
+        {
+          "DimCanal[name]": "Marketplace genérico Aurora",
+          "[Revenue]": 95376298.16000001,
+          "[AdjustedCOGS]": 73034854.89549589,
+          "[GrossProfit]": 22341443.26450412,
+          "[GrossMargin]": 0.23424523383183607
+        }
+      ]
+    },
+    {
+      "name": "by_category",
+      "rows": [
+        {
+          "DimProduto[category_name]": "Computadores de mesa",
+          "[Revenue]": 189804857.59,
+          "[AdjustedCOGS]": 145998605.86689967,
+          "[GrossProfit]": 43806251.723100334,
+          "[GrossMargin]": 0.23079626243142207
+        },
+        {
+          "DimProduto[category_name]": "Notebooks",
+          "[Revenue]": 209957992.725,
+          "[AdjustedCOGS]": 167960278.37427935,
+          "[GrossProfit]": 41997714.350720644,
+          "[GrossMargin]": 0.20002912871113535
+        },
+        {
+          "DimProduto[category_name]": "Gráficos",
+          "[Revenue]": 168620377.02,
+          "[AdjustedCOGS]": 136907603.78829202,
+          "[GrossProfit]": 31712773.23170799,
+          "[GrossMargin]": 0.18807200999169008
+        },
+        {
+          "DimProduto[category_name]": "Processadores",
+          "[Revenue]": 74122873.435,
+          "[AdjustedCOGS]": 56157822.177447826,
+          "[GrossProfit]": 17965051.257552177,
+          "[GrossMargin]": 0.24236852168590212
+        },
+        {
+          "DimProduto[category_name]": "Impressão",
+          "[Revenue]": 63635423.085,
+          "[AdjustedCOGS]": 50045760.16355,
+          "[GrossProfit]": 13589662.921450004,
+          "[GrossMargin]": 0.21355500227126373
+        },
+        {
+          "DimProduto[category_name]": "Monitores",
+          "[Revenue]": 55661500.205000006,
+          "[AdjustedCOGS]": 42689529.94899283,
+          "[GrossProfit]": 12971970.256007172,
+          "[GrossMargin]": 0.2330510354236179
+        },
+        {
+          "DimProduto[category_name]": "Redes",
+          "[Revenue]": 40298240.935,
+          "[AdjustedCOGS]": 29913522.77644742,
+          "[GrossProfit]": 10384718.158552583,
+          "[GrossMargin]": 0.2576965623711184
+        },
+        {
+          "DimProduto[category_name]": "Unidades de armazenamento",
+          "[Revenue]": 35939487.335,
+          "[AdjustedCOGS]": 26851711.45086004,
+          "[GrossProfit]": 9087775.884139962,
+          "[GrossMargin]": 0.2528632587168195
+        },
+        {
+          "DimProduto[category_name]": "Entrada",
+          "[Revenue]": 25140582.99,
+          "[AdjustedCOGS]": 17814397.73120695,
+          "[GrossProfit]": 7326185.258793049,
+          "[GrossMargin]": 0.29140872595146805
+        },
+        {
+          "DimProduto[category_name]": "Áudio",
+          "[Revenue]": 25469927.985,
+          "[AdjustedCOGS]": 18532674.22890293,
+          "[GrossProfit]": 6937253.756097071,
+          "[GrossMargin]": 0.2723703718433215
+        },
+        {
+          "DimProduto[category_name]": "Memória",
+          "[Revenue]": 19000004.080000002,
+          "[AdjustedCOGS]": 14140636.705122849,
+          "[GrossProfit]": 4859367.374877153,
+          "[GrossMargin]": 0.25575612270485115
+        },
+        {
+          "DimProduto[category_name]": "Acessórios",
+          "[Revenue]": 14937708.06,
+          "[AdjustedCOGS]": 10443107.047643311,
+          "[GrossProfit]": 4494601.012356689,
+          "[GrossMargin]": 0.3008896006203437
+        }
+      ]
+    }
+  ]
+}

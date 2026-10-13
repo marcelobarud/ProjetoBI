@@ -1,6 +1,6 @@
 # Arquitetura inicial dos dashboards — InfoTech Intelligence
 
-**Escopo:** arquitetura planejada de cinco páginas para Desktop; três reais implementadas e validadas: Visão Executiva, Análise Comercial e Produtos e Categorias (Fase 5.3). Design System v0.2 preservado, com navegação/sincronização e componentes candidatos à v0.3. Relações, medidas e dados permanecem aprovados. Ver os relatórios das Fases 5.2 e 5.3 para testes e limitações.
+**Escopo:** arquitetura planejada de cinco páginas para Desktop; quatro reais implementadas: Visão Executiva, Análise Comercial, Produtos e Categorias e Custos e Margens (Fase 5.4). Design System v0.2 preservado, com novos componentes candidatos à v0.3. Relações, medidas e dados permanecem aprovados. A Fase 5.4 validou reconciliações e parte das interações no Desktop; ver seu relatório para alcance e limitações.
 
 ## 1. Contratos do modelo usados no desenho
 
@@ -46,10 +46,10 @@ As células usam somente medidas que existem atualmente. Os valores de linha/col
 1. **Visão Executiva** — leitura em menos de um minuto; poucos KPIs, período e canais, tendência de coorte e comparação Top N.
 2. **Análise Comercial** — volume/status de pedidos, receita comercial pré-devolução, ticket e canais/lojas/clientes.
 3. **Produtos e Categorias** — comportamento no grão de item com Top N e drill-down real de categoria/produto.
-4. **Custos e Margens** — zonas separadas para coorte do pedido e fluxos operacionais.
+4. **Custos e Margens** — perspectiva de coorte do pedido; fluxos operacionais continuam planejados e devem permanecer em zona própria quando implementados.
 5. **Devoluções** — recebimentos e destinação; solicitação, aprovação, recebimento e refund são conceitos distintos.
 
-Page Navigator horizontal no cabeçalho, atualmente com os três destinos reais e estado ativo aparente. Custos e Margens e Devoluções permanecem planejamento; não existem páginas futuras vazias. Navegação nativa acompanha páginas. Não criar várias páginas manuais de “detalhe” nem botões um a um na versão inicial.
+Page Navigator horizontal no cabeçalho, com quatro destinos reais e estado ativo. Devoluções permanece planejada; não há página futura vazia. Navegação nativa acompanha páginas. Não criar várias páginas manuais de “detalhe” nem botões um a um na versão inicial.
 
 ## 5. Política de filtros compartilhados
 
@@ -81,7 +81,7 @@ Na página 1, categoria → cartão `Pedidos Concluídos` mantém `NoFilter`. Na
 | 5.1 / 5.1.2 | Visão Executiva homologada no escopo local; sete cenários aprovados manualmente, baseline DAX anterior preservado, eixos 16 pt, títulos 17 pt e legenda 15 pt; componentes e limitações em Design System v0.2 |
 | 5.2 | PASS local: quatro KPIs, status, dois temporais com escalas separadas, Canal/Top 5 lojas, navegador e filtros sincronizados. YTD visual deferido como refinamento específico, DAX validado. Sem tabela de clientes no layout atual; nenhuma nova métrica |
 | 5.3 | PASS local: quatro KPIs financeiros por coorte, Top 5 produtos, todas as categorias, matriz Categoria → Produto, filtros locais pesquisáveis, contexto geral sincronizado e navegador com três destinos. Sem atribuições de cabeçalho; medidas/modelo preservados. Ver `phase-5.3-products-categories-dashboard.md` |
-| 5.4 | Implementar Custos e Margens com coorte e fluxo operacional separados |
+| 5.4 | PARTIAL local: página Custos e Margens, composição financeira, tendência por coorte e comparação por canal/categoria implementadas; DAX reconciliado e Desktop reaberto. Navegação/sincronização observadas em amostra; fluxos operacionais e validação exaustiva de todas as interações ficam documentados como limites. Ver `phase-5.4-costs-margins-dashboard.md` |
 | 5.5 | Implementar Devoluções com solicitação e recebimento diferenciados |
 | 5.6 | Auditoria integrada visual, funcional, acessível, temporal e de desempenho |
 

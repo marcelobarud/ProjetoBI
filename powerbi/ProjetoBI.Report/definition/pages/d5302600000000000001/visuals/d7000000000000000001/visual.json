@@ -22,7 +22,7 @@
             "altText": {
               "expr": {
                 "Literal": {
-                  "Value": "'Navegação entre Visão Executiva, Análise Comercial e Produtos e Categorias. A página ativa fica destacada em azul.'"
+                  "Value": "'Navegação entre Visão Executiva, Análise Comercial e Produtos e Categorias e Custos e Margens. A página ativa fica destacada em azul.'"
                 }
               }
             }
@@ -161,7 +161,7 @@
             "columnCount": {
               "expr": {
                 "Literal": {
-                  "Value": "3L"
+                  "Value": "4L"
                 }
               }
             },

@@ -243,3 +243,18 @@ A versão permanece **v0.2**. DS-C01–06 foram reutilizados na terceira página
 Canvas e fontes foram inspecionados em Fit to Page (45% no viewport 1366 × 720), captura ampliada do Desktop e tamanho real 100% por rolagem do canvas. A escala reduzida não torna a página integralmente confortável em qualquer tela; não homologar leitura universal em telas pequenas. Alt text/tab order dos 14 visuais presentes; teclado/foco exercitados no Produto. Leitor de tela, daltonismo e escala de cinza não foram testados nesta fase.
 
 Ver [Fase 5.3](phase-5.3-products-categories-dashboard.md) para reconciliações, capturas, desempenho e restrições. A biblioteca não requer alteração de DAX, relacionamentos, tema-fonte ou banco.
+
+## 15. Custos e Margens — Fase 5.4 (candidatos à v0.3)
+
+A versão vigente continua **InfoTech Intelligence v0.2**. A quarta página reutiliza DS-C01–06 e mantém canvas Full HD de 1920 × 1080 px, fundo `#F5F7FB`, superfícies brancas, Segoe UI, margens de 36 px e espaçamento de 8 px. Os componentes abaixo foram implementados e renderizados no Desktop, mas não promovem automaticamente a versão da biblioteca:
+
+| Componente candidato | Implementação observada | Estado e limites |
+|---|---|---|
+| Navegação de quatro páginas | Navegador nativo horizontal com os quatro nomes completos, destino ativo azul/branco e faixa superior do cabeçalho | Destinos válidos e página ativa vistos no Desktop. A escala de encaixe depende do viewport; não inferir legibilidade universal em telas pequenas. |
+| DS-C02 compartilhado | Between 760 × 112 px, data inicial/final e slider horizontal de duas alças; Canal e Loja em dropdown; grupos `InfoTech.PeriodoComercial`, `InfoTech.Canal` e `InfoTech.Loja` | Canal e Loja filtraram a página e sincronizaram com páginas existentes em testes observados. A alça de período mudou o intervalo e os indicadores; o seletor de data abriu. Não equivale à validação exaustiva dos três filtros em todos os sentidos. |
+| KPIs financeiros por coorte | Quatro cartões principais 450 × 136 px, valor 32 pt/título 13 pt: receita após devoluções, COGS ajustado, lucro bruto e margem; faixa complementar com COGS original, reversão sellable, COGS ajustado e perda non-sellable | Custos mantêm a precisão homologada; perda non-sellable é identificada como já incluída. Ver valores e semântica no relatório da Fase 5.4. |
+| Evolução monetária de três séries | Linha temporal mensal com receita, COGS ajustado e lucro bruto por coorte do pedido; título 17 pt, eixos 16 pt e legenda 15 pt | Candidato; usar escala monetária comum e não incorporar recebimento de devolução ou movimento de fulfillment nessa coorte. |
+| Comparação financeira por dimensão | Barras horizontais de lucro bruto por Canal e Categoria; tooltips com receita, COGS ajustado e margem | Categorias filtram métricas atribuíveis aos itens; indicadores de cabeçalho não são alocados ao produto. Ranking ordenado por lucro bruto. |
+| Ponte do COGS | COGS original concluído − reversão sellable = COGS ajustado; cartão informativo de perda non-sellable | Padrão candidato: a perda non-sellable permanece dentro do custo e não deve ser deduzida novamente. Não representa fluxo operacional por data de movimento/recebimento. |
+
+O viewport usado na inspeção do Desktop foi 1152 × 513 px; a captura Fit to Page exibiu a página inteira a 26%, com redução visual dos textos. A definição do canvas permanece Full HD; tamanhos configurados não garantem leitura equivalente em qualquer viewport. Os tamanhos e limites observados, inclusive aspectos de acessibilidade não testados, constam em [Fase 5.4](phase-5.4-costs-margins-dashboard.md). A v0.2 segue vigente até revisão formal posterior.
