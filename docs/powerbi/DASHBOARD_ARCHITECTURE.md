@@ -1,6 +1,6 @@
 # Arquitetura inicial dos dashboards — InfoTech Intelligence
 
-**Escopo:** plano de cinco páginas para Desktop. Nenhuma página, visual, medida ou interação foi implementada nesta fase. Relações, medidas e dados permanecem os aprovados no modelo semântico.
+**Escopo:** arquitetura de cinco páginas para Desktop. A Fase 5.1 compôs a primeira página no PBIR; o usuário confirmou a abertura e a presença dos componentes; a revisão visual detalhada e os testes de filtros ainda aguardam validação no Desktop. Relações, medidas e dados permanecem os aprovados no modelo semântico.
 
 ## 1. Contratos do modelo usados no desenho
 
@@ -18,7 +18,7 @@
 3. **Área principal:** 3–5 KPIs prioritários, um visual temporal e no máximo dois detalhamentos por bloco. Preferir hierarquia, não densidade.
 4. **Rodapé opcional:** intervalo efetivo do dataset (até 30 set 2026) e perspectiva das datas; não exibir “última atualização” sem campo de atualização do dataset.
 
-Formato de referência 16:9 (1280×720 conceitual), 12 colunas, 24 px de margem e unidade de espaçamento de 8 px, sujeito a confirmação de página no Desktop. Reorganizar em mobile por prioridade: filtros, KPIs, série temporal, detalhamentos; esconder visuais secundários somente após testar leitura e navegação. Nenhum mobile layout será feito na Fase 5.0.
+Formato de referência 16:9 (1280×720 conceitual), 12 colunas, 24 px de margem e unidade de espaçamento de 8 px. A página Visão Executiva usa Full HD 1920×1080, conforme orientação do usuário, e margens de 36 px. Reorganizar em mobile por prioridade: filtros, KPIs, série temporal, detalhamentos; esconder visuais secundários somente após testar leitura e navegação. Nenhum mobile layout foi feito na Fase 5.1.
 
 ## 3. Matriz funcional
 
@@ -62,7 +62,7 @@ Page Navigator horizontal no cabeçalho, 5 títulos curtos e estado ativo aparen
 | Cliente | Local por página quando útil | Não expor dados de contato/notas; usar identificador/nome legível apenas quando necessário |
 | Status | Local à análise que define seu significado | `order_status` e `return_status` não são intercambiáveis |
 
-Fase 5.1 deverá testar interações e estado de limpeza dos filtros em dados reais. Seleção de categoria na página 1 não pode alterar silenciosamente `Pedidos Concluídos`; por isso não se sincroniza Produto com essa página. Não criar tabelas desconectadas de data para simular seleções independentes sem autorização de alteração do modelo.
+Na página 1, a interação PBIR categoria → cartão `Pedidos Concluídos` está definida como `NoFilter`; período, canal e loja permanecem segmentadores locais. A seleção de categoria não deve alterar silenciosamente o indicador de cabeçalho. O comportamento e os estados de limpeza ainda precisam ser testados no Desktop com dados reais. Não criar tabelas desconectadas de data para simular seleções independentes sem autorização de alteração do modelo.
 
 ## 6. Riscos e dependências
 
@@ -78,7 +78,7 @@ Fase 5.1 deverá testar interações e estado de limpeza dos filtros em dados re
 
 | Fase futura | Resultado esperado |
 |---|---|
-| 5.1 | Implementar Visão Executiva; aplicar o tema, identidade, Page Navigator, KPIs, filtros, visuais e interações; homologar renderização, legibilidade e desempenho no Desktop |
+| 5.1 | Implementada no PBIR em canvas Full HD com tema, KPIs, filtros, visuais e interação de categoria protegendo o cartão de pedidos; revisão visual, filtros, reconciliação e desempenho ainda pendentes |
 | 5.2 | Implementar Análise Comercial usando componentes aprovados |
 | 5.3 | Implementar Produtos e Categorias sem atribuições de cabeçalho |
 | 5.4 | Implementar Custos e Margens com coorte e fluxo operacional separados |

@@ -1,6 +1,6 @@
 # InfoTech Intelligence — Design System v0.1
 
-**Estado:** fundação documental. Direção criativa e paleta inicial aprovadas; componentes e páginas ainda não implementados nem homologados visualmente no Desktop.
+**Estado:** v0.1 aplicada na composição PBIR da página Visão Executiva. Tema e canvas foram aceitos pelo Desktop; o usuário confirmou a reabertura e a presença dos componentes, enquanto a revisão visual detalhada ainda está pendente. Os padrões abaixo permanecem base documental até essa revisão visual.
 
 ## 1. Identidade
 
@@ -57,7 +57,7 @@ Usar sentence case em títulos e rótulos. Evitar CAIXA ALTA contínua, excesso 
 
 ## 4. Grid e densidade
 
-- Referência desktop: widescreen 16:9, área conceitual 1280 × 720 px. Confirmar a configuração efetiva da página no Power BI ao iniciar a Fase 5.1; o tema não define tamanho de canvas.
+- Referência desktop: widescreen 16:9. A Fase 5.1 adotou, por solicitação do usuário, canvas Full HD de 1920 × 1080 px. A composição implementada usa margens de 36 px e não substitui a referência conceitual compacta de 1280 × 720 px para páginas futuras.
 - Grid conceitual de 12 colunas, margem externa de 24 px e base de espaçamento de 8 px. Usar intervalos de 8, 16, 24 ou 32 px; elementos equivalentes compartilham largura, altura e alinhamento.
 - Referência vertical: cabeçalho 64 px; contexto/filtros 56 px; intervalos de 16 px; área analítica aproximada de 496 px; margem inferior 24 px e rodapé opcional até 24 px. Ajustar a área útil à página real e ao navegador.
 - Uma linha de filtros no desktop; evitar painéis que espremam os visuais. Reservar largura para títulos completos e rótulos pt-BR.
@@ -136,13 +136,20 @@ Sem 3D, eixo truncado sem aviso, excesso de decimais, legenda longa ou visuais d
 
 ## 9. Limites do tema e do Desktop
 
-O tema `powerbi/themes/infotech-light.json` configura nome, cores de série e status, gradiente, cores estruturais e classes tipográficas verificadas no schema publicado. O schema oficial mais recente encontrado foi o `reportThemeSchema-2.157.json`; o Desktop instalado é 2.158.1177.0 e ainda não havia schema 2.158 publicado nesta inspeção. A importação e a validação visual no Desktop ficam para a Fase 5.1, quando o tema for usado na primeira página.
+O tema `powerbi/themes/infotech-light.json` configura nome, cores de série e status, gradiente, cores estruturais e classes tipográficas verificadas no schema publicado. O schema oficial mais recente encontrado foi o `reportThemeSchema-2.157.json`; o Desktop instalado é 2.158.1177.0 e ainda não havia schema 2.158 publicado nesta inspeção. A importação do tema foi aceita pelo Desktop na Fase 5.1; o usuário confirmou que a página abre e os componentes aparecem. A revisão visual detalhada permanece pendente.
 
-O tema não define por si só tamanho/fundo da página, grid/posicionamento, filtros sincronizados, interações, texto alternativo, ordem de tabulação ou regras de formatação condicional. Raio de canto, sombra, estado do Page Navigator, unidades, eixos, rótulos e tooltips podem depender do tipo de visual e ajuste manual. Propriedades visuais só devem ser incluídas em `visualStyles` após confirmar o nome do visual e o caminho da propriedade no schema correspondente e verificar a renderização.
+O tema não define por si só tamanho/fundo da página, grid/posicionamento, filtros sincronizados, interações, texto alternativo, ordem de tabulação ou regras de formatação condicional. Raio de canto, sombra, estado do Page Navigator, unidades, eixos, rótulos e tooltips podem depender do tipo de visual e ajuste manual. Propriedades visuais só devem ser incluídas em `visualStyles` após confirmar o nome do visual e o caminho da propriedade no schema correspondente e verificar a renderização. Na Fase 5.1, o Desktop aceitou a importação e indicou o tema como atual; confirmar a renderização do tema aplicado aos visuais após reabrir o PBIP.
 
 O Desktop instalado expôs estes visuais nativos durante a inspeção do painel: barras/colunas agrupadas e empilhadas, 100% empilhadas, linha, área, combinações linha-coluna, ribbon, cascata, funil, dispersão, pizza/rosca, treemap, mapas, gauge, Card, KPI, slicer, tabela, matriz, visuais R/Python, Key influencers, decomposition tree, Narrative, imagem e outros. “Goals” e “List slicer” apareceram como Preview; componentes externos e versões Preview não são dependências da arquitetura v0.1. Page Navigator é nativo no menu de navegação do Power BI, separado da galeria de visuais.
 
-## 10. Governança e registro de decisões
+## 10. Evidência de implementação da Fase 5.1
+
+- Aplicados no PBIP o tema `InfoTech Intelligence — Light v0.1` e o fundo `#F5F7FB`; o Desktop aceitou a importação e indicou o tema como atual. Ao registrar o tema, expandiu `dataColors` de oito para 480 cores, mantendo os oito tokens iniciais na mesma ordem e sem alterar as demais propriedades do tema-fonte.
+- A página reutilizada foi definida em Full HD 1920×1080, com cabeçalho tipográfico, filtros compactos, quatro cartões, uma linha temporal e duas barras horizontais.
+- Os valores de contraste aprovados para texto primário e secundário continuam atendendo ao mínimo de 4,5:1 nos fundos previstos. O usuário confirmou a abertura e a presença dos componentes; a inspeção do canvas, escala de cinza, leitor de tela, foco e navegação por teclado ainda não foi concluída.
+- O espaçamento do canvas e a hierarquia foram codificados em PBIR, mas ainda não são classificados como visualmente homologados. Manter a versão v0.1; não promover tokens a v0.2 antes de confirmar a renderização no Desktop.
+
+## 11. Governança e registro de decisões
 
 Adicionar token/cor somente com contraste verificado, significado único, caso de uso, impacto nos visuais e atualização do tema. Novos componentes reutilizam grid, escala tipográfica, rótulos, unidades e estados deste documento. Mudança de identidade incrementa a versão e revisa todas as páginas e tema; páginas existentes não devem depender de cores locais sem decisão registrada.
 
