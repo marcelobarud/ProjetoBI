@@ -1,0 +1,637 @@
+{
+  "source": "Live Power BI Desktop local Import model; read-only DAX",
+  "capturedAt": "2026-10-13T11:41:36.2481351-03:00",
+  "scenarios": [
+    {
+      "dax": "EVALUATE ROW(\"Pedidos\",[Total de Pedidos],\"Concluidos\",[Pedidos Concluídos],\"Cancelados\",[Pedidos Cancelados],\"Confirmados\",[Pedidos Confirmados],\"Receita\",[Receita Líquida de Produtos — Antes de Devoluções],\"Ticket\",[Ticket Médio — Pedidos Concluídos],\"Conclusao\",[Taxa de Conclusão],\"Cancelamento\",[Taxa de Cancelamento],\"YTD\",[Receita YTD — Antes de Devoluções],\"YTDAnterior\",[Receita YTD Ano Anterior — Antes de Devoluções],\"YoY\",[Variação Percentual de Receita YTD YoY — Antes de Devoluções])",
+      "name": "global",
+      "rows": [
+        {
+          "[Pedidos]": 120000,
+          "[Concluidos]": 116305,
+          "[Cancelados]": 3265,
+          "[Confirmados]": 430,
+          "[Receita]": 949319764.19,
+          "[Ticket]": 8169.0941,
+          "[Conclusao]": 0.9692083333333333,
+          "[Cancelamento]": 0.027208333333333334,
+          "[YTD]": 234603762.77,
+          "[YTDAnterior]": null,
+          "[YoY]": null
+        }
+      ]
+    },
+    {
+      "dax": "EVALUATE CALCULATETABLE(ROW(\"Pedidos\",[Total de Pedidos],\"Concluidos\",[Pedidos Concluídos],\"Cancelados\",[Pedidos Cancelados],\"Confirmados\",[Pedidos Confirmados],\"Receita\",[Receita Líquida de Produtos — Antes de Devoluções],\"Ticket\",[Ticket Médio — Pedidos Concluídos],\"Conclusao\",[Taxa de Conclusão],\"Cancelamento\",[Taxa de Cancelamento],\"YTD\",[Receita YTD — Antes de Devoluções],\"YTDAnterior\",[Receita YTD Ano Anterior — Antes de Devoluções],\"YoY\",[Variação Percentual de Receita YTD YoY — Antes de Devoluções]),DATESBETWEEN('DimCalendario'[Data],DATE(2026,1,1),DATE(2026,9,30)))",
+      "name": "jan_set_2026",
+      "rows": [
+        {
+          "[Pedidos]": 30000,
+          "[Concluidos]": 28736,
+          "[Cancelados]": 834,
+          "[Confirmados]": 430,
+          "[Receita]": 234603762.77,
+          "[Ticket]": 8171.1022,
+          "[Conclusao]": 0.9578666666666666,
+          "[Cancelamento]": 0.0278,
+          "[YTD]": 234603762.77,
+          "[YTDAnterior]": 209080826.98,
+          "[YoY]": 0.12207210081697946
+        }
+      ]
+    },
+    {
+      "dax": "EVALUATE CALCULATETABLE(ROW(\"Pedidos\",[Total de Pedidos],\"Concluidos\",[Pedidos Concluídos],\"Cancelados\",[Pedidos Cancelados],\"Confirmados\",[Pedidos Confirmados],\"Receita\",[Receita Líquida de Produtos — Antes de Devoluções],\"Ticket\",[Ticket Médio — Pedidos Concluídos],\"Conclusao\",[Taxa de Conclusão],\"Cancelamento\",[Taxa de Cancelamento],\"YTD\",[Receita YTD — Antes de Devoluções],\"YTDAnterior\",[Receita YTD Ano Anterior — Antes de Devoluções],\"YoY\",[Variação Percentual de Receita YTD YoY — Antes de Devoluções]),DATESBETWEEN('DimCalendario'[Data],DATE(2025,1,1),DATE(2025,9,30)))",
+      "name": "jan_set_2025",
+      "rows": [
+        {
+          "[Pedidos]": 25732,
+          "[Concluidos]": 25034,
+          "[Cancelados]": 698,
+          "[Confirmados]": null,
+          "[Receita]": 209080826.98,
+          "[Ticket]": 8358.7103,
+          "[Conclusao]": 0.9728742421887144,
+          "[Cancelamento]": 0.02712575781128556,
+          "[YTD]": 209080826.98,
+          "[YTDAnterior]": 170523082.92,
+          "[YoY]": 0.22611451423317958
+        }
+      ]
+    },
+    {
+      "dax": "EVALUATE CALCULATETABLE(ROW(\"Pedidos\",[Total de Pedidos],\"Concluidos\",[Pedidos Concluídos],\"Cancelados\",[Pedidos Cancelados],\"Confirmados\",[Pedidos Confirmados],\"Receita\",[Receita Líquida de Produtos — Antes de Devoluções],\"Ticket\",[Ticket Médio — Pedidos Concluídos],\"Conclusao\",[Taxa de Conclusão],\"Cancelamento\",[Taxa de Cancelamento],\"YTD\",[Receita YTD — Antes de Devoluções],\"YTDAnterior\",[Receita YTD Ano Anterior — Antes de Devoluções],\"YoY\",[Variação Percentual de Receita YTD YoY — Antes de Devoluções]),DATESBETWEEN('DimCalendario'[Data],DATE(2026,1,1),DATE(2026,9,30)),TREATAS({\"Loja física\"},'DimCanal'[name]))",
+      "name": "canal_fisico_2026",
+      "rows": [
+        {
+          "[Pedidos]": 15000,
+          "[Concluidos]": 14577,
+          "[Cancelados]": 423,
+          "[Confirmados]": null,
+          "[Receita]": 105619508.57,
+          "[Ticket]": 7245.6273,
+          "[Conclusao]": 0.9718,
+          "[Cancelamento]": 0.0282,
+          "[YTD]": 105619508.57,
+          "[YTDAnterior]": 96727080.28,
+          "[YoY]": 0.0919331821477368
+        }
+      ]
+    },
+    {
+      "dax": "EVALUATE CALCULATETABLE(ROW(\"Pedidos\",[Total de Pedidos],\"Concluidos\",[Pedidos Concluídos],\"Cancelados\",[Pedidos Cancelados],\"Confirmados\",[Pedidos Confirmados],\"Receita\",[Receita Líquida de Produtos — Antes de Devoluções],\"Ticket\",[Ticket Médio — Pedidos Concluídos],\"Conclusao\",[Taxa de Conclusão],\"Cancelamento\",[Taxa de Cancelamento],\"YTD\",[Receita YTD — Antes de Devoluções],\"YTDAnterior\",[Receita YTD Ano Anterior — Antes de Devoluções],\"YoY\",[Variação Percentual de Receita YTD YoY — Antes de Devoluções]),DATESBETWEEN('DimCalendario'[Data],DATE(2026,1,1),DATE(2026,9,30)),TREATAS({\"Unidade Sintética Equatorial\"},'DimLoja'[name]))",
+      "name": "loja_equatorial_2026",
+      "rows": [
+        {
+          "[Pedidos]": 1097,
+          "[Concluidos]": 1057,
+          "[Cancelados]": 40,
+          "[Confirmados]": null,
+          "[Receita]": 15501455.58,
+          "[Ticket]": 14665.5209,
+          "[Conclusao]": 0.9635369188696444,
+          "[Cancelamento]": 0.03646308113035551,
+          "[YTD]": 15501455.58,
+          "[YTDAnterior]": 13089569.16,
+          "[YoY]": 0.1842601838546686
+        }
+      ]
+    },
+    {
+      "dax": "EVALUATE CALCULATETABLE(ROW(\"Pedidos\",[Total de Pedidos],\"Concluidos\",[Pedidos Concluídos],\"Cancelados\",[Pedidos Cancelados],\"Confirmados\",[Pedidos Confirmados],\"Receita\",[Receita Líquida de Produtos — Antes de Devoluções],\"Ticket\",[Ticket Médio — Pedidos Concluídos],\"Conclusao\",[Taxa de Conclusão],\"Cancelamento\",[Taxa de Cancelamento],\"YTD\",[Receita YTD — Antes de Devoluções],\"YTDAnterior\",[Receita YTD Ano Anterior — Antes de Devoluções],\"YoY\",[Variação Percentual de Receita YTD YoY — Antes de Devoluções]),DATESBETWEEN('DimCalendario'[Data],DATE(2026,1,1),DATE(2026,9,30)),TREATAS({\"Loja física\"},'DimCanal'[name]),TREATAS({\"Unidade Sintética Equatorial\"},'DimLoja'[name]))",
+      "name": "combinado_2026",
+      "rows": [
+        {
+          "[Pedidos]": 1097,
+          "[Concluidos]": 1057,
+          "[Cancelados]": 40,
+          "[Confirmados]": null,
+          "[Receita]": 15501455.58,
+          "[Ticket]": 14665.5209,
+          "[Conclusao]": 0.9635369188696444,
+          "[Cancelamento]": 0.03646308113035551,
+          "[YTD]": 15501455.58,
+          "[YTDAnterior]": 13089569.16,
+          "[YoY]": 0.1842601838546686
+        }
+      ]
+    },
+    {
+      "dax": "EVALUATE CALCULATETABLE(ROW(\"Pedidos\",[Total de Pedidos],\"Concluidos\",[Pedidos Concluídos],\"Cancelados\",[Pedidos Cancelados],\"Confirmados\",[Pedidos Confirmados],\"Receita\",[Receita Líquida de Produtos — Antes de Devoluções],\"Ticket\",[Ticket Médio — Pedidos Concluídos],\"Conclusao\",[Taxa de Conclusão],\"Cancelamento\",[Taxa de Cancelamento],\"YTD\",[Receita YTD — Antes de Devoluções],\"YTDAnterior\",[Receita YTD Ano Anterior — Antes de Devoluções],\"YoY\",[Variação Percentual de Receita YTD YoY — Antes de Devoluções]),DATESBETWEEN('DimCalendario'[Data],DATE(2026,9,30),DATE(2026,9,30)))",
+      "name": "sem_dados",
+      "rows": [
+        {
+          "[Pedidos]": null,
+          "[Concluidos]": null,
+          "[Cancelados]": null,
+          "[Confirmados]": null,
+          "[Receita]": null,
+          "[Ticket]": null,
+          "[Conclusao]": null,
+          "[Cancelamento]": null,
+          "[YTD]": 234603762.77,
+          "[YTDAnterior]": 209080826.98,
+          "[YoY]": 0.12207210081697946
+        }
+      ]
+    },
+    {
+      "dax": "EVALUATE SUMMARIZECOLUMNS('DimCanal'[name],\"Pedidos\",[Total de Pedidos],\"Receita\",[Receita Líquida de Produtos — Antes de Devoluções]) ORDER BY [Receita] DESC",
+      "name": "canais",
+      "rows": [
+        {
+          "DimCanal[name]": "Loja física",
+          "[Pedidos]": 62580,
+          "[Receita]": 450481410.49
+        },
+        {
+          "DimCanal[name]": "E-commerce próprio",
+          "[Pedidos]": 35400,
+          "[Receita]": 306169014.92
+        },
+        {
+          "DimCanal[name]": "Marketplace genérico Aurora",
+          "[Pedidos]": 11460,
+          "[Receita]": 98879478.9
+        },
+        {
+          "DimCanal[name]": "Marketplace genérico Horizonte",
+          "[Pedidos]": 10560,
+          "[Receita]": 93789859.88
+        }
+      ]
+    },
+    {
+      "dax": "EVALUATE SUMMARIZECOLUMNS('DimLoja'[name],\"Pedidos\",[Total de Pedidos],\"Receita\",[Receita Líquida de Produtos — Antes de Devoluções]) ORDER BY [Receita] DESC",
+      "name": "lojas",
+      "rows": [
+        {
+          "DimLoja[name]": null,
+          "[Pedidos]": 57420,
+          "[Receita]": 498838353.7
+        },
+        {
+          "DimLoja[name]": "Unidade Sintética Equatorial",
+          "[Pedidos]": 3940,
+          "[Receita]": 57080200.74
+        },
+        {
+          "DimLoja[name]": "Unidade Sintética Cerrado",
+          "[Pedidos]": 4724,
+          "[Receita]": 50468504.91
+        },
+        {
+          "DimLoja[name]": "Unidade Sintética Capibaribe",
+          "[Pedidos]": 4595,
+          "[Receita]": 50352857.83
+        },
+        {
+          "DimLoja[name]": "Unidade Sintética Serra",
+          "[Pedidos]": 6163,
+          "[Receita]": 46796862.71
+        },
+        {
+          "DimLoja[name]": "Unidade Sintética Guanabara",
+          "[Pedidos]": 6082,
+          "[Receita]": 45785588.52
+        },
+        {
+          "DimLoja[name]": "Unidade Sintética Campinas",
+          "[Pedidos]": 5940,
+          "[Receita]": 44086606.67
+        },
+        {
+          "DimLoja[name]": "Unidade Sintética Ilha",
+          "[Pedidos]": 5839,
+          "[Receita]": 43906493.66
+        },
+        {
+          "DimLoja[name]": "Unidade Sintética Pinhal",
+          "[Pedidos]": 8433,
+          "[Receita]": 38480194.42
+        },
+        {
+          "DimLoja[name]": "Unidade Sintética Horizonte Paulista",
+          "[Pedidos]": 8600,
+          "[Receita]": 37946851.73
+        },
+        {
+          "DimLoja[name]": "Unidade Sintética Pampa",
+          "[Pedidos]": 8264,
+          "[Receita]": 35577249.3
+        }
+      ]
+    },
+    {
+      "dax": "EVALUATE SUMMARIZECOLUMNS('DimCalendario'[AnoMes],\"Pedidos\",[Total de Pedidos],\"Concluidos\",[Pedidos Concluídos],\"Receita\",[Receita Líquida de Produtos — Antes de Devoluções]) ORDER BY 'DimCalendario'[AnoMes]",
+      "name": "meses",
+      "rows": [
+        {
+          "DimCalendario[AnoMes]": "2023-01",
+          "[Pedidos]": 1735,
+          "[Concluidos]": 1684,
+          "[Receita]": 12886936.08
+        },
+        {
+          "DimCalendario[AnoMes]": "2023-02",
+          "[Pedidos]": 1928,
+          "[Concluidos]": 1878,
+          "[Receita]": 15155155.26
+        },
+        {
+          "DimCalendario[AnoMes]": "2023-03",
+          "[Pedidos]": 1928,
+          "[Concluidos]": 1875,
+          "[Receita]": 14724519.57
+        },
+        {
+          "DimCalendario[AnoMes]": "2023-04",
+          "[Pedidos]": 1928,
+          "[Concluidos]": 1873,
+          "[Receita]": 15181598.97
+        },
+        {
+          "DimCalendario[AnoMes]": "2023-05",
+          "[Pedidos]": 1927,
+          "[Concluidos]": 1878,
+          "[Receita]": 15228900.09
+        },
+        {
+          "DimCalendario[AnoMes]": "2023-06",
+          "[Pedidos]": 1927,
+          "[Concluidos]": 1875,
+          "[Receita]": 15022582.29
+        },
+        {
+          "DimCalendario[AnoMes]": "2023-07",
+          "[Pedidos]": 1927,
+          "[Concluidos]": 1868,
+          "[Receita]": 15339621.77
+        },
+        {
+          "DimCalendario[AnoMes]": "2023-08",
+          "[Pedidos]": 1927,
+          "[Concluidos]": 1880,
+          "[Receita]": 14450469.7
+        },
+        {
+          "DimCalendario[AnoMes]": "2023-09",
+          "[Pedidos]": 1927,
+          "[Concluidos]": 1875,
+          "[Receita]": 14642092.22
+        },
+        {
+          "DimCalendario[AnoMes]": "2023-10",
+          "[Pedidos]": 1929,
+          "[Concluidos]": 1882,
+          "[Receita]": 15123103.89
+        },
+        {
+          "DimCalendario[AnoMes]": "2023-11",
+          "[Pedidos]": 2699,
+          "[Concluidos]": 2616,
+          "[Receita]": 21046440.38
+        },
+        {
+          "DimCalendario[AnoMes]": "2023-12",
+          "[Pedidos]": 2218,
+          "[Concluidos]": 2164,
+          "[Receita]": 17534278.07
+        },
+        {
+          "DimCalendario[AnoMes]": "2024-01",
+          "[Pedidos]": 2169,
+          "[Concluidos]": 2115,
+          "[Receita]": 17403336.89
+        },
+        {
+          "DimCalendario[AnoMes]": "2024-02",
+          "[Pedidos]": 2410,
+          "[Concluidos]": 2343,
+          "[Receita]": 19023395.51
+        },
+        {
+          "DimCalendario[AnoMes]": "2024-03",
+          "[Pedidos]": 2410,
+          "[Concluidos]": 2338,
+          "[Receita]": 19526752.26
+        },
+        {
+          "DimCalendario[AnoMes]": "2024-04",
+          "[Pedidos]": 2410,
+          "[Concluidos]": 2341,
+          "[Receita]": 19001274.41
+        },
+        {
+          "DimCalendario[AnoMes]": "2024-05",
+          "[Pedidos]": 2410,
+          "[Concluidos]": 2349,
+          "[Receita]": 18970868.79
+        },
+        {
+          "DimCalendario[AnoMes]": "2024-06",
+          "[Pedidos]": 2410,
+          "[Concluidos]": 2347,
+          "[Receita]": 19153918.21
+        },
+        {
+          "DimCalendario[AnoMes]": "2024-07",
+          "[Pedidos]": 2410,
+          "[Concluidos]": 2347,
+          "[Receita]": 18936725.23
+        },
+        {
+          "DimCalendario[AnoMes]": "2024-08",
+          "[Pedidos]": 2410,
+          "[Concluidos]": 2346,
+          "[Receita]": 19353367.9
+        },
+        {
+          "DimCalendario[AnoMes]": "2024-09",
+          "[Pedidos]": 2409,
+          "[Concluidos]": 2347,
+          "[Receita]": 19153443.72
+        },
+        {
+          "DimCalendario[AnoMes]": "2024-10",
+          "[Pedidos]": 2410,
+          "[Concluidos]": 2341,
+          "[Receita]": 18766224.13
+        },
+        {
+          "DimCalendario[AnoMes]": "2024-11",
+          "[Pedidos]": 3372,
+          "[Concluidos]": 3280,
+          "[Receita]": 26257282.94
+        },
+        {
+          "DimCalendario[AnoMes]": "2024-12",
+          "[Pedidos]": 2770,
+          "[Concluidos]": 2694,
+          "[Receita]": 22168395.52
+        },
+        {
+          "DimCalendario[AnoMes]": "2025-01",
+          "[Pedidos]": 2603,
+          "[Concluidos]": 2532,
+          "[Receita]": 21761321.22
+        },
+        {
+          "DimCalendario[AnoMes]": "2025-02",
+          "[Pedidos]": 2892,
+          "[Concluidos]": 2814,
+          "[Receita]": 23325281.77
+        },
+        {
+          "DimCalendario[AnoMes]": "2025-03",
+          "[Pedidos]": 2892,
+          "[Concluidos]": 2821,
+          "[Receita]": 23342562.09
+        },
+        {
+          "DimCalendario[AnoMes]": "2025-04",
+          "[Pedidos]": 2892,
+          "[Concluidos]": 2806,
+          "[Receita]": 23522212.25
+        },
+        {
+          "DimCalendario[AnoMes]": "2025-05",
+          "[Pedidos]": 2892,
+          "[Concluidos]": 2815,
+          "[Receita]": 23322227.67
+        },
+        {
+          "DimCalendario[AnoMes]": "2025-06",
+          "[Pedidos]": 2891,
+          "[Concluidos]": 2813,
+          "[Receita]": 23305599.96
+        },
+        {
+          "DimCalendario[AnoMes]": "2025-07",
+          "[Pedidos]": 2890,
+          "[Concluidos]": 2809,
+          "[Receita]": 23703153.78
+        },
+        {
+          "DimCalendario[AnoMes]": "2025-08",
+          "[Pedidos]": 2890,
+          "[Concluidos]": 2811,
+          "[Receita]": 23376519.41
+        },
+        {
+          "DimCalendario[AnoMes]": "2025-09",
+          "[Pedidos]": 2890,
+          "[Concluidos]": 2813,
+          "[Receita]": 23421948.83
+        },
+        {
+          "DimCalendario[AnoMes]": "2025-10",
+          "[Pedidos]": 2893,
+          "[Concluidos]": 2814,
+          "[Receita]": 22829176.06
+        },
+        {
+          "DimCalendario[AnoMes]": "2025-11",
+          "[Pedidos]": 4049,
+          "[Concluidos]": 3943,
+          "[Receita]": 31873768.53
+        },
+        {
+          "DimCalendario[AnoMes]": "2025-12",
+          "[Pedidos]": 3326,
+          "[Concluidos]": 3242,
+          "[Receita]": 26881546.05
+        },
+        {
+          "DimCalendario[AnoMes]": "2026-01",
+          "[Pedidos]": 3034,
+          "[Concluidos]": 2946,
+          "[Receita]": 24306354.39
+        },
+        {
+          "DimCalendario[AnoMes]": "2026-02",
+          "[Pedidos]": 3372,
+          "[Concluidos]": 3287,
+          "[Receita]": 26490609.35
+        },
+        {
+          "DimCalendario[AnoMes]": "2026-03",
+          "[Pedidos]": 3372,
+          "[Concluidos]": 3280,
+          "[Receita]": 26563976.37
+        },
+        {
+          "DimCalendario[AnoMes]": "2026-04",
+          "[Pedidos]": 3372,
+          "[Concluidos]": 3278,
+          "[Receita]": 27116530.9
+        },
+        {
+          "DimCalendario[AnoMes]": "2026-05",
+          "[Pedidos]": 3370,
+          "[Concluidos]": 3270,
+          "[Receita]": 26883465.48
+        },
+        {
+          "DimCalendario[AnoMes]": "2026-06",
+          "[Pedidos]": 3370,
+          "[Concluidos]": 3277,
+          "[Receita]": 26952346.88
+        },
+        {
+          "DimCalendario[AnoMes]": "2026-07",
+          "[Pedidos]": 3370,
+          "[Concluidos]": 3266,
+          "[Receita]": 27034955.45
+        },
+        {
+          "DimCalendario[AnoMes]": "2026-08",
+          "[Pedidos]": 3370,
+          "[Concluidos]": 3286,
+          "[Receita]": 26600930.53
+        },
+        {
+          "DimCalendario[AnoMes]": "2026-09",
+          "[Pedidos]": 3370,
+          "[Concluidos]": 2846,
+          "[Receita]": 22654593.42
+        }
+      ]
+    },
+    {
+      "dax": "EVALUATE SUMMARIZECOLUMNS('FatoPedidos'[order_status],\"Pedidos\",[Total de Pedidos],\"Participacao\",[Participação de Pedidos por Status])",
+      "name": "statuses",
+      "rows": [
+        {
+          "FatoPedidos[order_status]": "completed",
+          "[Pedidos]": 116305,
+          "[Participacao]": 0.9692083333333333
+        },
+        {
+          "FatoPedidos[order_status]": "confirmed",
+          "[Pedidos]": 430,
+          "[Participacao]": 0.0035833333333333333
+        },
+        {
+          "FatoPedidos[order_status]": "cancelled",
+          "[Pedidos]": 3265,
+          "[Participacao]": 0.027208333333333334
+        }
+      ]
+    }
+  ],
+  "independentReconciliation": [
+    {
+      "dax": "EVALUATE ROW(\"Pedidos\",DISTINCTCOUNT('FatoPedidos'[sales_order_id]),\"Concluidos\",CALCULATE(DISTINCTCOUNT('FatoPedidos'[sales_order_id]),KEEPFILTERS('FatoPedidos'[order_status]=\"completed\")),\"Cancelados\",CALCULATE(DISTINCTCOUNT('FatoPedidos'[sales_order_id]),KEEPFILTERS('FatoPedidos'[order_status]=\"cancelled\")),\"Confirmados\",CALCULATE(DISTINCTCOUNT('FatoPedidos'[sales_order_id]),KEEPFILTERS('FatoPedidos'[order_status]=\"confirmed\")),\"Receita\",CALCULATE(SUMX('FatoPedidos','FatoPedidos'[subtotal_amount]-'FatoPedidos'[discount_amount]),KEEPFILTERS('FatoPedidos'[order_status]=\"completed\")),\"Ticket\",DIVIDE(CALCULATE(SUM('FatoPedidos'[total_amount]),KEEPFILTERS('FatoPedidos'[order_status]=\"completed\")),CALCULATE(DISTINCTCOUNT('FatoPedidos'[sales_order_id]),KEEPFILTERS('FatoPedidos'[order_status]=\"completed\"))))",
+      "result": "PASS: counts identical, money and ticket equal at cents; BLANK preserved",
+      "name": "global",
+      "rows": [
+        {
+          "[Pedidos]": 120000,
+          "[Concluidos]": 116305,
+          "[Cancelados]": 3265,
+          "[Confirmados]": 430,
+          "[Receita]": 949319764.19,
+          "[Ticket]": 8169.0941
+        }
+      ]
+    },
+    {
+      "dax": "EVALUATE CALCULATETABLE(ROW(\"Pedidos\",DISTINCTCOUNT('FatoPedidos'[sales_order_id]),\"Concluidos\",CALCULATE(DISTINCTCOUNT('FatoPedidos'[sales_order_id]),KEEPFILTERS('FatoPedidos'[order_status]=\"completed\")),\"Cancelados\",CALCULATE(DISTINCTCOUNT('FatoPedidos'[sales_order_id]),KEEPFILTERS('FatoPedidos'[order_status]=\"cancelled\")),\"Confirmados\",CALCULATE(DISTINCTCOUNT('FatoPedidos'[sales_order_id]),KEEPFILTERS('FatoPedidos'[order_status]=\"confirmed\")),\"Receita\",CALCULATE(SUMX('FatoPedidos','FatoPedidos'[subtotal_amount]-'FatoPedidos'[discount_amount]),KEEPFILTERS('FatoPedidos'[order_status]=\"completed\")),\"Ticket\",DIVIDE(CALCULATE(SUM('FatoPedidos'[total_amount]),KEEPFILTERS('FatoPedidos'[order_status]=\"completed\")),CALCULATE(DISTINCTCOUNT('FatoPedidos'[sales_order_id]),KEEPFILTERS('FatoPedidos'[order_status]=\"completed\")))),DATESBETWEEN('DimCalendario'[Data],DATE(2026,1,1),DATE(2026,9,30)))",
+      "result": "PASS: counts identical, money and ticket equal at cents; BLANK preserved",
+      "name": "jan_set_2026",
+      "rows": [
+        {
+          "[Pedidos]": 30000,
+          "[Concluidos]": 28736,
+          "[Cancelados]": 834,
+          "[Confirmados]": 430,
+          "[Receita]": 234603762.77,
+          "[Ticket]": 8171.1022
+        }
+      ]
+    },
+    {
+      "dax": "EVALUATE CALCULATETABLE(ROW(\"Pedidos\",DISTINCTCOUNT('FatoPedidos'[sales_order_id]),\"Concluidos\",CALCULATE(DISTINCTCOUNT('FatoPedidos'[sales_order_id]),KEEPFILTERS('FatoPedidos'[order_status]=\"completed\")),\"Cancelados\",CALCULATE(DISTINCTCOUNT('FatoPedidos'[sales_order_id]),KEEPFILTERS('FatoPedidos'[order_status]=\"cancelled\")),\"Confirmados\",CALCULATE(DISTINCTCOUNT('FatoPedidos'[sales_order_id]),KEEPFILTERS('FatoPedidos'[order_status]=\"confirmed\")),\"Receita\",CALCULATE(SUMX('FatoPedidos','FatoPedidos'[subtotal_amount]-'FatoPedidos'[discount_amount]),KEEPFILTERS('FatoPedidos'[order_status]=\"completed\")),\"Ticket\",DIVIDE(CALCULATE(SUM('FatoPedidos'[total_amount]),KEEPFILTERS('FatoPedidos'[order_status]=\"completed\")),CALCULATE(DISTINCTCOUNT('FatoPedidos'[sales_order_id]),KEEPFILTERS('FatoPedidos'[order_status]=\"completed\")))),DATESBETWEEN('DimCalendario'[Data],DATE(2025,1,1),DATE(2025,9,30)))",
+      "result": "PASS: counts identical, money and ticket equal at cents; BLANK preserved",
+      "name": "jan_set_2025",
+      "rows": [
+        {
+          "[Pedidos]": 25732,
+          "[Concluidos]": 25034,
+          "[Cancelados]": 698,
+          "[Confirmados]": null,
+          "[Receita]": 209080826.98,
+          "[Ticket]": 8358.7103
+        }
+      ]
+    },
+    {
+      "dax": "EVALUATE CALCULATETABLE(ROW(\"Pedidos\",DISTINCTCOUNT('FatoPedidos'[sales_order_id]),\"Concluidos\",CALCULATE(DISTINCTCOUNT('FatoPedidos'[sales_order_id]),KEEPFILTERS('FatoPedidos'[order_status]=\"completed\")),\"Cancelados\",CALCULATE(DISTINCTCOUNT('FatoPedidos'[sales_order_id]),KEEPFILTERS('FatoPedidos'[order_status]=\"cancelled\")),\"Confirmados\",CALCULATE(DISTINCTCOUNT('FatoPedidos'[sales_order_id]),KEEPFILTERS('FatoPedidos'[order_status]=\"confirmed\")),\"Receita\",CALCULATE(SUMX('FatoPedidos','FatoPedidos'[subtotal_amount]-'FatoPedidos'[discount_amount]),KEEPFILTERS('FatoPedidos'[order_status]=\"completed\")),\"Ticket\",DIVIDE(CALCULATE(SUM('FatoPedidos'[total_amount]),KEEPFILTERS('FatoPedidos'[order_status]=\"completed\")),CALCULATE(DISTINCTCOUNT('FatoPedidos'[sales_order_id]),KEEPFILTERS('FatoPedidos'[order_status]=\"completed\")))),DATESBETWEEN('DimCalendario'[Data],DATE(2026,1,1),DATE(2026,9,30)),TREATAS({\"Loja física\"},'DimCanal'[name]))",
+      "result": "PASS: counts identical, money and ticket equal at cents; BLANK preserved",
+      "name": "canal_fisico_2026",
+      "rows": [
+        {
+          "[Pedidos]": 15000,
+          "[Concluidos]": 14577,
+          "[Cancelados]": 423,
+          "[Confirmados]": null,
+          "[Receita]": 105619508.57,
+          "[Ticket]": 7245.6273
+        }
+      ]
+    },
+    {
+      "dax": "EVALUATE CALCULATETABLE(ROW(\"Pedidos\",DISTINCTCOUNT('FatoPedidos'[sales_order_id]),\"Concluidos\",CALCULATE(DISTINCTCOUNT('FatoPedidos'[sales_order_id]),KEEPFILTERS('FatoPedidos'[order_status]=\"completed\")),\"Cancelados\",CALCULATE(DISTINCTCOUNT('FatoPedidos'[sales_order_id]),KEEPFILTERS('FatoPedidos'[order_status]=\"cancelled\")),\"Confirmados\",CALCULATE(DISTINCTCOUNT('FatoPedidos'[sales_order_id]),KEEPFILTERS('FatoPedidos'[order_status]=\"confirmed\")),\"Receita\",CALCULATE(SUMX('FatoPedidos','FatoPedidos'[subtotal_amount]-'FatoPedidos'[discount_amount]),KEEPFILTERS('FatoPedidos'[order_status]=\"completed\")),\"Ticket\",DIVIDE(CALCULATE(SUM('FatoPedidos'[total_amount]),KEEPFILTERS('FatoPedidos'[order_status]=\"completed\")),CALCULATE(DISTINCTCOUNT('FatoPedidos'[sales_order_id]),KEEPFILTERS('FatoPedidos'[order_status]=\"completed\")))),DATESBETWEEN('DimCalendario'[Data],DATE(2026,1,1),DATE(2026,9,30)),TREATAS({\"Unidade Sintética Equatorial\"},'DimLoja'[name]))",
+      "result": "PASS: counts identical, money and ticket equal at cents; BLANK preserved",
+      "name": "loja_equatorial_2026",
+      "rows": [
+        {
+          "[Pedidos]": 1097,
+          "[Concluidos]": 1057,
+          "[Cancelados]": 40,
+          "[Confirmados]": null,
+          "[Receita]": 15501455.58,
+          "[Ticket]": 14665.5209
+        }
+      ]
+    },
+    {
+      "dax": "EVALUATE CALCULATETABLE(ROW(\"Pedidos\",DISTINCTCOUNT('FatoPedidos'[sales_order_id]),\"Concluidos\",CALCULATE(DISTINCTCOUNT('FatoPedidos'[sales_order_id]),KEEPFILTERS('FatoPedidos'[order_status]=\"completed\")),\"Cancelados\",CALCULATE(DISTINCTCOUNT('FatoPedidos'[sales_order_id]),KEEPFILTERS('FatoPedidos'[order_status]=\"cancelled\")),\"Confirmados\",CALCULATE(DISTINCTCOUNT('FatoPedidos'[sales_order_id]),KEEPFILTERS('FatoPedidos'[order_status]=\"confirmed\")),\"Receita\",CALCULATE(SUMX('FatoPedidos','FatoPedidos'[subtotal_amount]-'FatoPedidos'[discount_amount]),KEEPFILTERS('FatoPedidos'[order_status]=\"completed\")),\"Ticket\",DIVIDE(CALCULATE(SUM('FatoPedidos'[total_amount]),KEEPFILTERS('FatoPedidos'[order_status]=\"completed\")),CALCULATE(DISTINCTCOUNT('FatoPedidos'[sales_order_id]),KEEPFILTERS('FatoPedidos'[order_status]=\"completed\")))),DATESBETWEEN('DimCalendario'[Data],DATE(2026,1,1),DATE(2026,9,30)),TREATAS({\"Loja física\"},'DimCanal'[name]),TREATAS({\"Unidade Sintética Equatorial\"},'DimLoja'[name]))",
+      "result": "PASS: counts identical, money and ticket equal at cents; BLANK preserved",
+      "name": "combinado_2026",
+      "rows": [
+        {
+          "[Pedidos]": 1097,
+          "[Concluidos]": 1057,
+          "[Cancelados]": 40,
+          "[Confirmados]": null,
+          "[Receita]": 15501455.58,
+          "[Ticket]": 14665.5209
+        }
+      ]
+    },
+    {
+      "dax": "EVALUATE CALCULATETABLE(ROW(\"Pedidos\",DISTINCTCOUNT('FatoPedidos'[sales_order_id]),\"Concluidos\",CALCULATE(DISTINCTCOUNT('FatoPedidos'[sales_order_id]),KEEPFILTERS('FatoPedidos'[order_status]=\"completed\")),\"Cancelados\",CALCULATE(DISTINCTCOUNT('FatoPedidos'[sales_order_id]),KEEPFILTERS('FatoPedidos'[order_status]=\"cancelled\")),\"Confirmados\",CALCULATE(DISTINCTCOUNT('FatoPedidos'[sales_order_id]),KEEPFILTERS('FatoPedidos'[order_status]=\"confirmed\")),\"Receita\",CALCULATE(SUMX('FatoPedidos','FatoPedidos'[subtotal_amount]-'FatoPedidos'[discount_amount]),KEEPFILTERS('FatoPedidos'[order_status]=\"completed\")),\"Ticket\",DIVIDE(CALCULATE(SUM('FatoPedidos'[total_amount]),KEEPFILTERS('FatoPedidos'[order_status]=\"completed\")),CALCULATE(DISTINCTCOUNT('FatoPedidos'[sales_order_id]),KEEPFILTERS('FatoPedidos'[order_status]=\"completed\")))),DATESBETWEEN('DimCalendario'[Data],DATE(2026,9,30),DATE(2026,9,30)))",
+      "result": "PASS: counts identical, money and ticket equal at cents; BLANK preserved",
+      "name": "sem_dados",
+      "rows": [
+        {
+          "[Pedidos]": null,
+          "[Concluidos]": null,
+          "[Cancelados]": null,
+          "[Confirmados]": null,
+          "[Receita]": null,
+          "[Ticket]": null
+        }
+      ]
+    }
+  ],
+  "monthlyReconciliation": {
+    "completedOrders": 116305.0,
+    "result": "PASS",
+    "totalOrders": 120000.0,
+    "revenue": 949319764.1899997,
+    "months": 45
+  }
+}

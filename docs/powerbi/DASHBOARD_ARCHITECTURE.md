@@ -1,6 +1,6 @@
 # Arquitetura inicial dos dashboards — InfoTech Intelligence
 
-**Escopo:** arquitetura de cinco páginas para Desktop. A Visão Executiva foi homologada na Fase 5.1.2 com aprovação manual dos sete cenários, refinamento tipográfico e capturas do Desktop. O Design System v0.2 orienta as próximas páginas, com as limitações de escala/acessibilidade/desempenho documentadas. Relações, medidas e dados permanecem os aprovados no modelo semântico.
+**Escopo:** arquitetura planejada de cinco páginas para Desktop; duas reais implementadas e validadas: Visão Executiva e Análise Comercial (Fase 5.2). Design System v0.2 preservado, com navegação/sincronização e variações comerciais candidatas à v0.3. Relações, medidas e dados permanecem aprovados. Ver `phase-5.2-commercial-dashboard.md` para testes e limitações da segunda página.
 
 ## 1. Contratos do modelo usados no desenho
 
@@ -49,7 +49,7 @@ As células usam somente medidas que existem atualmente. Os valores de linha/col
 4. **Custos e Margens** — zonas separadas para coorte do pedido e fluxos operacionais.
 5. **Devoluções** — recebimentos e destinação; solicitação, aprovação, recebimento e refund são conceitos distintos.
 
-Page Navigator horizontal no cabeçalho, 5 títulos curtos e estado ativo aparente. Navegação nativa acompanha páginas. Não criar várias páginas manuais de “detalhe” nem botões um a um na versão inicial.
+Page Navigator horizontal no cabeçalho, atualmente com os dois destinos reais e estado ativo aparente. Os cinco títulos são planejamento; as três páginas seguintes não existem ainda. Navegação nativa acompanha páginas. Não criar várias páginas manuais de “detalhe” nem botões um a um na versão inicial.
 
 ## 5. Política de filtros compartilhados
 
@@ -62,7 +62,7 @@ Page Navigator horizontal no cabeçalho, 5 títulos curtos e estado ativo aparen
 | Cliente | Local por página quando útil | Não expor dados de contato/notas; usar identificador/nome legível apenas quando necessário |
 | Status | Local à análise que define seu significado | `order_status` e `return_status` não são intercambiáveis |
 
-Na página 1, a interação PBIR categoria → cartão `Pedidos Concluídos` está definida como `NoFilter`; período, canal e loja permanecem segmentadores locais. O usuário aprovou manualmente os cenários de filtros, limpeza e categoria na Fase 5.1.2. Novas páginas devem conferir suas próprias interações. O cabeçalho mostra somente o nome da página; o período atual é indicado no slicer, sem subtítulo temporal estático. Não criar tabelas desconectadas de data para simular seleções independentes sem autorização de alteração do modelo.
+Na página 1, categoria → cartão `Pedidos Concluídos` mantém `NoFilter`. Na Fase 5.2, Período, Canal e Loja passaram a usar grupos sincronizados entre páginas 1–2; seleção, alteração e limpeza foram exercitadas nos dois sentidos. Produto/Categoria não sincronizam. A Comercial usa `DataFilter` explícito entre temporais/rankings e demais cartões/gráficos; seleções de gráficos continuam locais à página. O cabeçalho mostra apenas o nome da página; período aparece no slicer. Não criar calendários desconectados para simular seleções independentes sem autorização do modelo.
 
 ## 6. Riscos e dependências
 
@@ -79,7 +79,7 @@ Na página 1, a interação PBIR categoria → cartão `Pedidos Concluídos` est
 | Fase futura | Resultado esperado |
 |---|---|
 | 5.1 / 5.1.2 | Visão Executiva homologada no escopo local; sete cenários aprovados manualmente, baseline DAX anterior preservado, eixos 16 pt, títulos 17 pt e legenda 15 pt; componentes e limitações em Design System v0.2 |
-| 5.2 | Implementar Análise Comercial usando componentes aprovados |
+| 5.2 | PASS local: quatro KPIs, status, dois temporais com escalas separadas, Canal/Top 5 lojas, navegador e filtros sincronizados. YTD visual deferido como refinamento específico, DAX validado. Sem tabela de clientes no layout atual; nenhuma nova métrica |
 | 5.3 | Implementar Produtos e Categorias sem atribuições de cabeçalho |
 | 5.4 | Implementar Custos e Margens com coorte e fluxo operacional separados |
 | 5.5 | Implementar Devoluções com solicitação e recebimento diferenciados |

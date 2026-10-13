@@ -132,6 +132,11 @@
           }
         }
       ]
+    },
+    "syncGroup": {
+      "fieldChanges": true,
+      "filterChanges": true,
+      "groupName": "InfoTech.Canal"
     }
   }
 }

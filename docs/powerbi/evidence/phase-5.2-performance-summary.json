@@ -1,0 +1,160 @@
+{
+  "source": "C:/Users/D2/AppData/Local/Temp/ProjetoBI-phase-5.2-performance.json",
+  "sha256": "5B92341B5400DA62C85AAF76D42DE4A33925533F39D50BAEC407D2D3A3C63BB3",
+  "sessionId": "5db03849-0e13-43a3-942b-34e6bbf033e0",
+  "sourceEvents": 2999,
+  "method": "end-start for complete Visual Container Lifecycle; commercial b* IDs only",
+  "startUtc": "2026-10-13T11:52:41.238Z",
+  "endUtc": "2026-10-13T11:59:09.361Z",
+  "conditions": "Local Import model, loaded before monitoring; cache state uncontrolled. Includes slicers, navigation, Refresh visuals and cross-filter; no PostgreSQL refresh.",
+  "actions": [
+    {
+      "count": 2,
+      "label": "UserAction_ChangePage"
+    },
+    {
+      "count": 10,
+      "label": "UserAction_ChangeSlicer"
+    },
+    {
+      "count": 4,
+      "label": "UserAction_CrossHighlight"
+    },
+    {
+      "count": 1,
+      "label": "UserAction_Refresh"
+    },
+    {
+      "count": 1,
+      "label": "UserAction_StartedMonitoring"
+    }
+  ],
+  "visuals": [
+    {
+      "visual": "Canal",
+      "samples": 17,
+      "minimumMs": 54.0,
+      "maximumMs": 401.0,
+      "averageMs": 225.53
+    },
+    {
+      "visual": "Cancelamento / total de pedidos",
+      "samples": 15,
+      "minimumMs": 279.0,
+      "maximumMs": 783.0,
+      "averageMs": 437.07
+    },
+    {
+      "visual": "Conclusão / total de pedidos",
+      "samples": 15,
+      "minimumMs": 280.0,
+      "maximumMs": 783.0,
+      "averageMs": 437.6
+    },
+    {
+      "visual": "Loja",
+      "samples": 16,
+      "minimumMs": 90.0,
+      "maximumMs": 400.0,
+      "averageMs": 235.0
+    },
+    {
+      "visual": "Page navigator",
+      "samples": 15,
+      "minimumMs": 127.0,
+      "maximumMs": 340.0,
+      "averageMs": 234.13
+    },
+    {
+      "visual": "Pedidos cancelados",
+      "samples": 15,
+      "minimumMs": 283.0,
+      "maximumMs": 785.0,
+      "averageMs": 438.93
+    },
+    {
+      "visual": "Pedidos concluídos",
+      "samples": 15,
+      "minimumMs": 284.0,
+      "maximumMs": 697.0,
+      "averageMs": 434.73
+    },
+    {
+      "visual": "Pedidos confirmados",
+      "samples": 15,
+      "minimumMs": 282.0,
+      "maximumMs": 784.0,
+      "averageMs": 433.27
+    },
+    {
+      "visual": "Período comercial",
+      "samples": 15,
+      "minimumMs": 155.0,
+      "maximumMs": 724.0,
+      "averageMs": 362.27
+    },
+    {
+      "visual": "Receita antes de devoluções",
+      "samples": 15,
+      "minimumMs": 283.0,
+      "maximumMs": 896.0,
+      "averageMs": 447.4
+    },
+    {
+      "visual": "Receita comercial mensal (R$ milhões)",
+      "samples": 15,
+      "minimumMs": 315.0,
+      "maximumMs": 912.0,
+      "averageMs": 520.6
+    },
+    {
+      "visual": "Receita comercial por canal (R$ milhões)",
+      "samples": 13,
+      "minimumMs": 313.0,
+      "maximumMs": 909.0,
+      "averageMs": 515.38
+    },
+    {
+      "visual": "Text box",
+      "samples": 15,
+      "minimumMs": 119.0,
+      "maximumMs": 322.0,
+      "averageMs": 217.8
+    },
+    {
+      "visual": "Ticket médio (inclui frete)",
+      "samples": 15,
+      "minimumMs": 282.0,
+      "maximumMs": 786.0,
+      "averageMs": 439.6
+    },
+    {
+      "visual": "Top 5 lojas — receita comercial (R$ milhões)",
+      "samples": 14,
+      "minimumMs": 311.0,
+      "maximumMs": 908.0,
+      "averageMs": 495.79
+    },
+    {
+      "visual": "Total de pedidos",
+      "samples": 15,
+      "minimumMs": 285.0,
+      "maximumMs": 790.0,
+      "averageMs": 441.13
+    },
+    {
+      "visual": "Volume mensal de pedidos",
+      "samples": 15,
+      "minimumMs": 314.0,
+      "maximumMs": 911.0,
+      "averageMs": 519.4
+    }
+  ],
+  "limitations": [
+    "Not initial cold-open latency",
+    "Overlapping durations cannot be summed into page time",
+    "Not comparable benchmark to phase 5.1.2",
+    "Full focus and screen reader compatibility not established",
+    "Captured before final responsive=false, axis 14 pt and layout spacing refinements; not a benchmark of the final typography."
+  ]
+}

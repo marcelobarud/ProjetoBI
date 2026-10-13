@@ -1,6 +1,6 @@
 # ProjetoBI — Plano Mestre de Conclusão e Preparação para Power BI
 
-**Status:** M5 PASS — Portfolio persistido e reconciliado; Fases 4.2–4.6 PASS; Fases 4.6.1–4.6.2 PARTIAL; Fase 5.0 PASS; Visão Executiva e Design System v0.2 homologados na Fase 5.1.2 (PASS, com limitações documentadas). O modelo permanece com 10 tabelas, 55 medidas, 11 pastas e 21 relações. Canvas Full HD 1920×1080. A Fase 5.2 está pronta para ser orientada pelo Design System e não foi iniciada. A configuração de limite de consultas permanece pendente desde a Fase 4.6.2.
+**Status:** M5 PASS — Portfolio persistido e reconciliado; Fases 4.2–4.6 PASS; Fases 4.6.1–4.6.2 PARTIAL; Fase 5.0 PASS; Visão Executiva e Design System v0.2 homologados na Fase 5.1.2 (PASS, com limitações documentadas). O modelo permanece com 10 tabelas, 55 medidas, 11 pastas e 21 relações. Canvas Full HD 1920×1080. A Fase 5.2 — Análise Comercial recebeu PASS local: duas páginas reais, navegação e filtros sincronizados, DAX reconciliado e persistência/recuperação validadas; limitações e YTD visual deferido documentados. A Fase 5.3 não foi iniciada. A configuração de limite de consultas permanece pendente desde a Fase 4.6.2.
 **Diretório:** `D:\Codex\ProjetoBI`
 **Objetivo principal:** concluir e validar o dataset Portfolio, disponibilizar baselines SQL confiáveis e preparar a exploração analítica no Power BI.
 
@@ -499,7 +499,7 @@ O objetivo completo será alcançado quando:
 | Fase 5.1 — Visão Executiva InfoTech | PASS por homologação na 5.1.2 | Tema, canvas Full HD, filtros, quatro KPIs, tendência mensal e rankings homologados no alcance documentado; sete cenários aprovados manualmente e baseline DAX da 5.1.1 preservado. Ver `docs/powerbi/phase-5.1.2-executive-dashboard-homologation.md`. |
 | Fase 5.1.1 — refinamento visual | PARTIAL histórico, fechado na 5.1.2 | Registro original preservado; Top 5 e valores foram reconciliados, e as pendências manuais receberam aprovação posterior. |
 | Fase 5.1.2 — homologação e Design System v0.2 | PASS | Eixos 16 pt, títulos 17 pt, legenda 15 pt, contexto temporal corrigido; componentes DS-C01–06, evidência manual, capturas e desempenho recuperado documentados. Limites de viewport pequeno, leitor de tela e medições sem condições de cache permanecem explícitos. |
-| Fase 5.2 — Análise Comercial | Não iniciada | Design System v0.2 pronto para orientar a implementação quando solicitada. |
+| Fase 5.2 — Análise Comercial | PASS local | Quatro KPIs, status/taxas, temporais separados, Canal/Top 5 lojas, Page Navigator e três slicers sincronizados. Sete contextos DAX contra agregações independentes, testes funcionais e salvar/fechar/reabrir passaram, incluindo recuperação após queda de energia. Design System v0.2 preservado; YTD visual deferido e restrições nativas/acessibilidade/desempenho documentadas em `docs/powerbi/phase-5.2-commercial-dashboard.md`. Fase 5.3 não iniciada. |
 
 ### Execução definitiva M5 — 2026-10-10
 

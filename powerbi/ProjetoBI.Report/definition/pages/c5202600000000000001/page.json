@@ -1,0 +1,249 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/page/2.1.0/schema.json",
+  "name": "c5202600000000000001",
+  "displayName": "Análise Comercial",
+  "displayOption": "FitToPage",
+  "height": 1080,
+  "width": 1920,
+  "objects": {
+    "background": [
+      {
+        "properties": {
+          "color": {
+            "solid": {
+              "color": {
+                "expr": {
+                  "Literal": {
+                    "Value": "'#F5F7FB'"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    ]
+  },
+  "visualInteractions": [
+    {
+      "target": "b3000000000000000001",
+      "type": "DataFilter",
+      "source": "b4000000000000000001"
+    },
+    {
+      "target": "b3000000000000000002",
+      "type": "DataFilter",
+      "source": "b4000000000000000001"
+    },
+    {
+      "target": "b3000000000000000003",
+      "type": "DataFilter",
+      "source": "b4000000000000000001"
+    },
+    {
+      "target": "b3000000000000000004",
+      "type": "DataFilter",
+      "source": "b4000000000000000001"
+    },
+    {
+      "target": "b3100000000000000001",
+      "type": "DataFilter",
+      "source": "b4000000000000000001"
+    },
+    {
+      "target": "b3100000000000000002",
+      "type": "DataFilter",
+      "source": "b4000000000000000001"
+    },
+    {
+      "target": "b3100000000000000003",
+      "type": "DataFilter",
+      "source": "b4000000000000000001"
+    },
+    {
+      "target": "b3100000000000000004",
+      "type": "DataFilter",
+      "source": "b4000000000000000001"
+    },
+    {
+      "target": "b4000000000000000002",
+      "type": "DataFilter",
+      "source": "b4000000000000000001"
+    },
+    {
+      "target": "b5000000000000000001",
+      "type": "DataFilter",
+      "source": "b4000000000000000001"
+    },
+    {
+      "target": "b5000000000000000002",
+      "type": "DataFilter",
+      "source": "b4000000000000000001"
+    },
+    {
+      "target": "b3000000000000000001",
+      "type": "DataFilter",
+      "source": "b4000000000000000002"
+    },
+    {
+      "target": "b3000000000000000002",
+      "type": "DataFilter",
+      "source": "b4000000000000000002"
+    },
+    {
+      "target": "b3000000000000000003",
+      "type": "DataFilter",
+      "source": "b4000000000000000002"
+    },
+    {
+      "target": "b3000000000000000004",
+      "type": "DataFilter",
+      "source": "b4000000000000000002"
+    },
+    {
+      "target": "b3100000000000000001",
+      "type": "DataFilter",
+      "source": "b4000000000000000002"
+    },
+    {
+      "target": "b3100000000000000002",
+      "type": "DataFilter",
+      "source": "b4000000000000000002"
+    },
+    {
+      "target": "b3100000000000000003",
+      "type": "DataFilter",
+      "source": "b4000000000000000002"
+    },
+    {
+      "target": "b3100000000000000004",
+      "type": "DataFilter",
+      "source": "b4000000000000000002"
+    },
+    {
+      "target": "b4000000000000000001",
+      "type": "DataFilter",
+      "source": "b4000000000000000002"
+    },
+    {
+      "target": "b5000000000000000001",
+      "type": "DataFilter",
+      "source": "b4000000000000000002"
+    },
+    {
+      "target": "b5000000000000000002",
+      "type": "DataFilter",
+      "source": "b4000000000000000002"
+    },
+    {
+      "target": "b3000000000000000001",
+      "type": "DataFilter",
+      "source": "b5000000000000000001"
+    },
+    {
+      "target": "b3000000000000000002",
+      "type": "DataFilter",
+      "source": "b5000000000000000001"
+    },
+    {
+      "target": "b3000000000000000003",
+      "type": "DataFilter",
+      "source": "b5000000000000000001"
+    },
+    {
+      "target": "b3000000000000000004",
+      "type": "DataFilter",
+      "source": "b5000000000000000001"
+    },
+    {
+      "target": "b3100000000000000001",
+      "type": "DataFilter",
+      "source": "b5000000000000000001"
+    },
+    {
+      "target": "b3100000000000000002",
+      "type": "DataFilter",
+      "source": "b5000000000000000001"
+    },
+    {
+      "target": "b3100000000000000003",
+      "type": "DataFilter",
+      "source": "b5000000000000000001"
+    },
+    {
+      "target": "b3100000000000000004",
+      "type": "DataFilter",
+      "source": "b5000000000000000001"
+    },
+    {
+      "target": "b4000000000000000001",
+      "type": "DataFilter",
+      "source": "b5000000000000000001"
+    },
+    {
+      "target": "b4000000000000000002",
+      "type": "DataFilter",
+      "source": "b5000000000000000001"
+    },
+    {
+      "target": "b5000000000000000002",
+      "type": "DataFilter",
+      "source": "b5000000000000000001"
+    },
+    {
+      "target": "b3000000000000000001",
+      "type": "DataFilter",
+      "source": "b5000000000000000002"
+    },
+    {
+      "target": "b3000000000000000002",
+      "type": "DataFilter",
+      "source": "b5000000000000000002"
+    },
+    {
+      "target": "b3000000000000000003",
+      "type": "DataFilter",
+      "source": "b5000000000000000002"
+    },
+    {
+      "target": "b3000000000000000004",
+      "type": "DataFilter",
+      "source": "b5000000000000000002"
+    },
+    {
+      "target": "b3100000000000000001",
+      "type": "DataFilter",
+      "source": "b5000000000000000002"
+    },
+    {
+      "target": "b3100000000000000002",
+      "type": "DataFilter",
+      "source": "b5000000000000000002"
+    },
+    {
+      "target": "b3100000000000000003",
+      "type": "DataFilter",
+      "source": "b5000000000000000002"
+    },
+    {
+      "target": "b3100000000000000004",
+      "type": "DataFilter",
+      "source": "b5000000000000000002"
+    },
+    {
+      "target": "b4000000000000000001",
+      "type": "DataFilter",
+      "source": "b5000000000000000002"
+    },
+    {
+      "target": "b4000000000000000002",
+      "type": "DataFilter",
+      "source": "b5000000000000000002"
+    },
+    {
+      "target": "b5000000000000000001",
+      "type": "DataFilter",
+      "source": "b5000000000000000002"
+    }
+  ]
+}

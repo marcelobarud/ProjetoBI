@@ -38,48 +38,7 @@
     "objects": {
       "general": [
         {
-          "properties": {
-            "filter": {
-              "filter": {
-                "Where": [
-                  {
-                    "Condition": {
-                      "Between": {
-                        "Expression": {
-                          "Column": {
-                            "Expression": {
-                              "SourceRef": {
-                                "Source": "d"
-                              }
-                            },
-                            "Property": "Data"
-                          }
-                        },
-                        "LowerBound": {
-                          "Literal": {
-                            "Value": "datetime'2026-01-01T00:00:00.0000000'"
-                          }
-                        },
-                        "UpperBound": {
-                          "Literal": {
-                            "Value": "datetime'2026-09-30T00:00:00.0000000'"
-                          }
-                        }
-                      }
-                    }
-                  }
-                ],
-                "From": [
-                  {
-                    "Entity": "DimCalendario",
-                    "Type": 0,
-                    "Name": "d"
-                  }
-                ],
-                "Version": 2
-              }
-            }
-          }
+          "properties": {}
         }
       ],
       "data": [
@@ -89,20 +48,6 @@
               "expr": {
                 "Literal": {
                   "Value": "'Between'"
-                }
-              }
-            },
-            "startDate": {
-              "expr": {
-                "Literal": {
-                  "Value": "datetime'2026-01-01T00:00:00.0000000'"
-                }
-              }
-            },
-            "endDate": {
-              "expr": {
-                "Literal": {
-                  "Value": "datetime'2026-09-30T00:00:00.0000000'"
                 }
               }
             }
@@ -192,6 +137,11 @@
         }
       ]
     },
-    "drillFilterOtherVisuals": true
+    "drillFilterOtherVisuals": true,
+    "syncGroup": {
+      "fieldChanges": true,
+      "filterChanges": true,
+      "groupName": "InfoTech.PeriodoComercial"
+    }
   }
 }

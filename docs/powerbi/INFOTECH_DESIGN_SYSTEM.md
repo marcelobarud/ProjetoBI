@@ -43,9 +43,9 @@ O tom de texto secundário foi escurecido tecnicamente em relação à sugestão
 
 ## 3. Tipografia
 
-Segoe UI e Segoe UI Semibold são usadas no Power BI. A escala abaixo registra as propriedades efetivas da Visão Executiva após o refinamento da Fase 5.1.2. Os ajustes locais dos visuais prevalecem sobre as classes gerais do tema.
+Segoe UI e Segoe UI Semibold são usadas no Power BI. A escala abaixo registra as propriedades configuradas na Visão Executiva após o refinamento da Fase 5.1.2. A inspeção nativa da Fase 5.2 identificou que o modo responsivo pode reduzir fontes ao renderizar; configuração não garante tamanho efetivo em todos os viewports. Os ajustes locais dos visuais prevalecem sobre as classes gerais do tema. Ver a ressalva e a variação comercial na seção 13.
 
-| Papel | Tamanho efetivo | Alinhamento/peso |
+| Papel | Referência configurada | Alinhamento/peso |
 |---|---:|---|
 | Wordmark principal | 30 pt | À esquerda, Segoe UI Semibold |
 | Nome da página | 12 pt | Segoe UI, texto secundário; sem período fixo |
@@ -90,7 +90,7 @@ Fundo branco; título de gráfico em 17 pt e de KPI em 13 pt; contorno discreto 
 
 ### Navegação
 
-**Proposto:** Page Navigator nativo em orientação horizontal e compacta, após conferir os rótulos e o espaço nas páginas futuras. A página ativa deve ter estado de seleção visível. Usar nomes concisos; ocultar páginas de drill-through se forem adicionadas no futuro. Um navegador nativo acompanha renomeação e ordenação de páginas.
+**Implementado e validado nas duas páginas reais na Fase 5.2; candidato à v0.3:** Page Navigator nativo horizontal e compacto com Visão Executiva e Análise Comercial. Página ativa Primary/branco; demais Surface/Text Primary. Páginas futuras e drill-through continuam propostos e exigem validação própria. Um navegador nativo acompanha renomeação e ordenação de páginas.
 
 ### Tooltips
 
@@ -204,3 +204,16 @@ Adicionar token/cor somente com contraste verificado, significado único, caso d
 | DS-010 | Nome da página sem período estático | Evitar contexto enganoso ao mudar datas | 2026-10-12 | Homologado na captura | DS-C01; textbox `a100...` |
 
 Mudanças pequenas de espaçamento podem ser incorporadas na próxima revisão; mudanças de significado, paleta ou interação recebem novo ID. A v0.2 homologa os componentes explicitamente identificados acima. As direções anteriores DS-001–004 são preservadas como histórico; tema JSON continua com a identidade v0.1, pois a revisão documental não redefine paleta nem exige renomear o recurso registrado.
+
+## 13. Variações comerciais e candidatos à v0.3 — Fase 5.2
+
+A versão permanece v0.2. A Análise Comercial reutiliza DS-C01–06; os padrões abaixo foram implementados e inspecionados nessa composição, mas reutilização em outras páginas exige validação.
+
+- **Navegação real:** 624 × 56 px, x1260/y30, texto 15 pt; dois destinos, estados branco/escuro e azul/branco. Cabeçalho em largura 1200 px nas duas páginas. Navegação nos dois sentidos após salvar/reabrir e após recuperação da queda de energia.
+- **Contexto sincronizado:** grupos `InfoTech.PeriodoComercial`, `InfoTech.Canal`, `InfoTech.Loja` nas duas páginas. Produto/Categoria ficam fora. Estado final limpo, sem impor Jan–Set/2026; esse intervalo é janela de teste.
+- **Status subordinado:** quatro cartões de 450 × 100 px, valor 24 pt/título 13 pt: Cancelados, Confirmados, Conclusão/Total, Cancelamento/Total. Confirmados não integram os outros status; preservar BLANK e o denominador.
+- **Fonte renderizada:** na primeira composição comercial, o Desktop mostrou `Axis font reduced` e 9 pt para eixo configurado em 16 pt. Nos quatro gráficos comerciais, `general.responsive=false` preserva a fonte; o painel nativo confirmou 16 pt. Temporais 912 × 280 px, eixos 16 pt/legenda 15 pt; barras 912 × 268 px, categorias 16 pt/eixo monetário 14 pt; títulos 17 pt. A Visão Executiva não recebeu mudança de responsividade nesta fase; registros históricos de tamanho configurado não são medição universal da fonte renderizada.
+- **Densidade temporal:** `AnoMes` ordenado, categoria mínima 80 px; rolagem necessária para intervalos longos, mantendo todos os pontos. Nove meses cabem na janela de teste. Inclinação/rotação é nativa; não reduzir automaticamente fonte para acomodar 45 nomes.
+- **Ranking de lojas:** Top 5 contextual incluindo `(Blank)` quando elegível; dez lojas nomeadas permanecem no slicer. Sem scrollbar na composição final. Ticks monetários podem quebrar linha ou truncar o último texto em contextos amplos/viewport reduzido; essa restrição não é padrão universal homologado. Tooltip BRL e título R$ milhões preservam unidade.
+
+YTD visual segue como refinamento específico por falta de espaço; contratos DAX validados. Acessibilidade completa e benchmark da última composição não foram estabelecidos. Ver [relatório da Fase 5.2](phase-5.2-commercial-dashboard.md). A [orientação Microsoft sobre responsividade](https://learn.microsoft.com/en-us/power-bi/create-reports/power-bi-create-mobile-optimized-report-format-visuals) descreve a adaptação nativa; cada componente deve ser conferido no painel e na renderização real.
