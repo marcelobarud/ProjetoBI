@@ -1,6 +1,8 @@
-# InfoTech Intelligence — Design System v0.1
+# InfoTech Intelligence — Design System v0.2
 
-**Estado:** v0.1 aplicada na composição PBIR da página Visão Executiva. Tema e canvas foram aceitos pelo Desktop; o usuário confirmou a reabertura e a presença dos componentes, enquanto a revisão visual detalhada ainda está pendente. Os padrões abaixo permanecem base documental até essa revisão visual.
+**Estado:** v0.2 consolidada na Fase 5.1.2. Os sete cenários de homologação receberam aprovação manual do usuário, com ressalva de tipografia corrigida nos três gráficos e reinspecionada por captura do Desktop. Ver `phase-5.1.2-executive-dashboard-homologation.md` para evidências e limitações.
+
+**Proposto** significa orientação ainda sem implementação validada; **implementado** significa presente no PBIP; **homologado** significa implementado e validado no Desktop por relato manual ou inspeção visual identificada. A homologação se limita aos cenários e ao ambiente documentados. Navegação futura, mobile, mensagens especiais de ausência de dados, tooltips personalizados e compatibilidade com leitor de tela continuam propostos ou não verificados.
 
 ## 1. Identidade
 
@@ -16,7 +18,7 @@ Usar “InfoTech Intelligence” como wordmark tipográfico no cabeçalho e “I
 
 ## 2. Tokens de cor
 
-| Token | Valor v0.1 | Uso | Contraste de texto medido |
+| Token | Valor preservado | Uso | Contraste de texto medido |
 |---|---|---|---|
 | Primary | `#2563EB` | Seleção, links e destaque principal | 5,17:1 em branco; 4,82:1 no fundo |
 | Secondary | `#0F9D92` | Série secundária e elementos de apoio | 3,36:1 em branco; usar em marcas/gráficos, não em texto pequeno |
@@ -41,23 +43,27 @@ O tom de texto secundário foi escurecido tecnicamente em relação à sugestão
 
 ## 3. Tipografia
 
-Segoe UI e Segoe UI Semibold estão instaladas no ambiente e são usadas pelo Power BI. O tema define somente classes de texto suportadas, sem substituir ajustes específicos que ainda precisam de teste.
+Segoe UI e Segoe UI Semibold são usadas no Power BI. A escala abaixo registra as propriedades efetivas da Visão Executiva após o refinamento da Fase 5.1.2. Os ajustes locais dos visuais prevalecem sobre as classes gerais do tema.
 
-| Papel | Faixa de projeto | Alinhamento/peso |
+| Papel | Tamanho efetivo | Alinhamento/peso |
 |---|---:|---|
-| Título principal da página | 24–28 pt | À esquerda, Segoe UI Semibold |
-| Título de seção | 16–18 pt | À esquerda, Semibold |
-| Título de visual | 12–14 pt | Frase curta, Semibold |
-| Valor KPI | 28–36 pt | Alinhado de forma consistente; unidade explícita |
-| Rótulo de KPI | 11–13 pt | Regular, diretamente acima ou ao lado do valor |
-| Eixo, legenda e tabela | 10–12 pt | Regular; evitar truncamento |
-| Nota/rodapé | 10–11 pt | Secundária; nunca carregar informação essencial |
+| Wordmark principal | 30 pt | À esquerda, Segoe UI Semibold |
+| Nome da página | 12 pt | Segoe UI, texto secundário; sem período fixo |
+| Título dos três gráficos | 17 pt | Segoe UI Semibold |
+| Valor KPI | 32 pt | Segoe UI Semibold; unidade explícita |
+| Título dos cartões e filtros | 13 pt | Segoe UI Semibold |
+| Valores dos slicers | 13 pt configurados | Segoe UI; tamanho final sujeito ao controle nativo |
+| Eixos X/Y e categorias dos três gráficos | 16 pt | Segoe UI |
+| Legenda temporal | 15 pt | Segoe UI |
+| Tabelas, notas e rodapé futuros | Proposto: 12–14 pt / 11–12 pt | Revalidar no visual implementado |
+
+O canvas é Full HD e foi inspecionado em Fit to Page, com capturas nas escalas 1 e 2 do bridge. A captura ampliada não representa uma troca do zoom do Desktop para 100%. Fit to Page reduz também as fontes conforme o espaço disponível: para 45 meses, o eixo categórico nativo inclina os rótulos e a leitura fica limitada em viewports pequenos. Esse comportamento denso não é um padrão homologado para qualquer intervalo; preferir uma janela temporal apropriada ou maior área de apresentação, preservando os pontos da série.
 
 Usar sentence case em títulos e rótulos. Evitar CAIXA ALTA contínua, excesso de pesos, itálico decorativo e textos abaixo de 10 pt. Reduzir conteúdo antes de reduzir tipografia.
 
 ## 4. Grid e densidade
 
-- Referência desktop: widescreen 16:9. A Fase 5.1 adotou, por solicitação do usuário, canvas Full HD de 1920 × 1080 px. A composição implementada usa margens de 36 px e não substitui a referência conceitual compacta de 1280 × 720 px para páginas futuras.
+- Referência implementada para as próximas páginas desktop: Full HD de 1920 × 1080 px (16:9), conforme solicitação do usuário, com margens de 36 px. A referência conceitual anterior de 1280 × 720 é histórica; suas dimensões não devem ser copiadas mecanicamente.
 - Grid conceitual de 12 colunas, margem externa de 24 px e base de espaçamento de 8 px. Usar intervalos de 8, 16, 24 ou 32 px; elementos equivalentes compartilham largura, altura e alinhamento.
 - Referência vertical: cabeçalho 64 px; contexto/filtros 56 px; intervalos de 16 px; área analítica aproximada de 496 px; margem inferior 24 px e rodapé opcional até 24 px. Ajustar a área útil à página real e ao navegador.
 - Uma linha de filtros no desktop; evitar painéis que espremam os visuais. Reservar largura para títulos completos e rótulos pt-BR.
@@ -74,7 +80,7 @@ Usar sentence case em títulos e rótulos. Evitar CAIXA ALTA contínua, excesso 
 
 ### Cards analíticos
 
-Fundo branco; título de 12–14 pt; contorno `#E2E8F0` ou separação por espaço; margens internas uniformes. Arredondamento pequeno, cor de fundo, sombra e borda dependem do visual e devem ser testados na Fase 5.1. O tema v0.1 não finge controlar esses detalhes.
+Fundo branco; título de gráfico em 17 pt e de KPI em 13 pt; contorno discreto ou separação por espaço; margens internas uniformes. As superfícies atuais foram inspecionadas no Desktop. Raio de canto, borda e sombra de outros tipos de visual exigem validação própria; não são garantidos pelo tema.
 
 ### Filtros
 
@@ -84,7 +90,7 @@ Fundo branco; título de 12–14 pt; contorno `#E2E8F0` ou separação por espa�
 
 ### Navegação
 
-Usar o Page Navigator nativo em orientação horizontal e compacta, se a validação visual da Fase 5.1 confirmar leitura dos cinco rótulos. A página ativa deve ter estado de seleção claramente visível. Usar nomes concisos; ocultar páginas de drill-through se forem adicionadas no futuro. Um navegador nativo acompanha renomeação e ordenação de páginas.
+**Proposto:** Page Navigator nativo em orientação horizontal e compacta, após conferir os rótulos e o espaço nas páginas futuras. A página ativa deve ter estado de seleção visível. Usar nomes concisos; ocultar páginas de drill-through se forem adicionadas no futuro. Um navegador nativo acompanha renomeação e ordenação de páginas.
 
 ### Tooltips
 
@@ -96,7 +102,7 @@ Cabeçalho distinto dos valores, totais identificáveis, BRL/contagem/% consiste
 
 ### Estados
 
-| Estado | Apresentação |
+| Estado | Apresentação proposta para novos componentes |
 |---|---|
 | Sem dados | Mensagem “Sem dados para os filtros selecionados”; não simular zero |
 | Filtro sem resultado | Manter filtros visíveis e explicar como limpar seleção |
@@ -106,7 +112,8 @@ Cabeçalho distinto dos valores, totais identificáveis, BRL/contagem/% consiste
 
 ## 6. Formatação numérica
 
-- Valores monetários em BRL; confirmar no Desktop a apresentação pt-BR (`R$`, separadores de milhar e decimal) das medidas existentes antes de homologar a primeira página.
+- Cartões financeiros em BRL com apresentação pt-BR (`R$`, milhar e decimal), confirmada no Desktop; percentual com duas casas e Pedidos concluídos como inteiro.
+- Os eixos monetários dos três gráficos usam milhões, precisão visual zero e fonte 16 pt. O Desktop renderiza o sufixo nativo `M`, que significa milhões; não presumir um sufixo personalizado `mi`. O tooltip nativo mantém a formatação do campo em BRL; tooltips personalizados não foram homologados.
 - Percentuais com duas casas por padrão; contagens inteiras; unidades abreviadas (mil, mi) somente quando preservarem leitura e houver contexto completo no tooltip.
 - Usar a formatação já homologada das medidas. Não alterar DAX nem arredondar valores intermediários para efeito visual. Não somar percentuais nem calcular margem pela média de margens mensais.
 - Valores zero permanecem zero; BLANK permanece vazio ou recebe estado “Sem dados”, conforme o visual. Tooltips, eixos, cards e tabelas compartilham unidade e precisão.
@@ -128,6 +135,8 @@ Sem 3D, eixo truncado sem aviso, excesso de decimais, legenda longa ou visuais d
 
 ## 8. Acessibilidade e interação
 
+O usuário aprovou manualmente o cenário de acessibilidade/desempenho entre os sete testes, sem detalhar teclas, estados de foco ou leitor de tela. Os onze visuais têm texto alternativo e tab order 0–10. A confirmação manual não comprova compatibilidade com leitor de tela, escala de cinza ou todos os estados de contraste; essas verificações específicas seguem não exercitadas.
+
 - Texto relevante com contraste ≥ 4,5:1 sobre o fundo real. Texto grande pode seguir o mínimo WCAG de 3:1, mas o sistema prioriza os valores acima. Não usar Border como texto.
 - Acrescentar título que descreva a pergunta e nomes de eixo com unidade. Definir texto alternativo para visuais, ordem de tabulação e foco visível no Desktop.
 - Garantir que filtros possam ser operados por teclado e que o estado selecionado não dependa apenas de cor.
@@ -136,20 +145,48 @@ Sem 3D, eixo truncado sem aviso, excesso de decimais, legenda longa ou visuais d
 
 ## 9. Limites do tema e do Desktop
 
-O tema `powerbi/themes/infotech-light.json` configura nome, cores de série e status, gradiente, cores estruturais e classes tipográficas verificadas no schema publicado. O schema oficial mais recente encontrado foi o `reportThemeSchema-2.157.json`; o Desktop instalado é 2.158.1177.0 e ainda não havia schema 2.158 publicado nesta inspeção. A importação do tema foi aceita pelo Desktop na Fase 5.1; o usuário confirmou que a página abre e os componentes aparecem. A revisão visual detalhada permanece pendente.
+O tema `powerbi/themes/infotech-light.json` configura nome, cores de série e status, gradiente, cores estruturais e classes tipográficas. Na inspeção histórica da Fase 5.0, o schema encontrado era `reportThemeSchema-2.157.json` e o Desktop instalado era 2.158.1177.0. A importação foi aceita na Fase 5.1; a renderização da Visão Executiva foi reinspecionada na Fase 5.1.2. A revisão documental v0.2 preserva o tema registrado v0.1 e acrescenta padrões locais validados.
 
-O tema não define por si só tamanho/fundo da página, grid/posicionamento, filtros sincronizados, interações, texto alternativo, ordem de tabulação ou regras de formatação condicional. Raio de canto, sombra, estado do Page Navigator, unidades, eixos, rótulos e tooltips podem depender do tipo de visual e ajuste manual. Propriedades visuais só devem ser incluídas em `visualStyles` após confirmar o nome do visual e o caminho da propriedade no schema correspondente e verificar a renderização. Na Fase 5.1, o Desktop aceitou a importação e indicou o tema como atual; confirmar a renderização do tema aplicado aos visuais após reabrir o PBIP.
+O tema não define por si só tamanho/fundo da página, grid/posicionamento, filtros sincronizados, interações, texto alternativo, ordem de tabulação ou regras de formatação condicional. Raio de canto, sombra, estado do Page Navigator, unidades, eixos, rótulos e tooltips podem depender do visual e de ajuste manual. Propriedades só devem ser incluídas em `visualStyles` após conferir o visual, o caminho suportado e a renderização. Novas páginas exigem inspeção própria no Desktop.
 
 O Desktop instalado expôs estes visuais nativos durante a inspeção do painel: barras/colunas agrupadas e empilhadas, 100% empilhadas, linha, área, combinações linha-coluna, ribbon, cascata, funil, dispersão, pizza/rosca, treemap, mapas, gauge, Card, KPI, slicer, tabela, matriz, visuais R/Python, Key influencers, decomposition tree, Narrative, imagem e outros. “Goals” e “List slicer” apareceram como Preview; componentes externos e versões Preview não são dependências da arquitetura v0.1. Page Navigator é nativo no menu de navegação do Power BI, separado da galeria de visuais.
 
-## 10. Evidência de implementação da Fase 5.1
+## 10. Evidência de homologação da Visão Executiva
 
 - Aplicados no PBIP o tema `InfoTech Intelligence — Light v0.1` e o fundo `#F5F7FB`; o Desktop aceitou a importação e indicou o tema como atual. Ao registrar o tema, expandiu `dataColors` de oito para 480 cores, mantendo os oito tokens iniciais na mesma ordem e sem alterar as demais propriedades do tema-fonte.
 - A página reutilizada foi definida em Full HD 1920×1080, com cabeçalho tipográfico, filtros compactos, quatro cartões, uma linha temporal e duas barras horizontais.
-- Os valores de contraste aprovados para texto primário e secundário continuam atendendo ao mínimo de 4,5:1 nos fundos previstos. O usuário confirmou a abertura e a presença dos componentes; a inspeção do canvas, escala de cinza, leitor de tela, foco e navegação por teclado ainda não foi concluída.
-- O espaçamento do canvas e a hierarquia foram codificados em PBIR, mas ainda não são classificados como visualmente homologados. Manter a versão v0.1; não promover tokens a v0.2 antes de confirmar a renderização no Desktop.
+- Os sete testes manuais foram aprovados pelo usuário na Fase 5.1.2: período, canal, loja, combinação, categoria, acessibilidade/desempenho e persistência. O relato é evidência manual, sem valores detalhados para cada seleção.
+- O cabeçalho contém somente InfoTech Intelligence e Visão Executiva; o período atual é identificado no slicer. A inspeção posterior ao refinamento confirmou quatro KPIs, quatro canais, cinco categorias, ausência de cortes nos nomes e ausência de scrollbar no ranking.
+- A exportação local `PowerBIPerformanceData.json` contém 153 eventos completos de ciclo de vida de visual, entre 45 e 408 ms, e ações de slicer/cross-highlight. Esses intervalos são calculados dos timestamps da sessão anterior ao refinamento; não equivalem a tempo de carregamento inicial da página, SLA ou benchmark após a mudança. Condições de cache e atribuição exata aos cenários não estão registradas. Ver o relatório da Fase 5.1.2.
+- Contraste dos tokens continua com as medições documentadas; leitor de tela e escala de cinza não são declarados testados.
 
-## 11. Governança e registro de decisões
+## 11. Biblioteca de componentes
+
+### DS-C01 — Cabeçalho corporativo
+
+**Homologado na Visão Executiva.** Wordmark 30 pt, nome da página 12 pt, cores Text Primary/Text Secondary; textbox em x=36, y=22, 1848 × 76 px. Usar o nome da página sem período estático quando o slicer permitir outras datas. Texto alternativo também deve evitar datas fixas. Depende da identidade InfoTech; Page Navigator futuro permanece proposto e precisa de validação dos rótulos e espaço.
+
+### DS-C02 — Barra de filtros
+
+**Homologada por relato manual e captura.** Período Between com `DimCalendario[Data]`, Canal/Loja em dropdowns nativos, um título por filtro e cabeçalho de campo oculto. Fonte configurada 13 pt. Referência x=36/820/1344, y=112; áreas 760/500/540 × 96 px. Usar os nomes das dimensões existentes; `All` representa ausência de restrição no Desktop deste ambiente. Seleção e limpeza passaram nos testes relatados. Não excluir membros em branco artificialmente nem transformar seleção múltipla em seleção única sem necessidade analítica. A presença e a leitura de membros em branco específicos não receberam evidência detalhada; novas páginas devem conferir esse estado. O intervalo salvo localmente após os testes foi limpo e é preservado; Jan–Set/2026 permanece contexto de referência, não texto fixo de cabeçalho.
+
+### DS-C03 — Cartão KPI
+
+**Homologado.** Quatro cartões nativos de 450 × 136 px, y=224, espaçamento horizontal 16 px; superfície branca e hierarquia título 13 pt / valor 32 pt. Usar medidas existentes de `_Medidas`; BRL e percentual com duas casas, contagens com precisão visual zero. Alinhamento e unidade devem seguir a captura. BLANK não é convertido em zero; mensagens especiais para ausência de dados e novos estados negativos continuam propostas até inspeção específica. Depende do contrato e da formatação do indicador; não copiar a lógica de uma medida entre grãos diferentes.
+
+### DS-C04 — Gráfico temporal
+
+**Homologado para a composição inspecionada, com ressalva de densidade em Fit to Page.** Linha de receita líquida e lucro bruto, `DimCalendario[AnoMes]` ordenado por `AnoMesOrdem`; coorte do pedido. Referência 1848 × 304 px, x=36, y=382. Título 17 pt, eixos 16 pt, legenda 15 pt, eixo monetário em milhões/zero casas; azul e verde-petróleo do tema. Subtítulo automático oculto. Não mudar grão, perspectiva ou escala por estética. O tooltip nativo usa os campos existentes; personalização de tooltip permanece proposta. A série de 45 meses mantém os pontos e rótulos inclinados; não homologar esse layout como solução universal para intervalos densos em telas reduzidas.
+
+### DS-C05 — Ranking horizontal
+
+**Homologado.** Canal e Top 5 em barras horizontais, 912 × 330 px, y=710, x=36/972. Títulos 17 pt; categorias e valores dos eixos 16 pt; milhões/zero casas. Nomes completos e espaçamento nativo foram inspecionados. O ranking usa `VisualTopN.ItemCount=5` e ordenação decrescente pela Receita Analítica Após Devoluções. Filtro e ordenação devem acompanhar o contexto; não simular Top N por recorte ou ocultação. O baseline de Jan–Set/2026 retornou cinco categorias sem empate no limite. Não há política adicional de desempate homologada para futuros dados com empate; qualquer mudança precisa de evidência no visual nativo e do contrato aprovado.
+
+### DS-C06 — Interações e contexto
+
+**Homologado nos cenários manuais relatados.** Período, Canal e Loja são filtros da página; categoria é seleção do gráfico financeiro. A interação categoria → Pedidos concluídos é `NoFilter`, protegendo a métrica de cabeçalho. Não sincronizar Produto/Categoria com páginas de métricas de pedido sem contrato de grão. As regras dependem das relações e medidas vigentes; reutilização exige conferir interações dos novos visuais, não apenas copiar cores e posições.
+
+## 12. Governança e registro de decisões
 
 Adicionar token/cor somente com contraste verificado, significado único, caso de uso, impacto nos visuais e atualização do tema. Novos componentes reutilizam grid, escala tipográfica, rótulos, unidades e estados deste documento. Mudança de identidade incrementa a versão e revisa todas as páginas e tema; páginas existentes não devem depender de cores locais sem decisão registrada.
 
@@ -159,5 +196,11 @@ Adicionar token/cor somente com contraste verificado, significado único, caso d
 | DS-002 | Base clara com azul, verde-petróleo e neutros | Leitura corporativa e poucos destaques simultâneos | 2026-10-12 | Aprovada como direção | Paleta tema e páginas |
 | DS-003 | Escurecer Text Secondary para `#5B6B82` | `#64748B` resulta em 4,44:1 sobre o canvas, abaixo do alvo 4,5:1 | 2026-10-12 | Proposta técnica v0.1 | Revalidar contraste quando o fundo mudar |
 | DS-004 | Usar somente visuais nativos estáveis no desenho inicial | Reduzir risco de compatibilidade e custo de manutenção | 2026-10-12 | Proposta | “Goals” e “List slicer” estão em Preview |
+| DS-005 | Between para período e dropdowns para Canal/Loja, rótulo único | Seleção legível e operação aprovada manualmente | 2026-10-12 | Homologado na Visão Executiva | DS-C02; slicers `a200...` |
+| DS-006 | Eixos 16 pt, títulos 17 pt e legenda 15 pt no Full HD | Corrigir ressalva de fonte pequena; preservar hierarquia | 2026-10-12 | Homologado na captura, com ressalva de densidade | DS-C04/05; gráficos `a400...`, `a500...`, `a600...` |
+| DS-007 | KPI 32 pt, título 13 pt; BRL/% duas casas e contagem inteira | Consistência e leitura; valores reconciliados | 2026-10-12 | Homologado | DS-C03; cartões `a300...` |
+| DS-008 | Top N real e ordenação decrescente | Exibir ranking contextual sem barras ocultas | 2026-10-12 | Homologado sem empate no baseline | DS-C05; `VisualTopN=5` |
+| DS-009 | Categoria não filtra Pedidos concluídos | Preservar o grão de cabeçalho | 2026-10-12 | Homologado por relato manual | DS-C06; interação `NoFilter` |
+| DS-010 | Nome da página sem período estático | Evitar contexto enganoso ao mudar datas | 2026-10-12 | Homologado na captura | DS-C01; textbox `a100...` |
 
-Mudanças pequenas de espaçamento podem ser incorporadas na próxima revisão do documento; mudanças de significado, paleta ou interação recebem novo ID. A versão 0.1 é fundação documental, não homologação visual.
+Mudanças pequenas de espaçamento podem ser incorporadas na próxima revisão; mudanças de significado, paleta ou interação recebem novo ID. A v0.2 homologa os componentes explicitamente identificados acima. As direções anteriores DS-001–004 são preservadas como histórico; tema JSON continua com a identidade v0.1, pois a revisão documental não redefine paleta nem exige renomear o recurso registrado.

@@ -1,6 +1,6 @@
 # Arquitetura inicial dos dashboards — InfoTech Intelligence
 
-**Escopo:** arquitetura de cinco páginas para Desktop. A Fase 5.1 compôs a primeira página no PBIR; o usuário confirmou a abertura e a presença dos componentes; a revisão visual detalhada e os testes de filtros ainda aguardam validação no Desktop. Relações, medidas e dados permanecem os aprovados no modelo semântico.
+**Escopo:** arquitetura de cinco páginas para Desktop. A Visão Executiva foi homologada na Fase 5.1.2 com aprovação manual dos sete cenários, refinamento tipográfico e capturas do Desktop. O Design System v0.2 orienta as próximas páginas, com as limitações de escala/acessibilidade/desempenho documentadas. Relações, medidas e dados permanecem os aprovados no modelo semântico.
 
 ## 1. Contratos do modelo usados no desenho
 
@@ -62,7 +62,7 @@ Page Navigator horizontal no cabeçalho, 5 títulos curtos e estado ativo aparen
 | Cliente | Local por página quando útil | Não expor dados de contato/notas; usar identificador/nome legível apenas quando necessário |
 | Status | Local à análise que define seu significado | `order_status` e `return_status` não são intercambiáveis |
 
-Na página 1, a interação PBIR categoria → cartão `Pedidos Concluídos` está definida como `NoFilter`; período, canal e loja permanecem segmentadores locais. A seleção de categoria não deve alterar silenciosamente o indicador de cabeçalho. O comportamento e os estados de limpeza ainda precisam ser testados no Desktop com dados reais. Não criar tabelas desconectadas de data para simular seleções independentes sem autorização de alteração do modelo.
+Na página 1, a interação PBIR categoria → cartão `Pedidos Concluídos` está definida como `NoFilter`; período, canal e loja permanecem segmentadores locais. O usuário aprovou manualmente os cenários de filtros, limpeza e categoria na Fase 5.1.2. Novas páginas devem conferir suas próprias interações. O cabeçalho mostra somente o nome da página; o período atual é indicado no slicer, sem subtítulo temporal estático. Não criar tabelas desconectadas de data para simular seleções independentes sem autorização de alteração do modelo.
 
 ## 6. Riscos e dependências
 
@@ -78,7 +78,7 @@ Na página 1, a interação PBIR categoria → cartão `Pedidos Concluídos` est
 
 | Fase futura | Resultado esperado |
 |---|---|
-| 5.1 | Implementada no PBIR em canvas Full HD com tema, KPIs, filtros, visuais e interação de categoria protegendo o cartão de pedidos; revisão visual, filtros, reconciliação e desempenho ainda pendentes |
+| 5.1 / 5.1.2 | Visão Executiva homologada no escopo local; sete cenários aprovados manualmente, baseline DAX anterior preservado, eixos 16 pt, títulos 17 pt e legenda 15 pt; componentes e limitações em Design System v0.2 |
 | 5.2 | Implementar Análise Comercial usando componentes aprovados |
 | 5.3 | Implementar Produtos e Categorias sem atribuições de cabeçalho |
 | 5.4 | Implementar Custos e Margens com coorte e fluxo operacional separados |

@@ -80,3 +80,7 @@ A captura de diagnóstico mostra o estado antes da correção do Top 5 e do limi
 O `INFOTECH_DESIGN_SYSTEM.md` permanece em v0.1. A mudança para v0.2 fica reservada à homologação após os testes de interação, acessibilidade, desempenho e persistência que ainda estão pendentes. As alterações preexistentes em `report.json`, `pt-BR.tmdl` e no JSON do título foram preservadas e ficaram fora do commit desta fase.
 
 **Classificação:** `FASE 5.1.1 PARTIAL — VALIDATION PENDING`
+
+## Fechamento posterior — Fase 5.1.2
+
+Em 2026-10-12, o usuário confirmou a aprovação manual dos sete cenários. A ressalva de tipografia foi refinada; o cabeçalho deixou de indicar um período fixo. A Visão Executiva e o Design System v0.2 foram homologados no alcance documentado em [phase-5.1.2-executive-dashboard-homologation.md](phase-5.1.2-executive-dashboard-homologation.md). A classificação PARTIAL acima permanece como registro histórico do encerramento original da Fase 5.1.1.

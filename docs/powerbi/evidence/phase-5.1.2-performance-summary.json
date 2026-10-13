@@ -1,0 +1,110 @@
+{
+  "source": "docs/powerbi/PowerBIPerformanceData.json",
+  "sha256": "17CE5248294B9AA840C41AD7918D113EE34118281650F6C38591A8C6D95BAD22",
+  "sourceVersion": "1.1.0",
+  "sourceEventCount": 1562,
+  "sessionId": "d29f03c8-57fd-410a-8008-58559fe51977",
+  "startUtc": "2026-10-13T01:49:55.2390000Z",
+  "endUtc": "2026-10-13T01:50:17.6580000Z",
+  "localWindow": "2026-10-12 22:49:55.239–22:50:17.658 America/Sao_Paulo",
+  "metric": "Visual Container Lifecycle: end minus start in milliseconds",
+  "limitations": [
+    "Manual session before phase 5.1.2 typography refinement",
+    "Initial page load and cold/warm cache conditions not recorded",
+    "Exact scenario to event mapping unavailable",
+    "Durations overlap and must not be summed into page response time"
+  ],
+  "actions": [
+    {
+      "label": "UserAction_ChangeSlicer",
+      "count": 11
+    },
+    {
+      "label": "UserAction_CrossHighlight",
+      "count": 3
+    },
+    {
+      "label": "UserAction_StartedMonitoring",
+      "count": 1
+    }
+  ],
+  "visuals": [
+    {
+      "visual": "Canal",
+      "samples": 15,
+      "minimumMs": 46.0,
+      "maximumMs": 237.0,
+      "averageMs": 124.8
+    },
+    {
+      "visual": "Evolução mensal de receita líquida e lucro bruto",
+      "samples": 14,
+      "minimumMs": 165.0,
+      "maximumMs": 408.0,
+      "averageMs": 274.79
+    },
+    {
+      "visual": "Loja",
+      "samples": 15,
+      "minimumMs": 45.0,
+      "maximumMs": 258.0,
+      "averageMs": 124.13
+    },
+    {
+      "visual": "Lucro bruto",
+      "samples": 14,
+      "minimumMs": 133.0,
+      "maximumMs": 376.0,
+      "averageMs": 216.43
+    },
+    {
+      "visual": "Margem bruta",
+      "samples": 14,
+      "minimumMs": 133.0,
+      "maximumMs": 377.0,
+      "averageMs": 222.0
+    },
+    {
+      "visual": "Pedidos concluídos",
+      "samples": 14,
+      "minimumMs": 133.0,
+      "maximumMs": 290.0,
+      "averageMs": 198.14
+    },
+    {
+      "visual": "Período comercial",
+      "samples": 14,
+      "minimumMs": 112.0,
+      "maximumMs": 354.0,
+      "averageMs": 182.36
+    },
+    {
+      "visual": "Receita líquida",
+      "samples": 14,
+      "minimumMs": 134.0,
+      "maximumMs": 376.0,
+      "averageMs": 216.57
+    },
+    {
+      "visual": "Receita líquida por canal",
+      "samples": 14,
+      "minimumMs": 163.0,
+      "maximumMs": 407.0,
+      "averageMs": 276.29
+    },
+    {
+      "visual": "Text box",
+      "samples": 14,
+      "minimumMs": 70.0,
+      "maximumMs": 226.0,
+      "averageMs": 116.71
+    },
+    {
+      "visual": "Top 5 categorias por receita líquida",
+      "samples": 11,
+      "minimumMs": 162.0,
+      "maximumMs": 354.0,
+      "averageMs": 255.73
+    }
+  ]
+}
