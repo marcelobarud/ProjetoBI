@@ -3,7 +3,7 @@
   "name": "a3000000000000000004",
   "position": {
     "x": 1434,
-    "y": 210,
+    "y": 224,
     "z": 1000,
     "height": 136,
     "width": 450,
@@ -63,7 +63,7 @@
             "labelPrecision": {
               "expr": {
                 "Literal": {
-                  "Value": "2L"
+                  "Value": "0L"
                 }
               }
             },
@@ -100,6 +100,33 @@
               "expr": {
                 "Literal": {
                   "Value": "true"
+                }
+              }
+            },
+            "fontFamily": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Segoe UI Semibold'"
+                }
+              }
+            },
+            "fontSize": {
+              "expr": {
+                "Literal": {
+                  "Value": "13D"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "general": [
+        {
+          "properties": {
+            "altText": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Contagem de pedidos concluídos.'"
                 }
               }
             }

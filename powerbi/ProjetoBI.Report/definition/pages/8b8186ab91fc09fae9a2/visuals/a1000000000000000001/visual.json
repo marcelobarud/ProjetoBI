@@ -5,7 +5,7 @@
     "z": 1000,
     "y": 22,
     "tabOrder": 0,
-    "height": 66,
+    "height": 76,
     "width": 1848,
     "x": 36
   },
@@ -23,7 +23,7 @@
                       "color": "#142238",
                       "bold": true,
                       "fontFamily": "Segoe UI Semibold",
-                      "fontSize": "24pt"
+                      "fontSize": "30pt"
                     }
                   }
                 ]
@@ -79,6 +79,19 @@
               "expr": {
                 "Literal": {
                   "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "general": [
+        {
+          "properties": {
+            "altText": {
+              "expr": {
+                "Literal": {
+                  "Value": "'InfoTech Intelligence — Visão Executiva, com dados comerciais de janeiro a setembro de 2026.'"
                 }
               }
             }

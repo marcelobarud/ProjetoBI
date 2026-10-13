@@ -3,7 +3,7 @@
   "name": "a3000000000000000003",
   "position": {
     "x": 968,
-    "y": 210,
+    "y": 224,
     "z": 1000,
     "height": 136,
     "width": 450,
@@ -100,6 +100,33 @@
               "expr": {
                 "Literal": {
                   "Value": "true"
+                }
+              }
+            },
+            "fontFamily": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Segoe UI Semibold'"
+                }
+              }
+            },
+            "fontSize": {
+              "expr": {
+                "Literal": {
+                  "Value": "13D"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "general": [
+        {
+          "properties": {
+            "altText": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Indicador de margem bruta analítica.'"
                 }
               }
             }
