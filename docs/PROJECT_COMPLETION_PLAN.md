@@ -1,6 +1,6 @@
 # ProjetoBI — Plano Mestre de Conclusão e Preparação para Power BI
 
-**Status:** M5 PASS — Portfolio persistido e reconciliado; Fases 4.2–4.6 PASS; Fases 4.6.1–4.6.2 PARTIAL. O modelo semântico tem 10 tabelas, 55 medidas e 21 relações; dashboards ainda não foram implementados. A configuração de limite de consultas permanece pendente: `Auto` não persistiu no ciclo de reabertura da Fase 4.6.2.
+**Status:** M5 PASS — Portfolio persistido e reconciliado; Fases 4.2–4.6 PASS; Fases 4.6.1–4.6.2 PARTIAL; Fase 5.0 PASS. O modelo semântico tem 10 tabelas, 55 medidas e 21 relações. A identidade InfoTech, o Design System e a arquitetura dos cinco dashboards estão documentados; páginas ainda não foram implementadas. A configuração de limite de consultas permanece pendente: `Auto` não persistiu no ciclo de reabertura da Fase 4.6.2.
 **Diretório:** `D:\Codex\ProjetoBI`
 **Objetivo principal:** concluir e validar o dataset Portfolio, disponibilizar baselines SQL confiáveis e preparar a exploração analítica no Power BI.
 
@@ -495,6 +495,7 @@ O objetivo completo será alcançado quando:
 | Fase 4.6 — auditoria integrada e working tree | PASS | 10 tabelas, 55 medidas em 11 pastas, 21 relações; validações SQL × DAX, filtros, datas e desempenho concluídas. Working tree inicial de 15 arquivos classificada e preservada, com plano seguro de regularização; dashboard não iniciado. Ver `docs/powerbi/phase-4.6-semantic-model-audit.md` e `docs/git/POWERBI_WORKTREE_AUDIT.md`. |
 | Fase 4.6.1 — regularização PBIP e working tree | PARTIAL | Diagrama preservado, PBIP reaberto, estrutura (10 tabelas, 55 medidas, 11 pastas, 21 relações) e oito regressões DAX verificadas. Auto não persistiu (`queryLimitOption=None`); o Desktop reintroduziu linhas em branco finais nos 13 TMDLs aprovados e em `_Medidas.tmdl`. Ver `docs/git/POWERBI_WORKTREE_REGULARIZATION.md`. |
 | Fase 4.6.2 — estabilização PBIP e serialização TMDL | PARTIAL | Os 14 TMDLs foram hash-estáveis após salvar/fechar/reabrir. `.gitattributes` limita a supressão de `blank-at-eof` aos TMDLs; testes confirmaram que espaços finais continuam detectáveis. Desktop 2.158.1177.0 abriu o modelo (10 tabelas, 55 medidas, 21 relações). A única tentativa de gravar `Auto` apareceu na interface, mas voltou a `No query limits` após reabrir; `report.json` foi restaurado ao original `None` e permanece fora dos commits. Não iniciar dashboards/publicação antes de resolver esse gate numa fase autorizada. Ver `docs/git/POWERBI_WORKTREE_STABILIZATION.md`. |
+| Fase 5.0 — identidade InfoTech e arquitetura dos dashboards | PASS | InfoTech Intelligence e Design System v0.1 definidos; matriz relaciona as cinco páginas a medidas existentes, dimensões, perspectivas temporais e riscos; tema JSON criado com propriedades documentadas no schema oficial publicado mais recente. Nenhuma página foi criada e o tema não foi aplicado ao PBIP. A Fase 5.1 permanece planejada, não iniciada. Ver `docs/powerbi/INFOTECH_DESIGN_SYSTEM.md`, `docs/powerbi/DASHBOARD_ARCHITECTURE.md` e `docs/powerbi/phase-5.0-dashboard-design.md`. |
 
 ### Execução definitiva M5 — 2026-10-10
 

@@ -1,0 +1,65 @@
+{
+  "$schema": "https://raw.githubusercontent.com/microsoft/powerbi-desktop-samples/main/Report%20Theme%20JSON%20Schema/reportThemeSchema-2.157.json",
+  "name": "InfoTech Intelligence — Light v0.1",
+  "dataColors": [
+    "#2563EB",
+    "#0F9D92",
+    "#D97706",
+    "#7C3AED",
+    "#B91C1C",
+    "#475569",
+    "#0891B2",
+    "#A16207"
+  ],
+  "good": "#15803D",
+  "neutral": "#B45309",
+  "bad": "#B91C1C",
+  "maximum": "#15803D",
+  "center": "#F5F7FB",
+  "minimum": "#B91C1C",
+  "null": "#E2E8F0",
+  "firstLevelElements": "#142238",
+  "secondLevelElements": "#5B6B82",
+  "thirdLevelElements": "#E2E8F0",
+  "fourthLevelElements": "#5B6B82",
+  "background": "#FFFFFF",
+  "secondaryBackground": "#E2E8F0",
+  "tableAccent": "#2563EB",
+  "textClasses": {
+    "callout": {
+      "fontFace": "Segoe UI Semibold",
+      "fontSize": 32,
+      "color": "#142238"
+    },
+    "header": {
+      "fontFace": "Segoe UI Semibold",
+      "fontSize": 16,
+      "color": "#142238"
+    },
+    "title": {
+      "fontFace": "Segoe UI Semibold",
+      "fontSize": 14,
+      "color": "#142238"
+    },
+    "largeTitle": {
+      "fontFace": "Segoe UI Semibold",
+      "fontSize": 26,
+      "color": "#142238"
+    },
+    "label": {
+      "fontFace": "Segoe UI",
+      "fontSize": 12,
+      "color": "#142238"
+    },
+    "lightLabel": {
+      "fontFace": "Segoe UI",
+      "fontSize": 11,
+      "color": "#5B6B82"
+    },
+    "smallLabel": {
+      "fontFace": "Segoe UI",
+      "fontSize": 10,
+      "color": "#5B6B82"
+    }
+  }
+}
