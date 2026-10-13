@@ -1,6 +1,6 @@
 # Arquitetura inicial dos dashboards — InfoTech Intelligence
 
-**Escopo:** arquitetura planejada de cinco páginas para Desktop; duas reais implementadas e validadas: Visão Executiva e Análise Comercial (Fase 5.2). Design System v0.2 preservado, com navegação/sincronização e variações comerciais candidatas à v0.3. Relações, medidas e dados permanecem aprovados. Ver `phase-5.2-commercial-dashboard.md` para testes e limitações da segunda página.
+**Escopo:** arquitetura planejada de cinco páginas para Desktop; três reais implementadas e validadas: Visão Executiva, Análise Comercial e Produtos e Categorias (Fase 5.3). Design System v0.2 preservado, com navegação/sincronização e componentes candidatos à v0.3. Relações, medidas e dados permanecem aprovados. Ver os relatórios das Fases 5.2 e 5.3 para testes e limitações.
 
 ## 1. Contratos do modelo usados no desenho
 
@@ -49,7 +49,7 @@ As células usam somente medidas que existem atualmente. Os valores de linha/col
 4. **Custos e Margens** — zonas separadas para coorte do pedido e fluxos operacionais.
 5. **Devoluções** — recebimentos e destinação; solicitação, aprovação, recebimento e refund são conceitos distintos.
 
-Page Navigator horizontal no cabeçalho, atualmente com os dois destinos reais e estado ativo aparente. Os cinco títulos são planejamento; as três páginas seguintes não existem ainda. Navegação nativa acompanha páginas. Não criar várias páginas manuais de “detalhe” nem botões um a um na versão inicial.
+Page Navigator horizontal no cabeçalho, atualmente com os três destinos reais e estado ativo aparente. Custos e Margens e Devoluções permanecem planejamento; não existem páginas futuras vazias. Navegação nativa acompanha páginas. Não criar várias páginas manuais de “detalhe” nem botões um a um na versão inicial.
 
 ## 5. Política de filtros compartilhados
 
@@ -80,9 +80,19 @@ Na página 1, categoria → cartão `Pedidos Concluídos` mantém `NoFilter`. Na
 |---|---|
 | 5.1 / 5.1.2 | Visão Executiva homologada no escopo local; sete cenários aprovados manualmente, baseline DAX anterior preservado, eixos 16 pt, títulos 17 pt e legenda 15 pt; componentes e limitações em Design System v0.2 |
 | 5.2 | PASS local: quatro KPIs, status, dois temporais com escalas separadas, Canal/Top 5 lojas, navegador e filtros sincronizados. YTD visual deferido como refinamento específico, DAX validado. Sem tabela de clientes no layout atual; nenhuma nova métrica |
-| 5.3 | Implementar Produtos e Categorias sem atribuições de cabeçalho |
+| 5.3 | PASS local: quatro KPIs financeiros por coorte, Top 5 produtos, todas as categorias, matriz Categoria → Produto, filtros locais pesquisáveis, contexto geral sincronizado e navegador com três destinos. Sem atribuições de cabeçalho; medidas/modelo preservados. Ver `phase-5.3-products-categories-dashboard.md` |
 | 5.4 | Implementar Custos e Margens com coorte e fluxo operacional separados |
 | 5.5 | Implementar Devoluções com solicitação e recebimento diferenciados |
 | 5.6 | Auditoria integrada visual, funcional, acessível, temporal e de desempenho |
 
 Este roteiro não autoriza a execução das fases seguintes.
+
+## 8. Composição implementada de Produtos e Categorias
+
+Full HD 1920 × 1080, 14 visuais. Receita após devoluções, COGS ajustado, lucro e margem usam medidas financeiras homologadas por coorte do pedido. Métricas de linhas/unidades ficam na matriz e tooltips, com pedidos distintos de itens e participação nos tooltips pertinentes. Nenhum cartão de valor de cabeçalho por produto.
+
+Período, Canal e Loja conservam os três grupos e passam a incluir exatamente um slicer por página 1–3. Categoria/Produto são locais à página 3; pesquisa nativa evita lista permanente do catálogo. As 18 interações explícitas dos rankings/matriz usam DataFilter. Grupos compartilhados não transportam seleções de gráficos nem filtros locais.
+
+Top 5 por receita no eixo SKU, com nome completo no tooltip, após teste do Top 10 com rolagem. Ranking de categorias inclui as 12, com rolagem vertical. Matriz inicialmente recolhida com sete medidas e percentuais recalculados, sem soma de margens. Ranking/matriz não eliminam negativos por filtro de apresentação. Escala monetária automática nos dois novos gráficos atende contextos globais e pequenos; cartões/tooltips conservam valores completos.
+
+Navegador 896 × 56 px e cabeçalho 920 × 76 px nas três páginas, sem mudar definições analíticas das anteriores. O modelo segue com 10 tabelas, 55 medidas, 11 pastas e 21 relações. PostgreSQL não foi acessado nesta fase. Candidatos à v0.3 e limites de densidade/viewport registrados no Design System v0.2.

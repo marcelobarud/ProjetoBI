@@ -1,0 +1,476 @@
+{
+  "model": {
+    "parentPid": 21484,
+    "msmdsrvPid": 24852,
+    "port": 50657,
+    "catalog": "a4dd4609-1a91-4642-9f50-076fba1c848b",
+    "tables": 10,
+    "measures": 55,
+    "displayFolders": 11,
+    "relationships": 21,
+    "active": 19,
+    "inactive": 2,
+    "importMode": "Desktop Import",
+    "queryErrors": 0
+  },
+  "timingsWarmMs": {
+    "productsGlobal1000": 459,
+    "productsJanSep2026_1000": 256,
+    "categories": 68,
+    "singleContextQueries": "18-56"
+  },
+  "global": {
+    "rowCount": 1000,
+    "MeasureRevenueBefore": 949319764.1900011,
+    "IndependentRevenueBefore": 949319764.1900011,
+    "MeasureReturnByOrder": 26730788.744999956,
+    "IndependentReturnByOrder": 26730788.744999956,
+    "MeasureRevenueAfter": 922588975.4449996,
+    "MeasureCOGSAdjusted": 717455650.2596453,
+    "IndependentCOGSOriginal": 725466564.623509,
+    "IndependentSellableReversal": 8010914.363862809,
+    "MeasureGrossProfit": 205133325.18535477,
+    "Rows": 241637.0,
+    "Units": 258994.0,
+    "derivedRevenueAfterIndependent": 922588975.4450011,
+    "derivedCogsAdjustedIndependent": 717455650.2596463,
+    "derivedProfitIndependent": 205133325.18535483,
+    "weightedMargin": 0.222345302886815
+  },
+  "janSep2026": {
+    "rowCount": 1000,
+    "MeasureRevenueBefore": 234603762.77000004,
+    "IndependentRevenueBefore": 234603762.77000004,
+    "MeasureReturnByOrder": 5943004.029999996,
+    "IndependentReturnByOrder": 5943004.029999996,
+    "MeasureRevenueAfter": 228660758.74000016,
+    "MeasureCOGSAdjusted": 176070150.08984244,
+    "IndependentCOGSOriginal": 177849100.5007231,
+    "IndependentSellableReversal": 1778950.4108806704,
+    "MeasureGrossProfit": 52590608.65015768,
+    "Rows": 60500.0,
+    "Units": 65409.0,
+    "derivedRevenueAfterIndependent": 228660758.74000004,
+    "derivedCogsAdjustedIndependent": 176070150.0898424,
+    "derivedProfitIndependent": 52590608.65015763,
+    "weightedMargin": 0.229994026696798
+  },
+  "notebooksJanSep2026": {
+    "rowCount": 84,
+    "MeasureRevenueBefore": 54362105.46,
+    "IndependentRevenueBefore": 54362105.46,
+    "MeasureReturnByOrder": 1487077.0699999998,
+    "IndependentReturnByOrder": 1487077.0699999998,
+    "MeasureRevenueAfter": 52875028.38999999,
+    "MeasureCOGSAdjusted": 41616385.24411977,
+    "IndependentCOGSOriginal": 41982115.76993267,
+    "IndependentSellableReversal": 365730.5258129,
+    "MeasureGrossProfit": 11258643.145880206,
+    "Rows": 5175.0,
+    "Units": 5581.0,
+    "derivedRevenueAfterIndependent": 52875028.39,
+    "derivedCogsAdjustedIndependent": 41616385.24411977,
+    "derivedProfitIndependent": 11258643.14588023,
+    "weightedMargin": 0.212929306871247
+  },
+  "graphicsJanSep2026": {
+    "rowCount": 84,
+    "MeasureRevenueBefore": 41097042.12,
+    "IndependentRevenueBefore": 41097042.12,
+    "MeasureReturnByOrder": 963602.8099999998,
+    "IndependentReturnByOrder": 963602.8099999998,
+    "MeasureRevenueAfter": 40133439.31000001,
+    "MeasureCOGSAdjusted": 32617437.48973421,
+    "IndependentCOGSOriginal": 32917913.066105496,
+    "IndependentSellableReversal": 300475.5763712901,
+    "MeasureGrossProfit": 7516001.8202658035,
+    "Rows": 5030.0,
+    "Units": 5452.0,
+    "derivedRevenueAfterIndependent": 40133439.309999995,
+    "derivedCogsAdjustedIndependent": 32617437.489734206,
+    "derivedProfitIndependent": 7516001.820265789,
+    "weightedMargin": 0.18727529834187545
+  },
+  "product65513": {
+    "product": "SKU-NOT-00001 / Notebook Nova 001",
+    "janSepRevenue": 611774.78,
+    "janSepProfit": 174447.42421288,
+    "janSepMargin": 0.285149747776265,
+    "globalRevenue": 2234404.92,
+    "globalProfit": 683439.26380906,
+    "globalMargin": 0.30587081942563
+  },
+  "equatorialJanSep": {
+    "category": "CAT-NOTEBOOK / Notebooks",
+    "channel": "CH-PHYSICAL / Loja física",
+    "store": "Unidade Sintética Equatorial",
+    "revenue": 3182873.24,
+    "cogs": 2555059.3245393,
+    "profit": 627813.9154607,
+    "margin": 0.197247539603776
+  },
+  "noDataEcommerceEquatorial": {
+    "revenue": null,
+    "cogs": null,
+    "profit": null,
+    "observation": "ROW returned BLANK values"
+  },
+  "historicalNegative": {
+    "year": 2025,
+    "customer": 2793808,
+    "store": "ST-PO-003",
+    "product": "SKU-MON-00342 / Monitor Vértice 342",
+    "revenue": 1355.02,
+    "profit": -160.043124
+  },
+  "top10Global": [
+    {
+      "product_id": 66389,
+      "sku": "SKU-NOT-00877",
+      "name": "Notebook Vértice 877",
+      "revenueAfter": 3489707.58
+    },
+    {
+      "product_id": 65873,
+      "sku": "SKU-NOT-00361",
+      "name": "Notebook Nova 361",
+      "revenueAfter": 3483765.3
+    },
+    {
+      "product_id": 66305,
+      "sku": "SKU-NOT-00793",
+      "name": "Notebook Pulso 793",
+      "revenueAfter": 3400081.19
+    },
+    {
+      "product_id": 66029,
+      "sku": "SKU-NOT-00517",
+      "name": "Notebook Prisma 517",
+      "revenueAfter": 3292054.6599999997
+    },
+    {
+      "product_id": 66461,
+      "sku": "SKU-NOT-00949",
+      "name": "Notebook Vértice 949",
+      "revenueAfter": 3242653.49
+    },
+    {
+      "product_id": 66509,
+      "sku": "SKU-NOT-00997",
+      "name": "Notebook Pulso 997",
+      "revenueAfter": 3180608.3049999997
+    },
+    {
+      "product_id": 65837,
+      "sku": "SKU-NOT-00325",
+      "name": "Notebook Pulso 325",
+      "revenueAfter": 3115864.63
+    },
+    {
+      "product_id": 65934,
+      "sku": "SKU-DES-00422",
+      "name": "Desktop Fluxo 422",
+      "revenueAfter": 3101703.4400000004
+    },
+    {
+      "product_id": 66209,
+      "sku": "SKU-NOT-00697",
+      "name": "Notebook Orbe 697",
+      "revenueAfter": 3039326.62
+    },
+    {
+      "product_id": 66293,
+      "sku": "SKU-NOT-00781",
+      "name": "Notebook Prisma 781",
+      "revenueAfter": 3031245.73
+    }
+  ],
+  "top10JanSep2026": [
+    {
+      "product_id": 65717,
+      "sku": "SKU-NOT-00205",
+      "name": "Notebook Prisma 205",
+      "revenueAfter": 999192.58
+    },
+    {
+      "product_id": 65984,
+      "sku": "SKU-GRA-00472",
+      "name": "Placa Gráfica Prisma 472",
+      "revenueAfter": 972987.81
+    },
+    {
+      "product_id": 66389,
+      "sku": "SKU-NOT-00877",
+      "name": "Notebook Vértice 877",
+      "revenueAfter": 952025.61
+    },
+    {
+      "product_id": 65729,
+      "sku": "SKU-NOT-00217",
+      "name": "Notebook Nova 217",
+      "revenueAfter": 935732.98
+    },
+    {
+      "product_id": 66029,
+      "sku": "SKU-NOT-00517",
+      "name": "Notebook Prisma 517",
+      "revenueAfter": 931338.67
+    },
+    {
+      "product_id": 66305,
+      "sku": "SKU-NOT-00793",
+      "name": "Notebook Pulso 793",
+      "revenueAfter": 918304.01
+    },
+    {
+      "product_id": 65802,
+      "sku": "SKU-DES-00290",
+      "name": "Desktop Vértice 290",
+      "revenueAfter": 912159.82
+    },
+    {
+      "product_id": 65933,
+      "sku": "SKU-NOT-00421",
+      "name": "Notebook Fluxo 421",
+      "revenueAfter": 908085.32
+    },
+    {
+      "product_id": 65682,
+      "sku": "SKU-DES-00170",
+      "name": "Desktop Fluxo 170",
+      "revenueAfter": 889751.8400000001
+    },
+    {
+      "product_id": 66317,
+      "sku": "SKU-NOT-00805",
+      "name": "Notebook Prisma 805",
+      "revenueAfter": 882523.89
+    }
+  ],
+  "categoriesGlobal": [
+    {
+      "categoryCode": "CAT-MEMORY",
+      "categoryName": "Memória",
+      "revenueAfter": 19000004.080000002,
+      "profit": 4859367.374877153,
+      "margin": 0.25575612270485115,
+      "itemLines": 19642
+    },
+    {
+      "categoryCode": "CAT-INPUT",
+      "categoryName": "Entrada",
+      "revenueAfter": 25140582.99,
+      "profit": 7326185.258793049,
+      "margin": 0.29140872595146805,
+      "itemLines": 19704
+    },
+    {
+      "categoryCode": "CAT-AUDIO",
+      "categoryName": "Áudio",
+      "revenueAfter": 25469927.985,
+      "profit": 6937253.756097071,
+      "margin": 0.2723703718433215,
+      "itemLines": 19814
+    },
+    {
+      "categoryCode": "CAT-PRINTING",
+      "categoryName": "Impressão",
+      "revenueAfter": 63635423.085,
+      "profit": 13589662.921450004,
+      "margin": 0.21355500227126373,
+      "itemLines": 19791
+    },
+    {
+      "categoryCode": "CAT-ACCESSORIES",
+      "categoryName": "Acessórios",
+      "revenueAfter": 14937708.06,
+      "profit": 4494601.012356689,
+      "margin": 0.3008896006203437,
+      "itemLines": 19889
+    },
+    {
+      "categoryCode": "CAT-GRAPHICS",
+      "categoryName": "Gráficos",
+      "revenueAfter": 168620377.02,
+      "profit": 31712773.23170799,
+      "margin": 0.18807200999169008,
+      "itemLines": 21016
+    },
+    {
+      "categoryCode": "CAT-NETWORK",
+      "categoryName": "Redes",
+      "revenueAfter": 40298240.935,
+      "profit": 10384718.158552583,
+      "margin": 0.2576965623711184,
+      "itemLines": 19864
+    },
+    {
+      "categoryCode": "CAT-DESKTOP",
+      "categoryName": "Computadores de mesa",
+      "revenueAfter": 189804857.59,
+      "profit": 43806251.723100334,
+      "margin": 0.23079626243142207,
+      "itemLines": 21151
+    },
+    {
+      "categoryCode": "CAT-PROCESSOR",
+      "categoryName": "Processadores",
+      "revenueAfter": 74122873.435,
+      "profit": 17965051.257552177,
+      "margin": 0.24236852168590212,
+      "itemLines": 20272
+    },
+    {
+      "categoryCode": "CAT-MONITOR",
+      "categoryName": "Monitores",
+      "revenueAfter": 55661500.205000006,
+      "profit": 12971970.256007172,
+      "margin": 0.2330510354236179,
+      "itemLines": 19769
+    },
+    {
+      "categoryCode": "CAT-NOTEBOOK",
+      "categoryName": "Notebooks",
+      "revenueAfter": 209957992.725,
+      "profit": 41997714.350720644,
+      "margin": 0.20002912871113535,
+      "itemLines": 21099
+    },
+    {
+      "categoryCode": "CAT-STORAGE",
+      "categoryName": "Unidades de armazenamento",
+      "revenueAfter": 35939487.335,
+      "profit": 9087775.884139962,
+      "margin": 0.2528632587168195,
+      "itemLines": 19626
+    }
+  ],
+  "maxAbsoluteDifference": {
+    "global1000Products": {
+      "revenueBefore": 0.0,
+      "revenueAfter": 0.0,
+      "cogsAdjusted": 0.0,
+      "grossProfit": 0.0,
+      "margin": 2.7755575615628914e-17
+    },
+    "janSep2026_1000Products": {
+      "revenueBefore": 0.0,
+      "revenueAfter": 0.0,
+      "cogsAdjusted": 0.0,
+      "grossProfit": 0.0,
+      "margin": 0.0
+    },
+    "categories12": {
+      "revenueBefore": 0.0,
+      "revenueAfter": 0.0,
+      "cogsAdjusted": 0.0,
+      "grossProfit": 0.0,
+      "margin": 0.0
+    }
+  },
+  "sourceRows": {
+    "global": "raw-products-global.json",
+    "janSep2026": "raw-products-jan-sep-2026.json",
+    "categories": "raw-categories.json"
+  },
+  "queryDefinitions": {
+    "globalProducts": "EVALUATE SUMMARIZECOLUMNS('DimProduto'[product_id],'DimProduto'[sku],'DimProduto'[name], <measure and independent-column expressions>)",
+    "janSepProducts": "EVALUATE SUMMARIZECOLUMNS('DimProduto'[product_id],'DimProduto'[sku],'DimProduto'[name], FILTER(ALL('DimCalendario'[Data]), Data>=DATE(2026,1,1)&&Data<=DATE(2026,9,30)), <same expressions>)",
+    "categories": "EVALUATE SUMMARIZECOLUMNS('DimProduto'[category_code],'DimProduto'[category_name], <same expressions>)",
+    "independentRevenueBefore": "VAR CompletedOrders=CALCULATETABLE(VALUES(FatoPedidos[sales_order_id]),KEEPFILTERS(order_status='completed')) RETURN CALCULATE(SUMX(FatoItensPedido,fulfilled_quantity*(unit_sale_price-item_discount_amount/quantity)),TREATAS(CompletedOrders,FatoItensPedido[sales_order_id]))",
+    "independentReturns": "SUM(returned_commercial_value_x1e8)/1e8 with USERELATIONSHIP(FatoDevolucoes[order_date],DimCalendario[Data])",
+    "independentCogs": "SUM(fulfillment_cogs_x1e8)/1e8 with completed status and USERELATIONSHIP(FatoCustoFulfillment[order_date],DimCalendario[Data])",
+    "independentSellableReversal": "SUM(sellable_cogs_reversal_x1e8)/1e8 with USERELATIONSHIP(FatoDevolucoes[order_date],DimCalendario[Data])",
+    "groupingOrderNote": "SUMMARIZECOLUMNS agrupa produto/categoria primeiro e aplica filter tables depois."
+  },
+  "productAdditivity": {
+    "globalRevenueAfter": 922588975.4449996,
+    "janSepRevenueAfter": 228660758.74000016,
+    "globalCOGS": 717455650.2596453,
+    "janSepCOGS": 176070150.08984244,
+    "globalProfit": 205133325.18535477,
+    "janSepProfit": 52590608.65015768,
+    "globalAndYearSumsMatchedDirect": true
+  },
+  "provenance": {
+    "source": "Power BI Desktop local Import; ADOMD read-only; PostgreSQL not accessed",
+    "timingScope": "warm local DAX queries, not Performance Analyzer or controlled benchmark",
+    "comparisonToleranceBRL": 1e-05,
+    "note": "global and janSep financial fields aggregate returned product rows; direct global values in directGlobal; floating aggregation can differ by a few micro-BRL without a material monetary divergence"
+  },
+  "directGlobal": {
+    "[MeasureRevenueBefore]": 949319764.19,
+    "[IndependentRevenueBefore]": 949319764.19,
+    "[MeasureRevenueAfter]": 922588975.445,
+    "[IndependentRevenueAfter]": 922588975.445,
+    "[IndependentReturnValue]": 26730788.745,
+    "[MeasureCOGSAdjusted]": 717455650.2596452,
+    "[IndependentCOGSOriginal]": 725466564.623508,
+    "[IndependentSellableReversal]": 8010914.36386281,
+    "[IndependentCOGSAdjusted]": 717455650.2596452,
+    "[MeasureProfit]": 205133325.18535483,
+    "[IndependentProfit]": 205133325.18535483
+  },
+  "catalog": [
+    {
+      "DimProduto[category_code]": "CAT-ACCESSORIES",
+      "DimProduto[category_name]": "Acessórios",
+      "[ProductCount]": 83
+    },
+    {
+      "DimProduto[category_code]": "CAT-AUDIO",
+      "DimProduto[category_name]": "Áudio",
+      "[ProductCount]": 83
+    },
+    {
+      "DimProduto[category_code]": "CAT-DESKTOP",
+      "DimProduto[category_name]": "Computadores de mesa",
+      "[ProductCount]": 84
+    },
+    {
+      "DimProduto[category_code]": "CAT-GRAPHICS",
+      "DimProduto[category_name]": "Gráficos",
+      "[ProductCount]": 84
+    },
+    {
+      "DimProduto[category_code]": "CAT-INPUT",
+      "DimProduto[category_name]": "Entrada",
+      "[ProductCount]": 83
+    },
+    {
+      "DimProduto[category_code]": "CAT-MEMORY",
+      "DimProduto[category_name]": "Memória",
+      "[ProductCount]": 83
+    },
+    {
+      "DimProduto[category_code]": "CAT-MONITOR",
+      "DimProduto[category_name]": "Monitores",
+      "[ProductCount]": 83
+    },
+    {
+      "DimProduto[category_code]": "CAT-NETWORK",
+      "DimProduto[category_name]": "Redes",
+      "[ProductCount]": 83
+    },
+    {
+      "DimProduto[category_code]": "CAT-NOTEBOOK",
+      "DimProduto[category_name]": "Notebooks",
+      "[ProductCount]": 84
+    },
+    {
+      "DimProduto[category_code]": "CAT-PRINTING",
+      "DimProduto[category_name]": "Impressão",
+      "[ProductCount]": 83
+    },
+    {
+      "DimProduto[category_code]": "CAT-PROCESSOR",
+      "DimProduto[category_name]": "Processadores",
+      "[ProductCount]": 84
+    },
+    {
+      "DimProduto[category_code]": "CAT-STORAGE",
+      "DimProduto[category_name]": "Unidades de armazenamento",
+      "[ProductCount]": 83
+    }
+  ]
+}

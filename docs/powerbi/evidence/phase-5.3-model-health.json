@@ -1,0 +1,53 @@
+{
+  "model": {
+    "pid": 24180,
+    "msmdsrvPid": 2128,
+    "port": "62118",
+    "tables": 10,
+    "measures": 55,
+    "displayFolders": 11,
+    "displayFolderNames": [
+      "01 | Pedidos",
+      "02 | Faturamento",
+      "03 | Descontos",
+      "04 | Ticket Médio",
+      "05 | Produtos e Itens",
+      "06 | Inteligência Temporal",
+      "07 | Indicadores Percentuais",
+      "08 | Devoluções",
+      "09 | Custos e COGS",
+      "10 | Lucro e Margem",
+      "11 | Análise Financeira Temporal"
+    ],
+    "relationships": 21,
+    "activeRelationships": 19,
+    "inactiveRelationships": 2,
+    "partitions": 10,
+    "measureErrorMessageCount": 0,
+    "partitionErrorMessageCount": 0,
+    "modeCounts": [
+      {
+        "mode": "0",
+        "count": 10
+      }
+    ]
+  },
+  "negativeContext": {
+    "groupBy": "DimCalendario[Data]",
+    "period": "2025",
+    "sku": "SKU-MON-00342",
+    "store": "ST-PO-003",
+    "customerFilter": "none",
+    "channelFilter": "none",
+    "matchedRows": 1,
+    "date": "2025-02-11",
+    "revenue": 1355.02,
+    "cogs": 1515.063124,
+    "profit": -160.043124,
+    "margin": -0.118111263302387,
+    "warmMs": 25,
+    "query": "SUMMARIZECOLUMNS with calendar date group, date/product/store filters, and revenue/cogs/profit/margin measures",
+    "productName": "Monitor Vértice 342",
+    "storeName": "Unidade Sintética Pampa"
+  }
+}

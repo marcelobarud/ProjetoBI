@@ -1,0 +1,365 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.13.0/schema.json",
+  "name": "d5000000000000000001",
+  "position": {
+    "x": 36,
+    "y": 464,
+    "z": 1000,
+    "width": 912,
+    "height": 320,
+    "tabOrder": 10
+  },
+  "visual": {
+    "visualType": "clusteredBarChart",
+    "query": {
+      "queryState": {
+        "Category": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "DimProduto"
+                    }
+                  },
+                  "Property": "sku"
+                }
+              },
+              "queryRef": "DimProduto.sku",
+              "nativeQueryRef": "sku",
+              "active": true,
+              "displayName": "SKU"
+            }
+          ]
+        },
+        "Y": {
+          "projections": [
+            {
+              "active": true,
+              "displayName": "Receita após devoluções",
+              "field": {
+                "Measure": {
+                  "Property": "Receita Analítica Após Devoluções",
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Medidas"
+                    }
+                  }
+                }
+              },
+              "nativeQueryRef": "Receita Analítica Após Devoluções",
+              "format": "\"R$\" #,##0.00;-\"R$\" #,##0.00;\"R$\" 0.00",
+              "queryRef": "_Medidas.Receita Analítica Após Devoluções"
+            }
+          ]
+        },
+        "Tooltips": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "DimProduto"
+                    }
+                  },
+                  "Property": "name"
+                }
+              },
+              "queryRef": "DimProduto.name",
+              "nativeQueryRef": "name",
+              "active": true,
+              "displayName": "Produto"
+            },
+            {
+              "active": true,
+              "displayName": "Unidades pedidas",
+              "field": {
+                "Measure": {
+                  "Property": "Unidades Pedidas",
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Medidas"
+                    }
+                  }
+                }
+              },
+              "nativeQueryRef": "Unidades Pedidas",
+              "format": "#,##0",
+              "queryRef": "_Medidas.Unidades Pedidas"
+            },
+            {
+              "active": true,
+              "displayName": "Linhas de itens",
+              "field": {
+                "Measure": {
+                  "Property": "Total de Linhas de Itens",
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Medidas"
+                    }
+                  }
+                }
+              },
+              "nativeQueryRef": "Total de Linhas de Itens",
+              "format": "#,##0",
+              "queryRef": "_Medidas.Total de Linhas de Itens"
+            },
+            {
+              "active": true,
+              "displayName": "Pedidos com itens",
+              "field": {
+                "Measure": {
+                  "Property": "Pedidos Distintos com Itens no Contexto",
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Medidas"
+                    }
+                  }
+                }
+              },
+              "nativeQueryRef": "Pedidos Distintos com Itens no Contexto",
+              "format": "#,##0",
+              "queryRef": "_Medidas.Pedidos Distintos com Itens no Contexto"
+            },
+            {
+              "active": true,
+              "displayName": "Lucro bruto",
+              "field": {
+                "Measure": {
+                  "Property": "Lucro Bruto Analítico",
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Medidas"
+                    }
+                  }
+                }
+              },
+              "nativeQueryRef": "Lucro Bruto Analítico",
+              "format": "\"R$\" #,##0.00;-\"R$\" #,##0.00;\"R$\" 0.00",
+              "queryRef": "_Medidas.Lucro Bruto Analítico"
+            },
+            {
+              "active": true,
+              "displayName": "Margem bruta",
+              "field": {
+                "Measure": {
+                  "Property": "Margem Bruta Analítica",
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Medidas"
+                    }
+                  }
+                }
+              },
+              "nativeQueryRef": "Margem Bruta Analítica",
+              "format": "0.00%;-0.00%;0.00%",
+              "queryRef": "_Medidas.Margem Bruta Analítica"
+            }
+          ]
+        }
+      },
+      "sortDefinition": {
+        "sort": [
+          {
+            "field": {
+              "Measure": {
+                "Property": "Receita Analítica Após Devoluções",
+                "Expression": {
+                  "SourceRef": {
+                    "Entity": "_Medidas"
+                  }
+                }
+              }
+            },
+            "direction": "Descending"
+          }
+        ],
+        "isDefaultSort": true
+      }
+    },
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Top 5 produtos — receita após devoluções (R$)'"
+                }
+              }
+            },
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "fontFamily": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Segoe UI Semibold'"
+                }
+              }
+            },
+            "fontSize": {
+              "expr": {
+                "Literal": {
+                  "Value": "17D"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "subTitle": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "general": [
+        {
+          "properties": {
+            "altText": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Cinco produtos com maior receita após devoluções; SKU identifica o eixo, nome completo e medidas de itens ficam no tooltip. O catálogo completo está na matriz e no filtro local.'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true,
+    "objects": {
+      "categoryAxis": [
+        {
+          "properties": {
+            "fontFamily": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Segoe UI'"
+                }
+              }
+            },
+            "fontSize": {
+              "expr": {
+                "Literal": {
+                  "Value": "16D"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "valueAxis": [
+        {
+          "properties": {
+            "fontFamily": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Segoe UI'"
+                }
+              }
+            },
+            "fontSize": {
+              "expr": {
+                "Literal": {
+                  "Value": "14D"
+                }
+              }
+            },
+            "labelDisplayUnits": {
+              "expr": {
+                "Literal": {
+                  "Value": "0D"
+                }
+              }
+            },
+            "labelPrecision": {
+              "expr": {
+                "Literal": {
+                  "Value": "1L"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "general": [
+        {
+          "properties": {
+            "responsive": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  },
+  "filterConfig": {
+    "filters": [
+      {
+        "name": "fd530000000000000001",
+        "displayName": "Top 5 produtos por receita após devoluções",
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "DimProduto"
+              }
+            },
+            "Property": "sku"
+          }
+        },
+        "type": "VisualTopN",
+        "filter": {
+          "Version": 2,
+          "From": [
+            {
+              "Name": "p",
+              "Entity": "DimProduto",
+              "Type": 0
+            }
+          ],
+          "Where": [
+            {
+              "Condition": {
+                "VisualTopN": {
+                  "ItemCount": 5
+                }
+              },
+              "Target": [
+                {
+                  "Column": {
+                    "Expression": {
+                      "SourceRef": {
+                        "Source": "p"
+                      }
+                    },
+                    "Property": "sku"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      }
+    ]
+  }
+}

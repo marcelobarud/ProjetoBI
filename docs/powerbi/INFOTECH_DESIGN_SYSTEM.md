@@ -223,3 +223,23 @@ A versão permanece v0.2. A Análise Comercial reutiliza DS-C01–06; os padrõe
 - **Ranking de lojas:** Top 5 contextual incluindo `(Blank)` quando elegível; dez lojas nomeadas permanecem no slicer. Sem scrollbar na composição final. Ticks monetários podem quebrar linha ou truncar o último texto em contextos amplos/viewport reduzido; essa restrição não é padrão universal homologado. Tooltip BRL e título R$ milhões preservam unidade.
 
 YTD visual segue como refinamento específico por falta de espaço; contratos DAX validados. Acessibilidade completa e benchmark da última composição não foram estabelecidos. Ver [relatório da Fase 5.2](phase-5.2-commercial-dashboard.md). A [orientação Microsoft sobre responsividade](https://learn.microsoft.com/en-us/power-bi/create-reports/power-bi-create-mobile-optimized-report-format-visuals) descreve a adaptação nativa; cada componente deve ser conferido no painel e na renderização real.
+
+## 14. Produtos e Categorias — Fase 5.3
+
+A versão permanece **v0.2**. DS-C01–06 foram reutilizados na terceira página Full HD; estes componentes foram implementados e conferidos nessa composição, com candidatos à v0.3 sem promoção automática do tema:
+
+| Componente | Configuração observada | Estado e limite |
+|---|---|---|
+| DS-C01 + navegador | Cabeçalho 920 × 76 px, x36/y22; Page Navigator 896 × 56 px, x988/y30, três colunas, texto 15 pt | Três nomes completos, ativo azul/branco; somente largura/cabeçalho/navegação ajustados nas páginas anteriores |
+| DS-C02 compartilhado | Between 760 × 112 px, slider e duas datas, responsividade desligada; Canal/Loja iguais à referência comercial | Grupos Período/Canal/Loja incluem um controle por página; seleção/limpeza sincronizadas, estado final limpo |
+| Faixa local, candidata | Categoria 760 × 80 px e Produto 1064 × 80 px, y224, fonte 13 pt; pesquisa de Produto | Sem sincronização; categoria restringe catálogo; pesquisa, teclado/foco e limpeza independente exercitados |
+| DS-C03 | Quatro cartões 450 × 136 px, y312; valor 32 pt/título 13 pt; BRL/% duas casas | Receita após devoluções, COGS ajustado, lucro e margem; BLANK e sinais negativos preservados |
+| DS-C05 produto | Top 5 real; SKU no eixo, nome completo no tooltip; 912 × 320 px | Top 10 exigia rolagem; Top 5 sem scrollbar, catálogo completo no filtro/matriz; decrescente por receita |
+| DS-C05 categoria | Todas as 12 categorias; 912 × 320 px | Rolagem vertical necessária e testada. Não homologar como componente sem rolagem |
+| Tipografia dos rankings | Categoria 16 pt, eixo monetário 14 pt, título 17 pt; `responsive=false` | Escala monetária automática, uma casa nos ticks, título R$; evita ticks repetidos e zeros em recortes pequenos. Tooltip/valores financeiros completos com duas casas |
+| Matriz hierárquica, candidata | 1848 × 244 px, y800, fonte 13 pt, Outline, Categoria → Produto; sete valores | Inicialmente recolhida; margem recalculada, BRL/% duas casas; rolagem vertical necessária, sem overflow horizontal observado |
+| DS-C06 | DataFilter explícito dos rankings/matriz para outros analíticos | Grão de item/produto; nenhum valor de cabeçalho ou frete atribuído; filtros locais não alteram páginas 1–2 |
+
+Canvas e fontes foram inspecionados em Fit to Page (45% no viewport 1366 × 720), captura ampliada do Desktop e tamanho real 100% por rolagem do canvas. A escala reduzida não torna a página integralmente confortável em qualquer tela; não homologar leitura universal em telas pequenas. Alt text/tab order dos 14 visuais presentes; teclado/foco exercitados no Produto. Leitor de tela, daltonismo e escala de cinza não foram testados nesta fase.
+
+Ver [Fase 5.3](phase-5.3-products-categories-dashboard.md) para reconciliações, capturas, desempenho e restrições. A biblioteca não requer alteração de DAX, relacionamentos, tema-fonte ou banco.

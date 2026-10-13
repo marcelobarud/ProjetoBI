@@ -1,0 +1,30 @@
+{
+  "scope": "Declared InfoTech text tokens/backgrounds and selected native navigator state; does not measure every anti-aliased rendered pixel or accessibility certification",
+  "pairs": [
+    {
+      "foreground": "#142238",
+      "background": "#FFFFFF",
+      "ratio": 15.962
+    },
+    {
+      "foreground": "#5B6B82",
+      "background": "#FFFFFF",
+      "ratio": 5.426
+    },
+    {
+      "foreground": "#142238",
+      "background": "#F5F7FB",
+      "ratio": 14.882
+    },
+    {
+      "foreground": "#5B6B82",
+      "background": "#F5F7FB",
+      "ratio": 5.059
+    },
+    {
+      "foreground": "#FFFFFF",
+      "background": "#2563EB",
+      "ratio": 5.169
+    }
+  ]
+}
