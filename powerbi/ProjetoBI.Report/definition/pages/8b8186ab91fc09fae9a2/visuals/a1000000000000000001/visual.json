@@ -31,7 +31,7 @@
               {
                 "textRuns": [
                   {
-                    "value": "Visão Executiva  |  Jan–Set 2026",
+                    "value": "Visão Executiva",
                     "textStyle": {
                       "color": "#5B6B82",
                       "fontFamily": "Segoe UI",
@@ -91,7 +91,7 @@
             "altText": {
               "expr": {
                 "Literal": {
-                  "Value": "'InfoTech Intelligence — Visão Executiva, com dados comerciais de janeiro a setembro de 2026.'"
+                  "Value": "'InfoTech Intelligence — Visão Executiva comercial e financeira para o período selecionado.'"
                 }
               }
             }
