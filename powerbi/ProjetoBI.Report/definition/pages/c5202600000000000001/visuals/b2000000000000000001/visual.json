@@ -3,9 +3,9 @@
   "name": "b2000000000000000001",
   "position": {
     "x": 36,
-    "y": 112,
+    "y": 104,
     "z": 1000,
-    "height": 80,
+    "height": 112,
     "width": 760,
     "tabOrder": 1
   },
@@ -38,7 +38,15 @@
     "objects": {
       "general": [
         {
-          "properties": {}
+          "properties": {
+            "responsive": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
         }
       ],
       "data": [
@@ -68,6 +76,39 @@
         }
       ],
       "items": [
+        {
+          "properties": {
+            "fontFamily": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Segoe UI'"
+                }
+              }
+            },
+            "textSize": {
+              "expr": {
+                "Literal": {
+                  "Value": "13D"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "slider": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "date": [
         {
           "properties": {
             "fontFamily": {
