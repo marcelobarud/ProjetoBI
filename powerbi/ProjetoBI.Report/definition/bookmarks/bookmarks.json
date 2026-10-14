@@ -31,6 +31,14 @@
         "f5442600000000000006"
       ],
       "displayName": "Fase 5.4.1 — Produtos e Categorias"
+    },
+    {
+      "name": "fase55_devolucoes",
+      "children": [
+        "f5502600000000000005",
+        "f5502600000000000006"
+      ],
+      "displayName": "Fase 5.5 — Devoluções"
     }
   ],
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/bookmarksMetadata/1.0.0/schema.json"

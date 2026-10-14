@@ -22,7 +22,7 @@
             "altText": {
               "expr": {
                 "Literal": {
-                  "Value": "'Navegação entre Visão Executiva, Análise Comercial e Produtos e Categorias e Custos e Margens. A página ativa fica destacada em azul.'"
+                  "Value": "'Navegação entre Visão Executiva, Análise Comercial, Produtos e Categorias, Custos e Margens e Devoluções. A página ativa fica destacada em azul.'"
                 }
               }
             }
@@ -161,7 +161,7 @@
             "columnCount": {
               "expr": {
                 "Literal": {
-                  "Value": "4L"
+                  "Value": "5L"
                 }
               }
             },
@@ -175,7 +175,7 @@
             "cellPadding": {
               "expr": {
                 "Literal": {
-                  "Value": "8L"
+                  "Value": "4L"
                 }
               }
             },
@@ -223,7 +223,7 @@
             "fontSize": {
               "expr": {
                 "Literal": {
-                  "Value": "15D"
+                  "Value": "14D"
                 }
               }
             }
@@ -262,7 +262,7 @@
             "fontSize": {
               "expr": {
                 "Literal": {
-                  "Value": "15D"
+                  "Value": "14D"
                 }
               }
             }
@@ -301,7 +301,7 @@
             "fontSize": {
               "expr": {
                 "Literal": {
-                  "Value": "15D"
+                  "Value": "14D"
                 }
               }
             }
@@ -352,10 +352,10 @@
   },
   "name": "d7000000000000000001",
   "position": {
-    "x": 636,
+    "x": 546,
     "y": 30,
     "z": 1000,
-    "width": 1000,
+    "width": 1090,
     "height": 56,
     "tabOrder": 13
   }

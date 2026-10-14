@@ -287,3 +287,18 @@ O nome vigente é **InfoTech**; **InfoTech Intelligence** permanece somente como
 Na página Custos e Margens, o rótulo acima dos cartões secundários usa 31 px de altura e o título “Composição do custo analítico — corte do pedido”. O título da tendência mensal usa “por mês de corte”. Essas propriedades foram conferidas nos arquivos PBIR e em captura real da página Custos e Margens no Desktop. A visão geral das quatro páginas foi examinada em 47% de zoom; a leitura ampliada e Fit to Page permanecem pendentes.
 
 Botões, cartões KPI e Page Navigator permanecem com os estilos previamente registrados. A aparência geral foi conferida nas quatro páginas, sem refinamento novo; bordas, padding, foco e detalhes tipográficos requerem revisão ampliada. A v0.2 segue como base; a futura v0.3 depende da inspeção real dos quatro dashboards, dos cartões, dos controles e da revisão estética. Consulte [relatório da Fase 5.4.2.1](phase-5.4.2.1-infotech-branding-closure.md).
+
+## 18. Devoluções — Fase 5.5 (candidatos à v0.3)
+
+A quinta página preserva **InfoTech v0.2** como referência vigente. A composição foi implementada no canvas Full HD, mas a inspeção desta fase foi parcial e não promove estes componentes a padrão homologado.
+
+| Componente candidato | Implementação observada | Estado e limite |
+|---|---|---|
+| Page Navigator de cinco destinos | Destinos Visão Executiva, Análise Comercial, Produtos e Categorias, Custos e Margens e Devoluções; fonte ajustada a 14 pt e faixa alargada com alteração mínima do cabeçalho | Nomes completos visíveis na janela do Desktop; escala de 36% e sem revisão em Fit to Page/100%. Não homologar universalmente em viewports menores |
+| DS-C02 na página Devoluções | Between com dois campos de data e slider horizontal; Canal e Loja compartilhados; painel via bookmarks | Painel aberto foi capturado; bookmark de fechar ocultou o painel e o usuário confirmou o clique em Fechar filtros. Arrasto, edição das datas e sincronização completa ainda não foram testados |
+| KPIs de devoluções | Valor comercial por pedido, reversão sellable, perda non-sellable e percentual comercial; rótulos com perspectiva explícita | Renderizaram no Desktop; DAX e contextos combinados não foram reconciliados nesta fase |
+| DS-C04 temporal | Valor comercial devolvido por mês da data do pedido, eixo em R$ mil | Renderizou em escala observada; escala temporal Jan–Set/2026 e variação de viewport pendentes |
+| DS-C05 categorias e produtos | Barra por valor comercial devolvido por categoria e Top 5 produtos | Renderizaram em escala observada; filtragem/cross-highlighting, nomes longos e casos sem dados pendentes |
+| Contexto de custos de devolução | Sellable reduz COGS analítico; non-sellable já está incorporado | Nota exibida; a perda não pode ser deduzida novamente. A v0.2 não aprova uma soma de impacto financeiro total |
+
+Não há medida de reembolso efetivo no modelo. As medidas disponíveis para contagem de itens/unidades usam recebimento, enquanto o slider compartilhado está definido como coorte do pedido; elas não foram promovidas a KPIs dessa página. A operação por data de recebimento fica para estudo futuro com contratos temporais e filtros próprios. Nenhuma tipografia de devoluções é classificada como padrão homologado sem leitura ampliada em Full HD e Fit to Page. Ver [relatório da Fase 5.5](phase-5.5-returns-dashboard.md) e [capturas reais](evidence/phase-5.5/).

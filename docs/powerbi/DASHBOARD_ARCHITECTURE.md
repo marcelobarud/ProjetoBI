@@ -1,6 +1,6 @@
 # Arquitetura inicial dos dashboards — InfoTech
 
-**Escopo:** arquitetura planejada de cinco páginas para Desktop; quatro implementadas: Visão Executiva, Análise Comercial, Produtos e Categorias e Custos e Margens (Fase 5.4). O nome vigente da marca é InfoTech, aprovado na Fase 5.4.2.1; “InfoTech Intelligence” é a denominação histórica das fases iniciais. Design System v0.2 preservado, com novos componentes candidatos à v0.3. Relações, medidas e dados permanecem aprovados. A Fase 5.4 validou reconciliações e parte das interações no Desktop; ver seu relatório para alcance e limitações.
+**Escopo:** arquitetura de cinco páginas para Desktop. A quinta página, Devoluções, foi implementada na Fase 5.5 e permanece com validação parcial; ver o relatório da fase. O nome vigente da marca é InfoTech, aprovado na Fase 5.4.2.1; “InfoTech Intelligence” é a denominação histórica das fases iniciais. Design System v0.2 preservado, com novos componentes candidatos à v0.3. Relações, medidas e dados permanecem aprovados. A Fase 5.4 validou reconciliações e parte das interações no Desktop; ver seu relatório para alcance e limitações.
 
 ## 1. Contratos do modelo usados no desenho
 
@@ -35,11 +35,9 @@ Formato de referência 16:9 (1280×720 conceitual), 12 colunas, 24 px de margem 
 | 4. Custos e Margens | Bloco de coorte: receita, COGS ajustado, lucro e margem | `Receita Analítica Após Devoluções`; `COGS Original Concluído — Data do Pedido`; `COGS Analítico Ajustado`; `Lucro Bruto Analítico`; `Margem Bruta Analítica` | Produto/categoria, Canal, Loja | Coorte por order_date, inclusive `USERELATIONSHIP` dos fatos de custo e devolução | Nomear “coorte do pedido” em cada visual. Perda non-sellable já permanece no COGS; não deduzir uma segunda vez |
 | 4. Custos e Margens | Bloco de fluxo operacional: custo por movimento e devolução por recebimento | `COGS de Fulfillment — Data do Movimento`; `COGS Original Concluído — Data do Movimento`; `Reversão COGS Sellable — Data do Recebimento`; `Perda Non-Sellable — Data do Recebimento` | Calendário por movimento ou recebimento; Produto, Canal e Loja | Fluxo operacional; `movement_date` versus `return_received_date` | Visuais separados e claramente rotulados; a mesma seleção de calendário opera por relações diferentes. Não chamar esse bloco de margem por coorte |
 | 4. Custos e Margens | Participação de custos e tendência de margem | `Participação do COGS Ajustado na Receita`; `Participação da Reversão Sellable no COGS`; `Participação Non-Sellable no COGS Ajustado`; `Margem Bruta Analítica YTD` | Categoria/Canal; calendário conforme painel | Percentuais financeiros por coorte, exceto quando título explicitar fluxo operacional | Não somar percentuais nem deduzir perda non-sellable novamente; não comparar perspectivas temporais numa mesma série |
-| 5. Devoluções | KPIs de linhas, unidades recebidas e valor comercial recebido | `Itens de Devolução`; `Unidades Recebidas em Devolução`; `Valor Comercial Devolvido — Data do Recebimento` | Canal, Loja, Cliente, Produto; `FatoDevolucoes[return_status]` | Evento de recebimento; contagem de linhas de devolução vs quantidades efetivamente recebidas | `Itens de Devolução` pode incluir itens ainda sem recebimento; não rotular como “devoluções recebidas” sem validar filtro/status |
-| 5. Devoluções | Barras por destino/condição e tendência mensal de recebimentos | `Unidades Recebidas em Devolução`; `Reversão COGS Sellable — Data do Recebimento`; `Perda Non-Sellable — Data do Recebimento` | `stock_destination`, `item_condition`, `return_reason_code`, categoria e Produto | `return_received_date`; linha de item devolvido/evento operacional | Destino e condição são categorias distintas. Não inferir aprovação/recebimento a partir de solicitação; não confundir devolução comercial com refund |
-| 5. Devoluções | Detalhe tabular Top N de produtos afetados | `Valor Comercial Devolvido — Data do Recebimento`; `Unidades Recebidas em Devolução` | Produto/categoria, Canal, motivo, destino | Evento pela data de recebimento; linhas de `FatoDevolucoes` | Drill-through futuro pode preservar filtros de Produto/Canal. Nova contagem exclusiva de solicitações efetivamente recebidas é dependência futura, não será inventada nesta fase |
+| 5. Devoluções | Quatro KPIs: valor comercial, reversão sellable, perda non-sellable e percentual comercial; linha mensal, barra por categoria e Top 5 produtos | `Valor Comercial Devolvido — Data do Pedido`; `Reversão COGS Sellable — Data do Pedido`; `Perda Non-Sellable — Data do Pedido`; `Percentual de Devoluções Comerciais` | Canal, Loja e período compartilhados; categorias/produtos como dimensões dos rankings | Coorte de `order_date`; grão de linha de devolução para valores elegíveis | Não há medida de reembolso efetivo nem contagem/unidades por coorte. Perda non-sellable já está incorporada no COGS ajustado; não deduzir novamente. Página em validação parcial |
 
-As células usam somente medidas que existem atualmente. Os valores de linha/coluna e campos de dimensão devem ser conferidos no painel de Dados durante a Fase de implementação; qualquer campo que não esteja disponível será tratado como dependência e não substituído por uma medida inventada.
+As células usam somente medidas existentes. A composição implementada e as limitações de validação da quinta página estão detalhadas em `phase-5.5-returns-dashboard.md`; não interpretar valores exibidos na captura como reconciliação DAX.
 
 ## 4. Páginas e ordem recomendadas
 
@@ -47,9 +45,9 @@ As células usam somente medidas que existem atualmente. Os valores de linha/col
 2. **Análise Comercial** — volume/status de pedidos, receita comercial pré-devolução, ticket e canais/lojas/clientes.
 3. **Produtos e Categorias** — comportamento no grão de item com Top N e drill-down real de categoria/produto.
 4. **Custos e Margens** — perspectiva de coorte do pedido; fluxos operacionais continuam planejados e devem permanecer em zona própria quando implementados.
-5. **Devoluções** — recebimentos e destinação; solicitação, aprovação, recebimento e refund são conceitos distintos.
+5. **Devoluções** — valor comercial e consequências de custo atribuídos à coorte do pedido; recebimento operacional e refund permanecem conceitos distintos e não foram adicionados à composição atual.
 
-Page Navigator horizontal no cabeçalho, com quatro destinos reais e estado ativo. Devoluções permanece planejada; não há página futura vazia. Navegação nativa acompanha páginas. Não criar várias páginas manuais de “detalhe” nem botões um a um na versão inicial.
+Page Navigator horizontal no cabeçalho, com cinco destinos reais e estado ativo. Os nomes completos foram vistos no Desktop na Fase 5.5; testes abrangentes de navegação entre todos os pares ainda estão pendentes. Navegação nativa acompanha páginas. Não criar várias páginas manuais de “detalhe” nem botões um a um na versão inicial.
 
 ## 5. Política de filtros compartilhados
 
@@ -57,7 +55,7 @@ Page Navigator horizontal no cabeçalho, com quatro destinos reais e estado ativ
 |---|---|---|
 | Canal | Compartilhar nas cinco páginas | Dimensão conformada; verificar interação em cada visual |
 | Loja | Compartilhar nas cinco páginas | Dimensão conformada; não confundir loja de pedido com local de estoque |
-| Período | Compartilhar entre páginas 1–3 como período de pedido/coorte; page 4 separa visualmente as perspectivas; page 5 usa recebimento | O mesmo calendário filtra datas ativas diferentes e `USERELATIONSHIP` em medidas de coorte. Rotular cada bloco e não comparar como se fossem datas iguais |
+| Período | Compartilhar entre as cinco páginas como período comercial da data do pedido/coorte | O calendário e `USERELATIONSHIP` suportam as medidas de coorte. Medidas operacionais por recebimento não usam silenciosamente o mesmo slider; rotular a perspectiva de cada bloco |
 | Segmentação Produto/Categoria | Local nas páginas 3–5; não sincronizar para 1–2 | A categoria pode aparecer como eixo de um visual específico da página 1, mas não como segmentação compartilhada. Medidas de pedido podem resultar em BLANK sob filtro de produto; item financeiro não representa cabeçalho |
 | Cliente | Local por página quando útil | Não expor dados de contato/notas; usar identificador/nome legível apenas quando necessário |
 | Status | Local à análise que define seu significado | `order_status` e `return_status` não são intercambiáveis |
@@ -82,7 +80,7 @@ Na página 1, categoria → cartão `Pedidos Concluídos` mantém `NoFilter`. Na
 | 5.2 | PASS local: quatro KPIs, status, dois temporais com escalas separadas, Canal/Top 5 lojas, navegador e filtros sincronizados. YTD visual deferido como refinamento específico, DAX validado. Sem tabela de clientes no layout atual; nenhuma nova métrica |
 | 5.3 | PASS local: quatro KPIs financeiros por coorte, Top 5 produtos, todas as categorias, matriz Categoria → Produto, filtros locais pesquisáveis, contexto geral sincronizado e navegador com três destinos. Sem atribuições de cabeçalho; medidas/modelo preservados. Ver `phase-5.3-products-categories-dashboard.md` |
 | 5.4 | PARTIAL local: página Custos e Margens, composição financeira, tendência por coorte e comparação por canal/categoria implementadas; DAX reconciliado e Desktop reaberto. Navegação/sincronização observadas em amostra; fluxos operacionais e validação exaustiva de todas as interações ficam documentados como limites. Ver `phase-5.4-costs-margins-dashboard.md` |
-| 5.5 | Implementar Devoluções com solicitação e recebimento diferenciados |
+| 5.5 | PARTIAL local: página Devoluções implementada com perspectiva comercial por coorte; reconciliações DAX, filtros cruzados completos, persistência e validação assistiva pendentes |
 | 5.6 | Auditoria integrada visual, funcional, acessível, temporal e de desempenho |
 
 Este roteiro não autoriza a execução das fases seguintes.
@@ -100,3 +98,9 @@ Navegador 896 × 56 px e cabeçalho 920 × 76 px nas três páginas, sem mudar d
 ## Painel de filtros recolhível — implementação local
 
 A Fase 5.4.1 implementou DS-C02 recolhível com bookmarks nativos de exibição em quatro páginas. Os três grupos `InfoTech.*` permanecem compartilhados; Categoria e Produto continuam locais a Produtos e Categorias. O painel aberto é uma sobreposição temporária; fechado, libera espaço real para cartões e gráficos. Consulte `phase-5.4.1-collapsible-filter-panel.md` para geometrias, limitações, evidências e estado de validação. A descrição comum de DS-C02 nesta arquitetura não altera por si só a versão v0.2 nem promove a candidata v0.3.
+
+## 9. Devoluções — implementação Fase 5.5
+
+A quinta página acrescenta quatro cartões sem criar medidas: valor comercial devolvido, reversão COGS sellable, perda non-sellable e percentual comercial, todos por coorte da data do pedido. A visualização temporal apresenta valor comercial por mês do pedido; as barras mostram valor por categoria e Top 5 produtos. Medidas de itens/unidades disponíveis usam data de recebimento e, portanto, não foram usadas sob o período comercial compartilhado. O modelo também não fornece medida de reembolso efetivo. Ver [relatório Fase 5.5](phase-5.5-returns-dashboard.md) para a rastreabilidade e limitações.
+
+O modelo oferece campos de recebimento, mas esta fase não implementa a zona operacional: o filtro compartilhado representa coorte comercial e as validações necessárias de consistência de medidas/filtros não foram concluídas. Perda non-sellable permanece incorporada ao COGS ajustado; não subtrair novamente. A página renderizou no Desktop e o painel aberto/fechado foi observado, mas DAX, sincronização em cinco páginas, cenários de filtro, persistência após salvar/reabrir, acessibilidade e desempenho ainda estão pendentes. A classificação permanece PARTIAL.

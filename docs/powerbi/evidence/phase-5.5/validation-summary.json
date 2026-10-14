@@ -1,0 +1,42 @@
+{
+  "phase": "5.5",
+  "status": "PARTIAL — FUNCTIONAL OR VISUAL VALIDATION PENDING",
+  "inspection_date": "2026-10-14",
+  "evidence_kind": "real Power BI Desktop screenshots",
+  "desktop_window_viewport_px": [1152, 544],
+  "canvas_definition_px": [1920, 1080],
+  "screenshots": [
+    {
+      "file": "01-devolucoes-filtros-fechados.png",
+      "state": "Devoluções page, filter panel closed",
+      "desktop_zoom_percent": 36
+    },
+    {
+      "file": "02-devolucoes-painel-aberto.png",
+      "state": "Devoluções page, filter panel open with Between date fields and slider visible",
+      "desktop_zoom_percent": 36
+    }
+  ],
+  "validated": [
+    "PBIP opened in Power BI Desktop without an error during this inspection",
+    "five page destinations displayed",
+    "four cards, monthly trend, category ranking, and Top 5 product ranking rendered",
+    "monthly trend labels displayed in R$ thousands",
+    "filter panel open state displayed",
+    "close bookmark hid the filter panel",
+    "user confirmed the Fechar filtros button click works"
+  ],
+  "not_validated": [
+    "DAX reconciliations and combined filter contexts",
+    "Jan-Sep 2026 scenario",
+    "typing dates and dragging both slider handles",
+    "cross-page synchronization in both directions",
+    "category/product interaction and edge cases",
+    "Performance Analyzer",
+    "keyboard, tab order, contrast and assistive accessibility",
+    "save-close-reopen persistence after this implementation"
+  ],
+  "data_refresh_performed": false,
+  "desktop_closed_without_saving_temporary_inspection_state": true,
+  "note": "Visible screenshot values are rendering evidence only; they were not reconciled independently in DAX."
+}
