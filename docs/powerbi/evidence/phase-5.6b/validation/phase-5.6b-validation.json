@@ -1,0 +1,71 @@
+{
+  "phase": "5.6B",
+  "result": "TECHNICAL PASS — AWAITING AESTHETIC APPROVAL",
+  "workspace": "D:\\Codex\\ProjetoBI",
+  "entry": {
+    "branch": "main",
+    "head": "48edec921f96eaf2b33d4dabf841e4de65489805"
+  },
+  "snapshot": {
+    "path": "C:\\Users\\D2\\AppData\\Local\\Temp\\ProjetoBI-Phase5.6B-preflight-20261014-201340.zip",
+    "sha256": "B3C939CB403B555C5C8A33951DED8CB6484789B9069FA05247282F6F94A49BFB",
+    "preexistingPaths": 107
+  },
+  "desktop": {
+    "openedWithoutError": true,
+    "refreshExecuted": false,
+    "windowViewportPx": [1152, 575],
+    "physicalDisplayResolutionVerified": false,
+    "testedZoomPercent": [36, 37, 51, 100],
+    "zoom100InspectedPages": [
+      "Visão Executiva",
+      "Análise Comercial",
+      "Produtos e Categorias",
+      "Custos e Margens",
+      "Devoluções"
+    ],
+    "initialContext": {
+      "periodStart": "2025-04-30",
+      "periodEnd": "2026-09-30",
+      "channel": "Loja física",
+      "store": "Unidade Sintética Campinas",
+      "localProductPageFilters": "All"
+    }
+  },
+  "evidence": {
+    "realDesktopScreenshots": 24,
+    "screenshotDimensionsPx": [1152, 575],
+    "archive": "docs/powerbi/evidence/archives/fase-5.6b-evidencias.zip",
+    "archiveEntries": 27
+  },
+  "report": {
+    "pages": 5,
+    "canvasPx": [1920, 1080],
+    "pageDisplayOptionsAfter": {
+      "Visão Executiva": "FitToWidth",
+      "Análise Comercial": "FitToWidth",
+      "Produtos e Categorias": "FitToWidth",
+      "Custos e Margens": "FitToWidth",
+      "Devoluções": "FitToWidth"
+    },
+    "pbirJsonFiles": 117,
+    "invalidPbirJsonFiles": 0
+  },
+  "semanticModel": {
+    "tables": 10,
+    "measures": 55,
+    "displayFolders": 11,
+    "relationships": 21,
+    "modifiedInThisPhase": false
+  },
+  "brandAsset": {
+    "xmlRoot": "svg",
+    "sourceAndRegisteredResourceHashesMatch": true,
+    "sha256": "29CA228E30EF819E4EF204C8864CCA155F31EB9C979E6E25E779E736667B343A"
+  },
+  "accessibility": {
+    "wcagContrastRatioMeasured": false,
+    "screenReaderTested": false,
+    "tabOrderAndFocusTested": false
+  }
+}
