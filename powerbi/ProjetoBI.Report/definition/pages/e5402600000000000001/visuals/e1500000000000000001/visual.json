@@ -19,7 +19,7 @@
               {
                 "textRuns": [
                   {
-                    "value": "Composição do custo analítico — corte do pedido",
+                    "value": "Composição do custo analítico — por data do pedido",
                     "textStyle": {
                       "fontFamily": "Segoe UI Semibold",
                       "fontSize": "17pt",
@@ -79,7 +79,7 @@
             "altText": {
               "expr": {
                 "Literal": {
-                  "Value": "'Título da composição do custo analítico por corte do pedido.'"
+                  "Value": "'Título da composição do custo analítico pela data comercial do pedido.'"
                 }
               }
             }

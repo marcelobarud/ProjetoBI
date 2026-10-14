@@ -1,16 +1,16 @@
 {
   "phase": "5.4.2.1",
-  "result": "PARTIAL — FINAL VISUAL VALIDATION PENDING",
+  "result": "PARTIAL — VALIDATION PENDING",
   "evidenceType": "local static inspection plus real Power BI Desktop captures",
   "desktopVisualCapture": {
-    "state": "partial visual inspection completed",
+    "state": "four pages observed at Fit to Width (about 38–47%); Custos e Margens additionally inspected at 100% after final title correction; PBIP reopened without error",
     "pages": [
       "Visão Executiva",
       "Análise Comercial",
       "Produtos e Categorias",
       "Custos e Margens"
     ],
-    "zoom": "47% for page overview",
+    "zoom": "Fit to Width: 38–47%; Actual size: 100% for Custos e Margens only",
     "bookmarksOpenAndCloseScreenshot": "Custos e Margens, at 38% with Bookmarks pane visible",
     "images": [
       {
@@ -49,7 +49,7 @@
         "valid": true
       }
     ],
-    "remaining": "Enlarged close-ups of header, primary KPIs, secondary KPIs, and filter buttons; Fit to Page comparison"
+    "remaining": "100% close-ups for the other three pages; independent click evidence for the native Fechar filtros button; keyboard/focus and screen-reader review"
   },
   "json": {
     "count": 96,
@@ -62,7 +62,8 @@
     "relationships": 21,
     "activeRelationships": 19,
     "inactiveRelationships": 2,
-    "pages": 4
+    "pages": 4,
+    "unchangedInThisTask": true
   },
   "headers": [
     {
@@ -89,9 +90,9 @@
   "costLabel": {
     "path": "powerbi/ProjetoBI.Report/definition/pages/e5402600000000000001/visuals/e1500000000000000001/visual.json",
     "height": 31,
-    "text": "Composição do custo analítico — corte do pedido"
+    "text": "Composição do custo analítico — por data do pedido"
   },
-  "lineChartTitle": "'Receita, COGS e lucro bruto por mês de corte (R$ milhões)'",
+  "lineChartTitle": "Receita, COGS e lucro bruto por mês do pedido (R$ milhões)",
   "svgAssets": [
     {
       "file": "infotech-horizontal.svg",
@@ -109,7 +110,7 @@
       "sha256": "29CA228E30EF819E4EF204C8864CCA155F31EB9C979E6E25E779E736667B343A"
     }
   ],
-  "functionalAndVisualTests": "Partial: four page views and open/close bookmark states inspected; remaining filter, sync, keyboard, save/reopen, and baseline checks not repeated",
+  "functionalAndVisualTests": "Local Desktop: period fields and both slider handles recalculated; Channel and Store isolated and combined (including a BLANK context); synchronized period/channel/store across all four pages; category/product remained local; all four pages navigated; existing open/close bookmarks exercised. Both financial baselines reconciled. User confirmed the native canvas Fechar filtros click works. All-page 100% close-ups and keyboard/screen-reader tests remain pending.",
   "modelOrPostgreSQLChanges": "none",
   "bookmarks": {
     "page": "Custos e Margens",
@@ -118,7 +119,346 @@
     "closedUsing": "existing report bookmark from Bookmarks pane",
     "closeVerified": true,
     "indicatorValuesAfterClose": "visually unchanged",
-    "filterValueInteraction": "not tested in this continuation",
-    "synchronization": "not tested in this continuation"
-  }
+    "filterValueInteraction": "period dates, channel and store tested; values restored to the recorded initial state",
+    "synchronization": "period, channel and store observed across all four pages; category and product remained local",
+    "fecharFiltersButton": "user confirmed click works correctly; no screenshot was provided"
+  },
+  "finalValidation": {
+    "date": "2026-10-14",
+    "result": "FASE 5.4.2.1 PARTIAL — VALIDATION PENDING",
+    "terminology": "financial measures use the commercial order-date cohort; visible titles and alt text updated accordingly",
+    "visual": "InfoTech I/T monogram and wordmark observed on all four pages at Fit to Width; final title and upper primary/secondary cards inspected at 100% on Custos e Margens; no title clipping observed there",
+    "filters": [
+      "date fields accepted typed values",
+      "both Between slider handles moved and recalculated visuals",
+      "Channel and Store tested separately and together",
+      "blank combinations remained BLANK",
+      "clearing one slicer preserved the other"
+    ],
+    "synchronization": "period/channel/store observed across Executive → Commercial → Products → Costs and Costs → Executive; Category and Product did not propagate from Products",
+    "navigation": "four existing destinations selected and active state observed",
+    "bookmarks": "existing open and close bookmark actions exercised on all four pages; Data suppressed, target visuals only, active section suppressed in the eight definitions",
+    "finance": {
+      "janSep2026": {
+        "grossProfit": "52590608.65",
+        "revenueAfterReturns": "228660758.74",
+        "adjustedCogs": "176070150.09",
+        "grossMargin": "23.00%"
+      },
+      "note": "non-sellable loss remains included in adjusted COGS",
+      "global": {
+        "grossProfit": "205133325.19",
+        "revenueAfterReturns": "922588975.45",
+        "adjustedCogs": "717455650.26",
+        "grossMargin": "22.23%"
+      }
+    },
+    "persistence": "saved original filter context; closed Desktop; edited only with Desktop closed; reopened PBIP without error; verified corrected titles and restored context/KPIs; no data refresh",
+    "staticModel": {
+      "activeRelationships": 19,
+      "inactiveRelationships": 2,
+      "tables": 10,
+      "measures": 55,
+      "pages": 4,
+      "relationships": 21,
+      "displayFolders": 11
+    },
+    "limitations": [
+      "100% close-ups for Executive, Commercial and Products pages not captured",
+      "keyboard focus, screen reader, and WCAG contrast were not validated",
+      "no data refresh or PostgreSQL access performed"
+    ],
+    "externalSnapshot": {
+      "path": "C:\\Users\\D2\\AppData\\Local\\Temp\\ProjetoBI-Phase-5.4.2.1-close-20261014-105616.zip",
+      "sha256": "2A870BC02C099240A95E437F6648E83040A1F54C0877809D80CF7572AB9E0967"
+    },
+    "userConfirmation": {
+      "source": "user confirmation in chat",
+      "statement": "clicking Fechar filtros works correctly",
+      "capture": "none"
+    },
+    "functionalGate": "PASS local"
+  },
+  "evidenceInventory": [
+    {
+      "file": "analise-comercial-desktop.jpg",
+      "bytes": 147231,
+      "sha256": "9F77996A2718321EADD3F1E8DEB95815FDC4136A30D3EE90C1D72194696429F2",
+      "captureSource": "Power BI Desktop screenshot",
+      "captureDate": "not individually recorded",
+      "width": 1366,
+      "height": 720
+    },
+    {
+      "file": "channel-ecommerce-alone-47pct-20261014.jpg",
+      "bytes": 133726,
+      "sha256": "60E3258A364CF3FF35E11891AD6A73292278950541AA36B15A3842C91877A0CA",
+      "captureSource": "Power BI Desktop screenshot",
+      "captureDate": "not individually recorded",
+      "width": 1366,
+      "height": 720
+    },
+    {
+      "file": "channel-ecommerce-store-campinas-blank-47pct-20261014.jpg",
+      "bytes": 104445,
+      "sha256": "DF793654D0ED31A70AE8AD67C3C70F7AD7C0667A538A83AEF402065FECAC2AE7",
+      "captureSource": "Power BI Desktop screenshot",
+      "captureDate": "not individually recorded",
+      "width": 1366,
+      "height": 720
+    },
+    {
+      "file": "custos-margens-desktop.jpg",
+      "bytes": 158166,
+      "sha256": "A3F3C72D2FC04340BF4BB7E9A37923DA528526130A1F2138CC5D2CB4B56F4E4B",
+      "captureSource": "Power BI Desktop screenshot",
+      "captureDate": "not individually recorded",
+      "width": 1366,
+      "height": 720
+    },
+    {
+      "file": "custos-titulos-corrigidos-100pct-20261014.jpg",
+      "bytes": 134552,
+      "sha256": "B1F3C9EF36E83CCEF36220AF12FF4B8A6F07B37E065FCB86EBF48365DA696C62",
+      "captureSource": "Power BI Desktop screenshot",
+      "captureDate": "not individually recorded",
+      "width": 1366,
+      "height": 720
+    },
+    {
+      "file": "date-typed-aug-2026-costs-47pct-20261014.jpg",
+      "bytes": 132659,
+      "sha256": "D9C7889B66F6E1776EE7D3ABBD8C3C38CBD0E4CEDCA95AB69B769567FBF29A18",
+      "captureSource": "Power BI Desktop screenshot",
+      "captureDate": "not individually recorded",
+      "width": 1366,
+      "height": 720
+    },
+    {
+      "file": "date-typed-jan-2026-costs-100pct-20261014.jpg",
+      "bytes": 119164,
+      "sha256": "CF830E032033F6D65D13AFEB5B654C5CF6EB4178168D7A114C9EBEDE73BC4CF2",
+      "captureSource": "Power BI Desktop screenshot",
+      "captureDate": "not individually recorded",
+      "width": 1366,
+      "height": 720
+    },
+    {
+      "file": "filtros-abertos-desktop.jpg",
+      "bytes": 141357,
+      "sha256": "24A453104406BD0B6269FA1BF5C294A0ABDAA591C52C07EBCC436480576EA79E",
+      "captureSource": "Power BI Desktop screenshot",
+      "captureDate": "not individually recorded",
+      "width": 1366,
+      "height": 720
+    },
+    {
+      "file": "final-state-costs-filters-open-fitwidth-47pct-20261014.jpg",
+      "bytes": 130853,
+      "sha256": "FFBBA38C2B8D8957E626CB5FA2430D14ED96C735FE171877EDB1EF1FEE4B85D5",
+      "captureSource": "Power BI Desktop screenshot",
+      "captureDate": "not individually recorded",
+      "width": 1366,
+      "height": 720
+    },
+    {
+      "file": "final-state-custos-filtros-abertos-100pct-20261014.jpg",
+      "bytes": 120115,
+      "sha256": "70B1FCB73856FA5D0D07160CE19B6022815C1E20890DDE5EC3CDA7F0A0D70DE4",
+      "captureSource": "Power BI Desktop screenshot",
+      "captureDate": "not individually recorded",
+      "width": 1366,
+      "height": 720
+    },
+    {
+      "file": "final-state-custos-filtros-abertos-38pct-20261014.jpg",
+      "bytes": 128396,
+      "sha256": "5F9AFD687DFB3F4E525D713D10E06C2650282A39CD0FBA7265A427DC6B9FF61A",
+      "captureSource": "Power BI Desktop screenshot",
+      "captureDate": "not individually recorded",
+      "width": 1366,
+      "height": 720
+    },
+    {
+      "file": "global-financial-baseline-costs-fitwidth-38pct-20261014.jpg",
+      "bytes": 150762,
+      "sha256": "5A0757919D8507B91EB1B66EE1F14FC442BD35EC3F7DAC90EAF60179AA58EFBE",
+      "captureSource": "Power BI Desktop screenshot",
+      "captureDate": "not individually recorded",
+      "width": 1366,
+      "height": 720
+    },
+    {
+      "file": "jan-sep-2026-baseline-custos-panel-closed-38pct-20261014.jpg",
+      "bytes": 130955,
+      "sha256": "24FF28BD0CEF0B4D3DFAF1690E12213EDD019D186C83681BFE9EDAB22DABF3E3",
+      "captureSource": "Power BI Desktop screenshot",
+      "captureDate": "not individually recorded",
+      "width": 1366,
+      "height": 720
+    },
+    {
+      "file": "jan-sep-2026-financial-components-open-47pct-20261014.jpg",
+      "bytes": 131957,
+      "sha256": "6CA0F582FCF7938EBFDD297DDAC17E25EF1BF4D34C3955074E7C9C64BD1BA022",
+      "captureSource": "Power BI Desktop screenshot",
+      "captureDate": "not individually recorded",
+      "width": 1366,
+      "height": 720
+    },
+    {
+      "file": "local-category-does-not-propagate-costs-38pct-20261014.jpg",
+      "bytes": 142176,
+      "sha256": "BC83DDAE070376BEDD332078684A240801B705614C3D1EB528049AD77777256F",
+      "captureSource": "Power BI Desktop screenshot",
+      "captureDate": "not individually recorded",
+      "width": 1366,
+      "height": 720
+    },
+    {
+      "file": "page-navigator-commercial-and-store-sync-38pct-20261014.jpg",
+      "bytes": 138397,
+      "sha256": "4F66E5E8F21A5A476475C612F4E33202DE7588CE12EF4176C17CE2DFC1DCEF3F",
+      "captureSource": "Power BI Desktop screenshot",
+      "captureDate": "not individually recorded",
+      "width": 1366,
+      "height": 720
+    },
+    {
+      "file": "page-navigator-products-local-and-synced-38pct-20261014.jpg",
+      "bytes": 133765,
+      "sha256": "2B72FE44CC5D3EEEFA3D9ABB2AD8F6B146B4C60FF31A3A7C82859F10A74CC039",
+      "captureSource": "Power BI Desktop screenshot",
+      "captureDate": "not individually recorded",
+      "width": 1366,
+      "height": 720
+    },
+    {
+      "file": "product-local-category-graficos-38pct-20261014.jpg",
+      "bytes": 129516,
+      "sha256": "4B67442E1F91EFA1E044C44490B5A9ADFE719126BD1193BB45D9D42ABA59C192",
+      "captureSource": "Power BI Desktop screenshot",
+      "captureDate": "not individually recorded",
+      "width": 1366,
+      "height": 720
+    },
+    {
+      "file": "product-local-product-filter-38pct-20261014.jpg",
+      "bytes": 129254,
+      "sha256": "28CD9A27D8DD2D2B48D310620B4C9DAD89244B9F60A689E7F83BA97A49E751B7",
+      "captureSource": "Power BI Desktop screenshot",
+      "captureDate": "not individually recorded",
+      "width": 1366,
+      "height": 720
+    },
+    {
+      "file": "product-selection-does-not-propagate-costs-38pct-20261014.jpg",
+      "bytes": 142153,
+      "sha256": "F6E1EB52BFB0CF29E5725927E5FD01ED7FE382A91A2E76F4052FC5B17244C47E",
+      "captureSource": "Power BI Desktop screenshot",
+      "captureDate": "not individually recorded",
+      "width": 1366,
+      "height": 720
+    },
+    {
+      "file": "products-original-local-filter-state-38pct-20261014.jpg",
+      "bytes": 127200,
+      "sha256": "F68068BDE69E86AAD1A5025E3B24230EF81F47F74A953F1FF62C40BB5244ECBA",
+      "captureSource": "Power BI Desktop screenshot",
+      "captureDate": "not individually recorded",
+      "width": 1366,
+      "height": 720
+    },
+    {
+      "file": "produtos-categorias-desktop.jpg",
+      "bytes": 139669,
+      "sha256": "4D130CD750788DE91D8D1B48DFA2FAAC426E27D63F009CA56E0067FF77C3C299",
+      "captureSource": "Power BI Desktop screenshot",
+      "captureDate": "not individually recorded",
+      "width": 1366,
+      "height": 720
+    },
+    {
+      "file": "slider-end-handle-moved-costs-38pct-20261014.jpg",
+      "bytes": 135159,
+      "sha256": "3205C40C39E2D646E24803453F830819CC96CA9DF53E999C54B56CCAB53229A9",
+      "captureSource": "Power BI Desktop screenshot",
+      "captureDate": "not individually recorded",
+      "width": 1366,
+      "height": 720
+    },
+    {
+      "file": "slider-moved-feb-2026-costs-100pct-20261014.jpg",
+      "bytes": 120851,
+      "sha256": "953F2E324306F10A8BF6D690B0533475798FC423A30D09E6ED13D4ECC7D2BEED",
+      "captureSource": "Power BI Desktop screenshot",
+      "captureDate": "not individually recorded",
+      "width": 1366,
+      "height": 720
+    },
+    {
+      "file": "store-campinas-alone-47pct-20261014.jpg",
+      "bytes": 131188,
+      "sha256": "DD0ACFBBAA3CB97D0AB8A6B041A3E1A81AE263F1A5EA99CC7D67C47F1BB79652",
+      "captureSource": "Power BI Desktop screenshot",
+      "captureDate": "not individually recorded",
+      "width": 1366,
+      "height": 720
+    },
+    {
+      "file": "sync-commercial-ecommerce-jan-sep-38pct-20261014.jpg",
+      "bytes": 135802,
+      "sha256": "957CD7EEFAE1DDA28D7C674C02B29BFEDEA5821ABEDA233DCAD186D43F1993C3",
+      "captureSource": "Power BI Desktop screenshot",
+      "captureDate": "not individually recorded",
+      "width": 1366,
+      "height": 720
+    },
+    {
+      "file": "sync-costs-to-executive-loja-fisica-jan-sep-38pct-20261014.jpg",
+      "bytes": 130474,
+      "sha256": "F63F576C33CE8FD0C1B304A50B3AFEA06D66978A8DB1E0BBF7B4BA6EB958E9E7",
+      "captureSource": "Power BI Desktop screenshot",
+      "captureDate": "not individually recorded",
+      "width": 1366,
+      "height": 720
+    },
+    {
+      "file": "sync-executive-ecommerce-jan-sep-38pct-20261014.jpg",
+      "bytes": 129870,
+      "sha256": "1C2B9BB588C86D57FE77D8ACF3B7F589E7AA632568FC122ADAA4B355649EC7AF",
+      "captureSource": "Power BI Desktop screenshot",
+      "captureDate": "not individually recorded",
+      "width": 1366,
+      "height": 720
+    },
+    {
+      "file": "sync-products-ecommerce-jan-sep-38pct-20261014.jpg",
+      "bytes": 127724,
+      "sha256": "B8A7ED1A6F1E96F9D8724534EE377803304D886DA4A84A11EA610EDEB7E4DD97",
+      "captureSource": "Power BI Desktop screenshot",
+      "captureDate": "not individually recorded",
+      "width": 1366,
+      "height": 720
+    },
+    {
+      "file": "synced-period-channel-store-on-executive-38pct-20261014.jpg",
+      "bytes": 131377,
+      "sha256": "88D1451C8809722D37561B5AA9285F42B3ED8ED4FEAFCA0380B1A87DCA5146FE",
+      "captureSource": "Power BI Desktop screenshot",
+      "captureDate": "not individually recorded",
+      "width": 1366,
+      "height": 720
+    },
+    {
+      "file": "visao-executiva-desktop.jpg",
+      "bytes": 141780,
+      "sha256": "E698BEDD1F75D97CD45F6F46C5CBDC9971DABCC404D7E47713C7D08ECA3FE6E9",
+      "captureSource": "Power BI Desktop screenshot",
+      "captureDate": "not individually recorded",
+      "width": 1366,
+      "height": 720
+    }
+  ],
+  "functionalGate": "PASS local — the user confirmed that clicking Fechar filtros works correctly"
 }

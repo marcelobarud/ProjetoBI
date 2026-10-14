@@ -97,7 +97,7 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'Receita, COGS e lucro bruto por mês de corte (R$ milhões)'"
+                  "Value": "'Receita, COGS e lucro bruto por mês do pedido (R$ milhões)'"
                 }
               }
             },
@@ -144,7 +144,7 @@
             "altText": {
               "expr": {
                 "Literal": {
-                  "Value": "'Evolução mensal por AnoMes do calendário comercial: receita após devoluções, COGS ajustado e lucro bruto. As três séries usam corte do pedido e valores em reais; eixo em milhões.'"
+                  "Value": "'Evolução mensal por AnoMes do calendário comercial: receita após devoluções, COGS ajustado e lucro bruto. As três séries usam a coorte da data comercial do pedido e valores em reais; eixo em milhões.'"
                 }
               }
             }
