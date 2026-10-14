@@ -1,6 +1,6 @@
-# Arquitetura inicial dos dashboards — InfoTech Intelligence
+# Arquitetura inicial dos dashboards — InfoTech
 
-**Escopo:** arquitetura planejada de cinco páginas para Desktop; quatro reais implementadas: Visão Executiva, Análise Comercial, Produtos e Categorias e Custos e Margens (Fase 5.4). Design System v0.2 preservado, com novos componentes candidatos à v0.3. Relações, medidas e dados permanecem aprovados. A Fase 5.4 validou reconciliações e parte das interações no Desktop; ver seu relatório para alcance e limitações.
+**Escopo:** arquitetura planejada de cinco páginas para Desktop; quatro implementadas: Visão Executiva, Análise Comercial, Produtos e Categorias e Custos e Margens (Fase 5.4). O nome vigente da marca é InfoTech, aprovado na Fase 5.4.2.1; “InfoTech Intelligence” é a denominação histórica das fases iniciais. Design System v0.2 preservado, com novos componentes candidatos à v0.3. Relações, medidas e dados permanecem aprovados. A Fase 5.4 validou reconciliações e parte das interações no Desktop; ver seu relatório para alcance e limitações.
 
 ## 1. Contratos do modelo usados no desenho
 
@@ -13,7 +13,7 @@
 
 ## 2. Estrutura comum
 
-1. **Cabeçalho:** wordmark InfoTech Intelligence, nome da área e navegador de páginas nativo horizontal.
+1. **Cabeçalho:** monograma I/T, wordmark InfoTech, nome da área e navegador de páginas nativo horizontal.
 2. **Contexto/filtros:** período nomeado pela perspectiva, Canal e Loja em posições constantes; Cliente ou Produto apenas quando útil à página. Mostrar como limpar filtro.
 3. **Área principal:** 3–5 KPIs prioritários, um visual temporal e no máximo dois detalhamentos por bloco. Preferir hierarquia, não densidade.
 4. **Rodapé opcional:** intervalo efetivo do dataset (até 30 set 2026) e perspectiva das datas; não exibir “última atualização” sem campo de atualização do dataset.

@@ -1,6 +1,6 @@
-# InfoTech Intelligence — Design System v0.2
+# InfoTech — Design System v0.2
 
-**Estado:** v0.2 consolidada na Fase 5.1.2. Os sete cenários de homologação receberam aprovação manual do usuário, com ressalva de tipografia corrigida nos três gráficos e reinspecionada por captura do Desktop. Ver `phase-5.1.2-executive-dashboard-homologation.md` para evidências e limitações.
+**Estado:** v0.2 consolidada na Fase 5.1.2. Desde a Fase 5.4.2.1, o nome vigente da marca é **InfoTech**; os registros anteriores usam “InfoTech Intelligence” e permanecem preservados como histórico. A regularização atual está em homologação visual parcial. Os sete cenários da Visão Executiva receberam aprovação manual do usuário, com ressalva de tipografia corrigida nos três gráficos e reinspecionada por captura do Desktop. Ver `phase-5.1.2-executive-dashboard-homologation.md` para evidências e limitações.
 
 **Proposto** significa orientação ainda sem implementação validada; **implementado** significa presente no PBIP; **homologado** significa implementado e validado no Desktop por relato manual ou inspeção visual identificada. A homologação se limita aos cenários e ao ambiente documentados. Navegação futura, mobile, mensagens especiais de ausência de dados, tooltips personalizados e compatibilidade com leitor de tela continuam propostos ou não verificados.
 
@@ -9,12 +9,12 @@
 | Elemento | Definição |
 |---|---|
 | Empresa fictícia | InfoTech |
-| Identidade analítica | InfoTech Intelligence |
+| Identidade analítica | InfoTech |
 | Segmento | Comércio de produtos de informática e tecnologia |
 | Posicionamento | Inteligência comercial, financeira e operacional baseada em dados |
 | Personalidade | Tecnológica, confiável, objetiva, moderna e profissional |
 
-Na linha de base v0.2, usar “InfoTech Intelligence” como wordmark tipográfico no cabeçalho. A proposta gráfica da Fase 5.4.2 acrescenta um monograma I/T e mantém o nome oficial; ela é candidata à v0.3 e aguarda revisão estética final. “InfoTech” pode identificar institucionalmente um rodapé compacto. A navegação deve privilegiar nomes de área; títulos de página descrevem a pergunta analítica. O rodapé, quando útil, informa o intervalo de dados e a perspectiva temporal, nunca presume que a data de hoje seja a última atualização. Não criar endereço, CNPJ, história, número de funcionários ou outros dados institucionais. Manter o nome em um único ponto de configuração visual para permitir substituição futura.
+O nome vigente e o wordmark são **InfoTech**, acompanhados pelo monograma geométrico I/T. A identidade inicial “InfoTech Intelligence” pertence ao histórico das fases anteriores, não ao nome atual. A navegação deve privilegiar nomes de área; títulos de página descrevem a pergunta analítica. O rodapé, quando útil, informa o intervalo de dados e a perspectiva temporal, nunca presume que a data de hoje seja a última atualização. Não criar endereço, CNPJ, história, número de funcionários ou outros dados institucionais. Manter o nome em um único ponto de configuração visual para permitir substituição futura.
 
 ## 2. Tokens de cor
 
@@ -153,10 +153,10 @@ O Desktop instalado expôs estes visuais nativos durante a inspeção do painel:
 
 ## 10. Evidência de homologação da Visão Executiva
 
-- Aplicados no PBIP o tema `InfoTech Intelligence — Light v0.1` e o fundo `#F5F7FB`; o Desktop aceitou a importação e indicou o tema como atual. Ao registrar o tema, expandiu `dataColors` de oito para 480 cores, mantendo os oito tokens iniciais na mesma ordem e sem alterar as demais propriedades do tema-fonte.
+- Na implantação histórica, o tema exibido era `InfoTech Intelligence — Light v0.1`; desde a Fase 5.4.2.1, seu nome de exibição é `InfoTech — Light v0.1`. O Desktop havia aceitado a importação e indicado o tema como atual. Ao registrar o tema, expandiu `dataColors` de oito para 480 cores, mantendo os oito tokens iniciais na mesma ordem e sem alterar as demais propriedades do tema-fonte.
 - A página reutilizada foi definida em Full HD 1920×1080, com cabeçalho tipográfico, filtros compactos, quatro cartões, uma linha temporal e duas barras horizontais.
 - Os sete testes manuais foram aprovados pelo usuário na Fase 5.1.2: período, canal, loja, combinação, categoria, acessibilidade/desempenho e persistência. O relato é evidência manual, sem valores detalhados para cada seleção.
-- O cabeçalho contém somente InfoTech Intelligence e Visão Executiva; o período atual é identificado no slicer. A inspeção posterior ao refinamento confirmou quatro KPIs, quatro canais, cinco categorias, ausência de cortes nos nomes e ausência de scrollbar no ranking.
+- À época da homologação da Visão Executiva, o cabeçalho continha InfoTech Intelligence e Visão Executiva; o período atual era identificado no slicer. A inspeção confirmou quatro KPIs, quatro canais, cinco categorias, ausência de cortes nos nomes e ausência de scrollbar no ranking. O nome do cabeçalho foi atualizado para InfoTech na Fase 5.4.2.1.
 - A exportação local `PowerBIPerformanceData.json` contém 153 eventos completos de ciclo de vida de visual, entre 45 e 408 ms, e ações de slicer/cross-highlight. Esses intervalos são calculados dos timestamps da sessão anterior ao refinamento; não equivalem a tempo de carregamento inicial da página, SLA ou benchmark após a mudança. Condições de cache e atribuição exata aos cenários não estão registradas. Ver o relatório da Fase 5.1.2.
 - Contraste dos tokens continua com as medições documentadas; leitor de tela e escala de cinza não são declarados testados.
 
@@ -166,13 +166,13 @@ O Desktop instalado expôs estes visuais nativos durante a inspeção do painel:
 
 **Linha de base v0.2:** wordmark 30 pt, nome da página 12 pt, cores Text Primary/Text Secondary; textbox em x=36, y=22, 1848 × 76 px na Visão Executiva. Usar o nome da página sem período estático quando o slicer permitir outras datas. Texto alternativo também deve evitar datas fixas.
 
-**Candidato à v0.3 — Fase 5.4.2:** símbolo monograma vetorial 48 × 48 px em x=36, y=36 e textbox da marca em x=96, y=22, 520 × 76 px. O wordmark permanece em 30 pt e o nome da página em 12 pt. A composição foi aplicada às quatro páginas, mantendo o Page Navigator a partir de x=636 e o botão Filtros. A inspeção visual registrada após reabrir o PBIP observou o símbolo ao lado do cabeçalho nas quatro páginas; não há capturas locais exportáveis nesta entrega e a validação visual completa continua pendente. Esta composição não é identidade definitiva até revisão estética do usuário.
+**Candidato à v0.3 — Fases 5.4.2/5.4.2.1:** símbolo monograma vetorial 48 × 48 px em x=36, y=36 e textbox da marca em x=96, y=22, 520 × 76 px. O wordmark atual é InfoTech em 30 pt e o nome da página em 12 pt. A composição foi aplicada às quatro páginas, mantendo o Page Navigator a partir de x=636 e o botão Filtros. A inspeção anterior observou o símbolo nos quatro cabeçalhos; a nova homologação visual não foi concluída, e a composição aguarda revisão estética final.
 
-**Biblioteca candidata:** `powerbi/branding/infotech/infotech-monogram.svg` é a variante aplicada, com viewBox 64 × 64, traços azul Primary `#2563EB` e verde-petróleo Secondary `#0F9D92`, fundo transparente e geometria original I/T sem dependência de fontes. Recomenda-se área de apresentação mínima de 40 × 40 px e manter proporção quadrada, sem recortar, recolorir, adicionar sombra ou esticar. `infotech-monogram-mono.svg` é alternativa de uma cor; `infotech-horizontal.svg` é proposta horizontal e não está aplicada. Manter respiro visual ao redor e usar apenas sobre fundo claro. O arquivo vetorial aplicado foi registrado no pacote de recursos do PBIP; testar abertura/reabertura no Desktop antes de distribuição.
+**Biblioteca candidata:** `powerbi/branding/infotech/infotech-monogram.svg` é a variante aplicada, com viewBox 64 × 64, traços azul Primary `#2563EB` e verde-petróleo Secondary `#0F9D92`, fundo transparente e geometria original I/T sem dependência de fontes. Recomenda-se área de apresentação mínima de 40 × 40 px e manter proporção quadrada, sem recortar, recolorir, adicionar sombra ou esticar. `infotech-monogram-mono.svg` é alternativa monocromática; `infotech-horizontal.svg` usa apenas InfoTech e não está aplicada. Manter respiro visual ao redor e usar apenas sobre fundo claro. O arquivo vetorial aplicado foi registrado no pacote de recursos do PBIP; reabertura final no Desktop continua pendente.
 
-As três propostas avaliadas foram: A) monograma geométrico I/T, preferido pelo usuário para o piloto; B) estrutura abstrata de nós conectados para sugerir inteligência de dados; C) wordmark com detalhe geométrico discreto. A e suas variações são as únicas desenhadas como vetores locais nesta fase; B e C permanecem conceitos documentais. O usuário ainda deve revisar a estética da composição antes de qualquer promoção.
+As três propostas avaliadas foram: A) monograma geométrico I/T, selecionado pelo usuário; B) estrutura abstrata de nós conectados para sugerir inteligência de dados; C) wordmark com detalhe geométrico discreto. A e suas variações são as únicas desenhadas como vetores locais; B e C permanecem conceitos documentais. A revisão estética final da composição continua pendente.
 
-DS-C02 refinado, DS-C03 refinado, padrão de cartões secundários e acabamento do Page Navigator são **candidatos à v0.3**; a Fase 5.4.2 preservou seus estilos e comportamentos existentes. O botão Filtros mantém texto, azul `#1D4ED8`, branco e 16 pt; Fechar filtros mantém `#DBEAFE`, texto `#142238` e 16 pt. Nenhum ícone foi acrescentado ao botão, evitando elementos sobrepostos ao bookmark. Os cartões mantêm valores 32 pt e títulos 13 pt, sem alteração de métricas ou números. O navegador nativo permanece sem alterações.
+DS-C02, DS-C03, padrão de cartões secundários e acabamento do Page Navigator seguem **candidatos à v0.3**, não homologados nesta fase. O botão Filtros mantém texto, azul `#1D4ED8`, branco e 16 pt; Fechar filtros mantém `#DBEAFE`, texto `#142238` e 16 pt. Nenhum ícone foi acrescentado ao botão. Os cartões mantêm valores 32 pt e títulos 13 pt, sem alteração de métricas ou números. O navegador nativo permanece sem alterações.
 
 ### DS-C02 — Barra de filtros
 
@@ -254,7 +254,7 @@ Ver [Fase 5.3](phase-5.3-products-categories-dashboard.md) para reconciliações
 
 ## 15. Custos e Margens — Fase 5.4 (candidatos à v0.3)
 
-A versão vigente continua **InfoTech Intelligence v0.2**. A quarta página reutiliza DS-C01–06 e mantém canvas Full HD de 1920 × 1080 px, fundo `#F5F7FB`, superfícies brancas, Segoe UI, margens de 36 px e espaçamento de 8 px. Os componentes abaixo foram implementados e renderizados no Desktop, mas não promovem automaticamente a versão da biblioteca:
+No registro da Fase 5.4, a versão vigente era **InfoTech Intelligence v0.2**. A base atual continua v0.2, com o nome de marca atualizado para InfoTech na Fase 5.4.2.1. A quarta página reutiliza DS-C01–06 e mantém canvas Full HD de 1920 × 1080 px, fundo `#F5F7FB`, superfícies brancas, Segoe UI, margens de 36 px e espaçamento de 8 px. Os componentes abaixo foram implementados e renderizados no Desktop, mas não promovem automaticamente a versão da biblioteca:
 
 | Componente candidato | Implementação observada | Estado e limites |
 |---|---|---|
@@ -269,7 +269,7 @@ O viewport usado na inspeção do Desktop foi 1152 × 513 px; a captura Fit to P
 
 ## 16. Painel recolhível de filtros — Fase 5.4.1 (candidato à v0.3)
 
-A versão vigente segue **InfoTech Intelligence v0.2**. A apresentação permanente de DS-C02 da v0.2 permanece no histórico; a variação abaixo é candidata e não promove automaticamente o design system.
+No registro da Fase 5.4.1, a versão vigente era **InfoTech Intelligence v0.2**. A base atual permanece v0.2 sob o nome InfoTech. A apresentação permanente de DS-C02 da v0.2 permanece no histórico; a variação abaixo é candidata e não promove automaticamente o design system.
 
 - Em quatro páginas Full HD, Período Between, Canal e Loja ficam em grupo horizontal nativo aberto/fechado por bookmarks. O estado fechado é inicial; os filtros continuam aplicados.
 - Datas e slider de duas alças preservam DS-C02; Canal/Loja usam dropdowns existentes. `InfoTech.PeriodoComercial`, `InfoTech.Canal` e `InfoTech.Loja` continuam sincronizados. Categoria e Produto pesquisável são locais à página Produtos e Categorias.
@@ -279,3 +279,11 @@ A versão vigente segue **InfoTech Intelligence v0.2**. A apresentação permane
 - O painel aberto sobrepõe parte do conteúdo analítico; no estado fechado os visuais usam o espaço recuperado. Não há indicador dinâmico de valores de filtro no botão; os controles continuam acessíveis ao abrir o painel.
 
 Ações abrir/fechar, preservação de seleção, sincronização compartilhada, contraste visual, navegador, reabertura do PBIP e disposição local de Categoria/Produto foram conferidos no Desktop. A captura usou viewport 1152 × 513 px em Fit to Width. Leitor de tela, percurso completo por Tab, escala de cinza e contraste automatizado não foram testados. O Performance Analyzer registrou somente atualização aquecida; não homologar como benchmark frio. Ver [relatório da Fase 5.4.1](phase-5.4.1-collapsible-filter-panel.md) e [pacote de evidências](evidence/archives/fase-5.4.1-evidencias.zip).
+
+## 17. Regularização da marca — Fase 5.4.2.1
+
+O nome vigente é **InfoTech**; **InfoTech Intelligence** permanece somente como denominação histórica nas fases anteriores. O monograma I/T é o símbolo escolhido pelo usuário. Os cabeçalhos das quatro páginas foram vistos no Desktop em 47% de zoom e exibem consistentemente o monograma e o wordmark InfoTech. A composição continua candidata à v0.3 até a inspeção ampliada e revisão estética final.
+
+Na página Custos e Margens, o rótulo acima dos cartões secundários usa 31 px de altura e o título “Composição do custo analítico — corte do pedido”. O título da tendência mensal usa “por mês de corte”. Essas propriedades foram conferidas nos arquivos PBIR e em captura real da página Custos e Margens no Desktop. A visão geral das quatro páginas foi examinada em 47% de zoom; a leitura ampliada e Fit to Page permanecem pendentes.
+
+Botões, cartões KPI e Page Navigator permanecem com os estilos previamente registrados. A aparência geral foi conferida nas quatro páginas, sem refinamento novo; bordas, padding, foco e detalhes tipográficos requerem revisão ampliada. A v0.2 segue como base; a futura v0.3 depende da inspeção real dos quatro dashboards, dos cartões, dos controles e da revisão estética. Consulte [relatório da Fase 5.4.2.1](phase-5.4.2.1-infotech-branding-closure.md).

@@ -1,10 +1,10 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 440 88" role="img" aria-labelledby="title desc">
-  <title id="title">InfoTech Intelligence</title>
-  <desc id="desc">Marca horizontal com monograma I/T, wordmark InfoTech e identificação Intelligence.</desc>
+  <title id="title">InfoTech</title>
+  <desc id="desc">Marca horizontal com monograma I/T e wordmark InfoTech.</desc>
   <g fill="none" stroke-linecap="round" stroke-linejoin="round">
     <path d="M13 17h17M13 47h17M17 17v30" stroke="#0F9D92" stroke-width="8"/>
     <path d="M29 11h23M40.5 11v36" stroke="#2563EB" stroke-width="8"/>
   </g>
   <text x="76" y="40" fill="#142238" font-family="Segoe UI, sans-serif" font-size="31" font-weight="600">InfoTech</text>
-  <text x="78" y="65" fill="#5B6B82" font-family="Segoe UI, sans-serif" font-size="15" letter-spacing="2.2">INTELLIGENCE</text>
+
 </svg>

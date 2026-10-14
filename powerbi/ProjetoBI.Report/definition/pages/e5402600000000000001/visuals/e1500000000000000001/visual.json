@@ -6,7 +6,7 @@
     "y": 272,
     "z": 1000,
     "width": 1848,
-    "height": 24,
+    "height": 31,
     "tabOrder": 11
   },
   "visual": {
@@ -19,7 +19,7 @@
               {
                 "textRuns": [
                   {
-                    "value": "Composição do custo analítico — coorte do pedido",
+                    "value": "Composição do custo analítico — corte do pedido",
                     "textStyle": {
                       "fontFamily": "Segoe UI Semibold",
                       "fontSize": "17pt",
@@ -79,7 +79,7 @@
             "altText": {
               "expr": {
                 "Literal": {
-                  "Value": "'Título da composição do custo analítico por coorte do pedido.'"
+                  "Value": "'Título da composição do custo analítico por corte do pedido.'"
                 }
               }
             }

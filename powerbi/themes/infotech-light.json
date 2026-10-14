@@ -1,6 +1,6 @@
 {
   "$schema": "https://raw.githubusercontent.com/microsoft/powerbi-desktop-samples/main/Report%20Theme%20JSON%20Schema/reportThemeSchema-2.157.json",
-  "name": "InfoTech Intelligence — Light v0.1",
+  "name": "InfoTech — Light v0.1",
   "dataColors": [
     "#2563EB",
     "#0F9D92",

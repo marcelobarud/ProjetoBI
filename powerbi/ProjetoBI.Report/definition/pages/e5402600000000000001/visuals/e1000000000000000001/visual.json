@@ -19,7 +19,7 @@
               {
                 "textRuns": [
                   {
-                    "value": "InfoTech Intelligence",
+                    "value": "InfoTech",
                     "textStyle": {
                       "fontFamily": "Segoe UI Semibold",
                       "fontSize": "30pt",
@@ -91,7 +91,7 @@
             "altText": {
               "expr": {
                 "Literal": {
-                  "Value": "'InfoTech Intelligence — custos e rentabilidade pela coorte da data comercial do pedido.'"
+                  "Value": "'InfoTech — custos e rentabilidade pela coorte da data comercial do pedido.'"
                 }
               }
             }

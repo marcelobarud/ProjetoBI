@@ -1,0 +1,124 @@
+{
+  "phase": "5.4.2.1",
+  "result": "PARTIAL — FINAL VISUAL VALIDATION PENDING",
+  "evidenceType": "local static inspection plus real Power BI Desktop captures",
+  "desktopVisualCapture": {
+    "state": "partial visual inspection completed",
+    "pages": [
+      "Visão Executiva",
+      "Análise Comercial",
+      "Produtos e Categorias",
+      "Custos e Margens"
+    ],
+    "zoom": "47% for page overview",
+    "bookmarksOpenAndCloseScreenshot": "Custos e Margens, at 38% with Bookmarks pane visible",
+    "images": [
+      {
+        "sha256": "9F77996A2718321EADD3F1E8DEB95815FDC4136A30D3EE90C1D72194696429F2",
+        "bytes": 147231,
+        "format": "JPEG",
+        "file": "analise-comercial-desktop.jpg",
+        "valid": true
+      },
+      {
+        "sha256": "A3F3C72D2FC04340BF4BB7E9A37923DA528526130A1F2138CC5D2CB4B56F4E4B",
+        "bytes": 158166,
+        "format": "JPEG",
+        "file": "custos-margens-desktop.jpg",
+        "valid": true
+      },
+      {
+        "sha256": "24A453104406BD0B6269FA1BF5C294A0ABDAA591C52C07EBCC436480576EA79E",
+        "bytes": 141357,
+        "format": "JPEG",
+        "file": "filtros-abertos-desktop.jpg",
+        "valid": true
+      },
+      {
+        "sha256": "4D130CD750788DE91D8D1B48DFA2FAAC426E27D63F009CA56E0067FF77C3C299",
+        "bytes": 139669,
+        "format": "JPEG",
+        "file": "produtos-categorias-desktop.jpg",
+        "valid": true
+      },
+      {
+        "sha256": "E698BEDD1F75D97CD45F6F46C5CBDC9971DABCC404D7E47713C7D08ECA3FE6E9",
+        "bytes": 141780,
+        "format": "JPEG",
+        "file": "visao-executiva-desktop.jpg",
+        "valid": true
+      }
+    ],
+    "remaining": "Enlarged close-ups of header, primary KPIs, secondary KPIs, and filter buttons; Fit to Page comparison"
+  },
+  "json": {
+    "count": 96,
+    "invalid": 0
+  },
+  "semanticModel": {
+    "tables": 10,
+    "measures": 55,
+    "displayFolders": 11,
+    "relationships": 21,
+    "activeRelationships": 19,
+    "inactiveRelationships": 2,
+    "pages": 4
+  },
+  "headers": [
+    {
+      "wordmark": "InfoTech",
+      "altText": "'InfoTech — Visão Executiva comercial e financeira para o período selecionado.'",
+      "path": "powerbi/ProjetoBI.Report/definition/pages/8b8186ab91fc09fae9a2/visuals/a1000000000000000001/visual.json"
+    },
+    {
+      "wordmark": "InfoTech",
+      "altText": "'InfoTech — Análise Comercial por data do pedido; receita antes de devoluções e ticket incluindo frete.'",
+      "path": "powerbi/ProjetoBI.Report/definition/pages/c5202600000000000001/visuals/b1000000000000000001/visual.json"
+    },
+    {
+      "wordmark": "InfoTech",
+      "altText": "'InfoTech — análise do desempenho comercial e financeiro por produto e categoria.'",
+      "path": "powerbi/ProjetoBI.Report/definition/pages/d5302600000000000001/visuals/d1000000000000000001/visual.json"
+    },
+    {
+      "wordmark": "InfoTech",
+      "altText": "'InfoTech — custos e rentabilidade pela coorte da data comercial do pedido.'",
+      "path": "powerbi/ProjetoBI.Report/definition/pages/e5402600000000000001/visuals/e1000000000000000001/visual.json"
+    }
+  ],
+  "costLabel": {
+    "path": "powerbi/ProjetoBI.Report/definition/pages/e5402600000000000001/visuals/e1500000000000000001/visual.json",
+    "height": 31,
+    "text": "Composição do custo analítico — corte do pedido"
+  },
+  "lineChartTitle": "'Receita, COGS e lucro bruto por mês de corte (R$ milhões)'",
+  "svgAssets": [
+    {
+      "file": "infotech-horizontal.svg",
+      "xmlValid": true,
+      "sha256": "FFE3086006869A7BA8AEDDDCC385E8897919F84F1E38BB24066FFC0EFD8AAA35"
+    },
+    {
+      "file": "infotech-monogram-mono.svg",
+      "xmlValid": true,
+      "sha256": "597A99446C03226172328B71276B6C6CF7F6F842B158F7E5F571AA5771199657"
+    },
+    {
+      "file": "infotech-monogram.svg",
+      "xmlValid": true,
+      "sha256": "29CA228E30EF819E4EF204C8864CCA155F31EB9C979E6E25E779E736667B343A"
+    }
+  ],
+  "functionalAndVisualTests": "Partial: four page views and open/close bookmark states inspected; remaining filter, sync, keyboard, save/reopen, and baseline checks not repeated",
+  "modelOrPostgreSQLChanges": "none",
+  "bookmarks": {
+    "page": "Custos e Margens",
+    "openedUsing": "existing report bookmark from Bookmarks pane",
+    "openVerified": true,
+    "closedUsing": "existing report bookmark from Bookmarks pane",
+    "closeVerified": true,
+    "indicatorValuesAfterClose": "visually unchanged",
+    "filterValueInteraction": "not tested in this continuation",
+    "synchronization": "not tested in this continuation"
+  }
+}

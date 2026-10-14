@@ -18,7 +18,7 @@
               {
                 "textRuns": [
                   {
-                    "value": "InfoTech Intelligence",
+                    "value": "InfoTech",
                     "textStyle": {
                       "color": "#142238",
                       "bold": true,
@@ -91,7 +91,7 @@
             "altText": {
               "expr": {
                 "Literal": {
-                  "Value": "'InfoTech Intelligence — Visão Executiva comercial e financeira para o período selecionado.'"
+                  "Value": "'InfoTech — Visão Executiva comercial e financeira para o período selecionado.'"
                 }
               }
             }

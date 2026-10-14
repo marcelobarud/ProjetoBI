@@ -19,7 +19,7 @@
               {
                 "textRuns": [
                   {
-                    "value": "InfoTech Intelligence",
+                    "value": "InfoTech",
                     "textStyle": {
                       "fontFamily": "Segoe UI Semibold",
                       "fontSize": "30pt",
@@ -91,7 +91,7 @@
             "altText": {
               "expr": {
                 "Literal": {
-                  "Value": "'InfoTech Intelligence — Análise Comercial por data do pedido; receita antes de devoluções e ticket incluindo frete.'"
+                  "Value": "'InfoTech — Análise Comercial por data do pedido; receita antes de devoluções e ticket incluindo frete.'"
                 }
               }
             }
