@@ -1,0 +1,6 @@
+EVALUATE
+ADDCOLUMNS(
+    VALUES('DimProduto'[category_name]),
+    "Valor_Devolvido", [Valor Comercial Devolvido — Data do Pedido]
+)
+ORDER BY [Valor_Devolvido] DESC, 'DimProduto'[category_name] ASC

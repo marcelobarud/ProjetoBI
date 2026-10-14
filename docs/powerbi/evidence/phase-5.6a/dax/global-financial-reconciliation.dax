@@ -1,0 +1,13 @@
+EVALUATE
+ROW(
+    "Valor Comercial Devolvido — Data do Pedido", [Valor Comercial Devolvido — Data do Pedido],
+    "Reversão COGS Sellable — Data do Pedido", [Reversão COGS Sellable — Data do Pedido],
+    "Perda Non-Sellable — Data do Pedido", [Perda Non-Sellable — Data do Pedido],
+    "Receita de Produtos — Antes de Devoluções (Itens)", [Receita de Produtos — Antes de Devoluções (Itens)],
+    "Receita Analítica Após Devoluções", [Receita Analítica Após Devoluções],
+    "COGS Original Concluído — Data do Pedido", [COGS Original Concluído — Data do Pedido],
+    "COGS Analítico Ajustado", [COGS Analítico Ajustado],
+    "Lucro Bruto Analítico", [Lucro Bruto Analítico],
+    "Margem Bruta Analítica", [Margem Bruta Analítica],
+    "Percentual de Devoluções Comerciais", [Percentual de Devoluções Comerciais]
+)

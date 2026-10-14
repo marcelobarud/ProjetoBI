@@ -1,0 +1,9 @@
+EVALUATE
+TOPN(5,
+    SUMMARIZECOLUMNS('DimProduto'[sku], 'DimProduto'[name],
+        "Valor_Devolvido", [Valor Comercial Devolvido — Data do Pedido]),
+    [Valor_Devolvido], DESC,
+    'DimProduto'[sku], ASC,
+    'DimProduto'[name], ASC
+)
+ORDER BY [Valor_Devolvido] DESC, 'DimProduto'[sku] ASC, 'DimProduto'[name] ASC

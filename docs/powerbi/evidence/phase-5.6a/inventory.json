@@ -1,0 +1,52 @@
+{
+  "auditDate": "2026-10-14",
+  "source": "D:\\Codex\\ProjetoBI",
+  "gitAtStart": {
+    "head": "fc26429",
+    "branch": "main",
+    "preexistingChanges": true,
+    "preexistingChangeScope": [
+      "PBIR page definitions and report.json",
+      "Power BI culture TMDL",
+      "historical evidence archives and performance export"
+    ],
+    "externalSnapshot": "C:\\Users\\D2\\AppData\\Local\\Temp\\ProjetoBI-Phase-5.6A-20261014-132430.zip",
+    "snapshotSha256": "ED7248E5C52AA97284B09C8AE2032CB6B96293AA5720081E35439ED83257DF8B"
+  },
+  "semanticModel": {
+    "tables": 10,
+    "measures": 55,
+    "distinctDisplayFolders": 11,
+    "relationships": 21,
+    "activeRelationships": 19,
+    "inactiveRelationships": 2,
+    "calendarStart": "2023-01-01",
+    "calendarEnd": "2026-09-30",
+    "storageMode": "Import"
+  },
+  "report": {
+    "pages": [
+      {"id":"8b8186ab91fc09fae9a2","name":"Visão Executiva","visuals":17},
+      {"id":"c5202600000000000001","name":"Análise Comercial","visuals":22},
+      {"id":"d5302600000000000001","name":"Produtos e Categorias","visuals":19},
+      {"id":"e5402600000000000001","name":"Custos e Margens","visuals":22},
+      {"id":"f5502600000000000001","name":"Devoluções","visuals":18}
+    ],
+    "jsonFilesParsed": 117,
+    "invalidJsonFiles": 0,
+    "syncGroupInstances": {
+      "InfoTech.PeriodoComercial": 5,
+      "InfoTech.Canal": 5,
+      "InfoTech.Loja": 5
+    },
+    "bookmarkDefinitions": 10,
+    "activePageAtInspection": "Custos e Margens"
+  },
+  "modelChanges": {
+    "dax": false,
+    "semanticTmdl": false,
+    "relationships": false,
+    "powerQuery": false,
+    "postgresqlOrData": false
+  }
+}

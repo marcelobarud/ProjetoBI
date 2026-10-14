@@ -75,6 +75,10 @@ As medidas foram conferidas no TMDL de `_Medidas`; não foram criadas medidas, c
 
 ## Documentação e governança
 
+### Acompanhamento posterior — auditoria integrada 5.6A (2026-10-14)
+
+A Fase 5.5 permanece historicamente **PARTIAL** como entregue. Na auditoria 5.6A, os valores globais e Jan–Set/2026 das medidas de devolução/custos foram consultados diretamente em DAX; as 12 categorias reconciliaram com o total global; o Top 5 sob o contexto salvo e os quatro cartões foram conferidos. A classificação desta validação integrada permanece **PARTIAL** porque slider/digitação, sincronização direcional entre páginas, interações locais, persistência, desempenho e acessibilidade ainda não foram exercitados. Portanto, a homologação funcional da página não está concluída. Ver `phase-5.6a-integrated-functional-audit.md` e `evidence/phase-5.6a/`.
+
 O Design System v0.2 continua vigente. A navegação com cinco destinos, o painel recolhível na quinta página, os cartões de devolução, o ranking por valor, a evolução por coorte e os rótulos de sellable/non-sellable foram registrados como candidatos à v0.3. A Fase 5.6 continua separada e não foi iniciada.
 
 Commit local criado com a mensagem `feat(powerbi): implementa dashboard de devolucoes`. As alterações anteriores fora do escopo permaneceram na working tree; nenhum push, merge, rebase ou tag foi executado.

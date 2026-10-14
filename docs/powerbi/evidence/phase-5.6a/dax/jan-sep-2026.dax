@@ -1,0 +1,14 @@
+EVALUATE
+CALCULATETABLE(
+    ROW(
+        "Receita Analítica Após Devoluções", [Receita Analítica Após Devoluções],
+        "COGS Analítico Ajustado", [COGS Analítico Ajustado],
+        "Lucro Bruto Analítico", [Lucro Bruto Analítico],
+        "Margem Bruta Analítica", [Margem Bruta Analítica],
+        "Valor Comercial Devolvido — Data do Pedido", [Valor Comercial Devolvido — Data do Pedido],
+        "Reversão COGS Sellable — Data do Pedido", [Reversão COGS Sellable — Data do Pedido],
+        "Perda Non-Sellable — Data do Pedido", [Perda Non-Sellable — Data do Pedido],
+        "Receita de Produtos — Antes de Devoluções (Itens)", [Receita de Produtos — Antes de Devoluções (Itens)]
+    ),
+    DATESBETWEEN('DimCalendario'[Data], DATE(2026,1,1), DATE(2026,9,30))
+)

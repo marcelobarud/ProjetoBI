@@ -1,0 +1,13 @@
+EVALUATE
+CALCULATETABLE(
+    SUMMARIZECOLUMNS(
+        'DimCalendario'[AnoMesOrdem],
+        'DimCalendario'[AnoMes],
+        "Devolucao", [Valor Comercial Devolvido — Data do Pedido],
+        "ReceitaAntes", [Receita de Produtos — Antes de Devoluções (Itens)],
+        "ReversaoSellable", [Reversão COGS Sellable — Data do Pedido],
+        "PerdaNonSellable", [Perda Non-Sellable — Data do Pedido]
+    ),
+    DATESBETWEEN('DimCalendario'[Data], DATE(2026,1,1), DATE(2026,9,30))
+)
+ORDER BY 'DimCalendario'[AnoMesOrdem]

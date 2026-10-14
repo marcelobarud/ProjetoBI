@@ -1,0 +1,23 @@
+context,measure,value,unit,precision
+Global,Valor Comercial Devolvido — Data do Pedido,26730788.745,BRL,0.001
+Global,Reversão COGS Sellable — Data do Pedido,8010914.36386281,BRL,internal decimal
+Global,Perda Non-Sellable — Data do Pedido,12296704.23413595,BRL,internal decimal
+Global,Receita de Produtos — Antes de Devoluções (Itens),949319764.19,BRL,0.01
+Global,Receita Analítica Após Devoluções,922588975.445,BRL,internal decimal
+Global,COGS Original Concluído — Data do Pedido,725466564.623508,BRL,internal decimal
+Global,COGS Analítico Ajustado,717455650.2596452,BRL,internal decimal
+Global,Lucro Bruto Analítico,205133325.18535483,BRL,internal decimal
+Global,Margem Bruta Analítica,0.22234530288681495,ratio,internal decimal
+Global,Percentual de Devoluções Comerciais,0.028157834434014806,ratio,internal decimal
+Jan-Sep 2026,Receita Analítica Após Devoluções,228660758.74,BRL,0.01
+Jan-Sep 2026,COGS Analítico Ajustado,176070150.08984238,BRL,internal decimal
+Jan-Sep 2026,Lucro Bruto Analítico,52590608.65015763,BRL,internal decimal
+Jan-Sep 2026,Margem Bruta Analítica,0.22999402669679792,ratio,internal decimal
+Jan-Sep 2026,Valor Comercial Devolvido — Data do Pedido,5943004.03,BRL,0.01
+Jan-Sep 2026,Reversão COGS Sellable — Data do Pedido,1778950.41088067,BRL,internal decimal
+Jan-Sep 2026,Perda Non-Sellable — Data do Pedido,2752994.19933278,BRL,internal decimal
+Jan-Sep 2026,Receita de Produtos — Antes de Devoluções (Itens),234603762.77,BRL,0.01
+Saved dashboard context,Valor Comercial Devolvido — Data do Pedido,420582.305,BRL,0.001
+Saved dashboard context,Reversão COGS Sellable — Data do Pedido,88812.47859743,BRL,internal decimal
+Saved dashboard context,Perda Non-Sellable — Data do Pedido,235478.1538917,BRL,internal decimal
+Saved dashboard context,Percentual de Devoluções Comerciais,0.021374596649639022,ratio,internal decimal

@@ -80,7 +80,7 @@ Na página 1, categoria → cartão `Pedidos Concluídos` mantém `NoFilter`. Na
 | 5.2 | PASS local: quatro KPIs, status, dois temporais com escalas separadas, Canal/Top 5 lojas, navegador e filtros sincronizados. YTD visual deferido como refinamento específico, DAX validado. Sem tabela de clientes no layout atual; nenhuma nova métrica |
 | 5.3 | PASS local: quatro KPIs financeiros por coorte, Top 5 produtos, todas as categorias, matriz Categoria → Produto, filtros locais pesquisáveis, contexto geral sincronizado e navegador com três destinos. Sem atribuições de cabeçalho; medidas/modelo preservados. Ver `phase-5.3-products-categories-dashboard.md` |
 | 5.4 | PARTIAL local: página Custos e Margens, composição financeira, tendência por coorte e comparação por canal/categoria implementadas; DAX reconciliado e Desktop reaberto. Navegação/sincronização observadas em amostra; fluxos operacionais e validação exaustiva de todas as interações ficam documentados como limites. Ver `phase-5.4-costs-margins-dashboard.md` |
-| 5.5 | PARTIAL local: página Devoluções implementada com perspectiva comercial por coorte; reconciliações DAX, filtros cruzados completos, persistência e validação assistiva pendentes |
+| 5.5 | PARTIAL local: página Devoluções implementada com perspectiva comercial por coorte. Auditoria 5.6A reconciliou valores globais e Jan–Set/2026, invariantes financeiros, 12 categorias e Top 5 sob contexto; digitação/slider, sincronização direcional, interações, persistência, desempenho e acessibilidade continuam pendentes. Design System v0.2 mantido. Ver `phase-5.6a-integrated-functional-audit.md`. |
 | 5.6 | Auditoria integrada visual, funcional, acessível, temporal e de desempenho |
 
 Este roteiro não autoriza a execução das fases seguintes.

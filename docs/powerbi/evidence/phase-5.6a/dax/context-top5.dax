@@ -1,0 +1,14 @@
+EVALUATE
+CALCULATETABLE(
+    TOPN(5,
+        SUMMARIZECOLUMNS('DimProduto'[sku], 'DimProduto'[name],
+            "Valor_Devolvido", [Valor Comercial Devolvido — Data do Pedido]),
+        [Valor_Devolvido], DESC,
+        'DimProduto'[sku], ASC,
+        'DimProduto'[name], ASC
+    ),
+    DATESBETWEEN('DimCalendario'[Data], DATE(2025,4,30), DATE(2026,9,30)),
+    TREATAS({"Loja Física"}, 'DimCanal'[name]),
+    TREATAS({"Unidade Sintética Campinas"}, 'DimLoja'[name])
+)
+ORDER BY [Valor_Devolvido] DESC, 'DimProduto'[sku] ASC, 'DimProduto'[name] ASC
