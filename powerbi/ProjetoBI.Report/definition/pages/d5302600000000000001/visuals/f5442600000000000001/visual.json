@@ -1,0 +1,17 @@
+{
+  "position": {
+    "z": 5000,
+    "width": 1872,
+    "x": 24,
+    "y": 96,
+    "tabOrder": 6,
+    "height": 224
+  },
+  "name": "f5442600000000000001",
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.13.0/schema.json",
+  "visualGroup": {
+    "displayName": "Painel de filtros — Produtos e Categorias",
+    "groupMode": "ScaleMode"
+  },
+  "isHidden": true
+}

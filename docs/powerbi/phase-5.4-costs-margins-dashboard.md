@@ -73,3 +73,7 @@ Verificações locais após reabertura: quatro páginas; 55 medidas em `_Medidas
 Verificação estrutural da página e revisão Git final ficam registradas no fechamento da fase. Commit autorizado: `feat(powerbi): implementa dashboard de custos e margens`.
 
 Fase 5.5 — Devoluções — não iniciada.
+
+## Acompanhamento visual — Fase 5.4.1
+
+A Fase 5.4 mantém aqui seu resultado histórico `PARTIAL` para as validações analíticas originalmente pendentes. A etapa 5.4.1 separada implementou e validou no Desktop o painel recolhível de filtros nas quatro páginas, sem mudança de DAX, modelo ou PostgreSQL. Bookmarks de abertura/fechamento preservaram as seleções e os três grupos sincronizados; veja `phase-5.4.1-collapsible-filter-panel.md`. O Performance Analyzer desta etapa cobre atualização visual aquecida, não carregamento frio. Essa conclusão não reclassifica retroativamente as pendências da auditoria financeira da Fase 5.4.

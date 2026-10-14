@@ -2,12 +2,12 @@
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.13.0/schema.json",
   "name": "a2000000000000000002",
   "position": {
-    "x": 820,
-    "y": 112,
-    "z": 1000,
-    "height": 96,
-    "width": 500,
-    "tabOrder": 2
+    "x": 796,
+    "y": 16,
+    "z": 5010,
+    "height": 80,
+    "width": 450,
+    "tabOrder": 4
   },
   "visual": {
     "visualType": "slicer",
@@ -138,5 +138,6 @@
       "filterChanges": true,
       "groupName": "InfoTech.Canal"
     }
-  }
+  },
+  "parentGroupName": "f5422600000000000001"
 }

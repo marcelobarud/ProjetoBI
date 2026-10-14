@@ -1,0 +1,37 @@
+{
+  "items": [
+    {
+      "name": "fase541_custos_margens",
+      "children": [
+        "f5412600000000000005",
+        "f5412600000000000006"
+      ],
+      "displayName": "Fase 5.4.1 — Custos e Margens"
+    },
+    {
+      "name": "fase541_8b8186ab91fc09fae9a2",
+      "children": [
+        "f5422600000000000005",
+        "f5422600000000000006"
+      ],
+      "displayName": "Fase 5.4.1 — Visão Executiva"
+    },
+    {
+      "name": "fase541_c5202600000000000001",
+      "children": [
+        "f5432600000000000005",
+        "f5432600000000000006"
+      ],
+      "displayName": "Fase 5.4.1 — Análise Comercial"
+    },
+    {
+      "name": "fase541_d5302600000000000001",
+      "children": [
+        "f5442600000000000005",
+        "f5442600000000000006"
+      ],
+      "displayName": "Fase 5.4.1 — Produtos e Categorias"
+    }
+  ],
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/bookmarksMetadata/1.0.0/schema.json"
+}

@@ -3,11 +3,11 @@
   "name": "e4000000000000000003",
   "position": {
     "x": 968,
-    "y": 400,
+    "y": 304,
     "z": 1000,
     "width": 450,
     "height": 112,
-    "tabOrder": 12
+    "tabOrder": 14
   },
   "visual": {
     "visualType": "card",
@@ -92,7 +92,7 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'= COGS analítico ajustado'"
+                  "Value": "'COGS ajustado'"
                 }
               }
             },

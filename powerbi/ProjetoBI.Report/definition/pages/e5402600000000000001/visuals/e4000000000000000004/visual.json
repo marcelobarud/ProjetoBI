@@ -3,11 +3,11 @@
   "name": "e4000000000000000004",
   "position": {
     "x": 1434,
-    "y": 400,
+    "y": 304,
     "z": 1000,
     "width": 450,
     "height": 112,
-    "tabOrder": 13
+    "tabOrder": 15
   },
   "visual": {
     "visualType": "card",
@@ -92,7 +92,7 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'Perda non-sellable — já no COGS ajustado'"
+                  "Value": "'Perda non-sellable'"
                 }
               }
             },

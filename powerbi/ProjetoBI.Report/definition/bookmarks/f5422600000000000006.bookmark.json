@@ -1,0 +1,27 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/bookmark/2.1.0/schema.json",
+  "displayName": "Filtros — fechar | Visão Executiva",
+  "name": "f5422600000000000006",
+  "options": {
+    "applyOnlyToTargetVisuals": true,
+    "targetVisualNames": [
+      "f5422600000000000001"
+    ],
+    "suppressActiveSection": true,
+    "suppressData": true
+  },
+  "explorationState": {
+    "version": "1.0",
+    "activeSection": "8b8186ab91fc09fae9a2",
+    "sections": {
+      "8b8186ab91fc09fae9a2": {
+        "visualContainers": {},
+        "visualContainerGroups": {
+          "f5422600000000000001": {
+            "isHidden": true
+          }
+        }
+      }
+    }
+  }
+}

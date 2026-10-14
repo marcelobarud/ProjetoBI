@@ -96,3 +96,7 @@ Período, Canal e Loja conservam os três grupos e passam a incluir exatamente u
 Top 5 por receita no eixo SKU, com nome completo no tooltip, após teste do Top 10 com rolagem. Ranking de categorias inclui as 12, com rolagem vertical. Matriz inicialmente recolhida com sete medidas e percentuais recalculados, sem soma de margens. Ranking/matriz não eliminam negativos por filtro de apresentação. Escala monetária automática nos dois novos gráficos atende contextos globais e pequenos; cartões/tooltips conservam valores completos.
 
 Navegador 896 × 56 px e cabeçalho 920 × 76 px nas três páginas, sem mudar definições analíticas das anteriores. O modelo segue com 10 tabelas, 55 medidas, 11 pastas e 21 relações. PostgreSQL não foi acessado nesta fase. Candidatos à v0.3 e limites de densidade/viewport registrados no Design System v0.2.
+
+## Painel de filtros recolhível — implementação local
+
+A Fase 5.4.1 implementou DS-C02 recolhível com bookmarks nativos de exibição em quatro páginas. Os três grupos `InfoTech.*` permanecem compartilhados; Categoria e Produto continuam locais a Produtos e Categorias. O painel aberto é uma sobreposição temporária; fechado, libera espaço real para cartões e gráficos. Consulte `phase-5.4.1-collapsible-filter-panel.md` para geometrias, limitações, evidências e estado de validação. A descrição comum de DS-C02 nesta arquitetura não altera por si só a versão v0.2 nem promove a candidata v0.3.

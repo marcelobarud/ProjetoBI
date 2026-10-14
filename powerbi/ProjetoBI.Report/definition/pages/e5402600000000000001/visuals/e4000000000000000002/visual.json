@@ -3,11 +3,11 @@
   "name": "e4000000000000000002",
   "position": {
     "x": 502,
-    "y": 400,
+    "y": 304,
     "z": 1000,
     "width": 450,
     "height": 112,
-    "tabOrder": 11
+    "tabOrder": 13
   },
   "visual": {
     "visualType": "card",
@@ -92,7 +92,7 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'− Reversão sellable'"
+                  "Value": "'Reversão sellable'"
                 }
               }
             },

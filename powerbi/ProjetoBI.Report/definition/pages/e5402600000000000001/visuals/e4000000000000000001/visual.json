@@ -3,11 +3,11 @@
   "name": "e4000000000000000001",
   "position": {
     "x": 36,
-    "y": 400,
+    "y": 304,
     "z": 1000,
     "width": 450,
     "height": 112,
-    "tabOrder": 10
+    "tabOrder": 12
   },
   "visual": {
     "visualType": "card",
@@ -92,7 +92,7 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'COGS original — pedidos concluídos'"
+                  "Value": "'COGS original'"
                 }
               }
             },

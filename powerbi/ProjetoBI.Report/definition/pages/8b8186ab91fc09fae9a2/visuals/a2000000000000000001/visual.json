@@ -2,12 +2,12 @@
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.7.0/schema.json",
   "name": "a2000000000000000001",
   "position": {
-    "z": 1000,
-    "y": 104,
-    "tabOrder": 1,
+    "z": 5010,
+    "y": 8,
+    "tabOrder": 3,
     "height": 112,
     "width": 760,
-    "x": 36
+    "x": 12
   },
   "visual": {
     "visualType": "slicer",
@@ -184,5 +184,6 @@
       "filterChanges": true,
       "groupName": "InfoTech.PeriodoComercial"
     }
-  }
+  },
+  "parentGroupName": "f5422600000000000001"
 }

@@ -258,3 +258,16 @@ A versão vigente continua **InfoTech Intelligence v0.2**. A quarta página reut
 | Ponte do COGS | COGS original concluído − reversão sellable = COGS ajustado; cartão informativo de perda non-sellable | Padrão candidato: a perda non-sellable permanece dentro do custo e não deve ser deduzida novamente. Não representa fluxo operacional por data de movimento/recebimento. |
 
 O viewport usado na inspeção do Desktop foi 1152 × 513 px; a captura Fit to Page exibiu a página inteira a 26%, com redução visual dos textos. A definição do canvas permanece Full HD; tamanhos configurados não garantem leitura equivalente em qualquer viewport. Os tamanhos e limites observados, inclusive aspectos de acessibilidade não testados, constam em [Fase 5.4](phase-5.4-costs-margins-dashboard.md). A v0.2 segue vigente até revisão formal posterior.
+
+## 16. Painel recolhível de filtros — Fase 5.4.1 (candidato à v0.3)
+
+A versão vigente segue **InfoTech Intelligence v0.2**. A apresentação permanente de DS-C02 da v0.2 permanece no histórico; a variação abaixo é candidata e não promove automaticamente o design system.
+
+- Em quatro páginas Full HD, Período Between, Canal e Loja ficam em grupo horizontal nativo aberto/fechado por bookmarks. O estado fechado é inicial; os filtros continuam aplicados.
+- Datas e slider de duas alças preservam DS-C02; Canal/Loja usam dropdowns existentes. `InfoTech.PeriodoComercial`, `InfoTech.Canal` e `InfoTech.Loja` continuam sincronizados. Categoria e Produto pesquisável são locais à página Produtos e Categorias.
+- A superfície é branca `#FFFFFF` com contorno claro `#E2E8F0`. O botão de abertura usa `#1D4ED8` com texto branco, fonte Semibold 16 pt e contraste calculado de 6,70:1; o botão de fechamento usa `#DBEAFE` com texto `#142238`, fonte Semibold 16 pt e contraste calculado de 13,08:1. A renderização foi conferida em Fit to Width; escala de cinza, foco por teclado completo e certificação WCAG não foram testados.
+- Geometria do grupo: x24/y96, largura 1872 px; altura 136 px nas páginas regulares e 224 px em Produtos e Categorias. A posição dos membros internos é relativa à origem do grupo; manter fundo, controles e fechamento dentro dos limites.
+- Navegador nativo: x636/y30, 1000 × 56 px; botão Filtros: x1652/y30, 232 × 56 px. Os quatro destinos aparecem integralmente no desktop testado.
+- O painel aberto sobrepõe parte do conteúdo analítico; no estado fechado os visuais usam o espaço recuperado. Não há indicador dinâmico de valores de filtro no botão; os controles continuam acessíveis ao abrir o painel.
+
+Ações abrir/fechar, preservação de seleção, sincronização compartilhada, contraste visual, navegador, reabertura do PBIP e disposição local de Categoria/Produto foram conferidos no Desktop. A captura usou viewport 1152 × 513 px em Fit to Width. Leitor de tela, percurso completo por Tab, escala de cinza e contraste automatizado não foram testados. O Performance Analyzer registrou somente atualização aquecida; não homologar como benchmark frio. Ver [relatório da Fase 5.4.1](phase-5.4.1-collapsible-filter-panel.md) e [pacote de evidências](evidence/archives/fase-5.4.1-evidencias.zip).

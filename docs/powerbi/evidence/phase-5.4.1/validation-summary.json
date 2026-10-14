@@ -1,0 +1,79 @@
+{
+  "result": "PASS visual and interaction validation; cold-load timing not captured",
+  "reportCanvas": {
+    "display": "FitToWidth",
+    "pages": 4,
+    "width": 1920,
+    "height": 1080
+  },
+  "desktop": {
+    "sharedPeriodChannelStoreSynchronized": true,
+    "openedWithoutError": true,
+    "pages": [
+      "Visão Executiva",
+      "Análise Comercial",
+      "Produtos e Categorias",
+      "Custos e Margens"
+    ],
+    "topPageNavigatorTested": true,
+    "defaultPanelState": "closed",
+    "dataRefresh": false,
+    "measuresOrModelChanged": false,
+    "buttonOpenCloseTestedOnAllPages": true,
+    "filterSelectionsPreserved": true
+  },
+  "testedFilterContext": {
+    "to": "2026-09-30",
+    "from": "2025-04-30",
+    "channel": "Loja física",
+    "store": "Unidade Sintética Campinas"
+  },
+  "validatedAt": "2026-10-13T22:31:28-03:00",
+  "limitations": [
+    "Leitor de tela, contraste automatizado, escala de cinza e navegação completa por Tab não foram testados.",
+    "O Performance Analyzer registra atualização visual aquecida; carregamento frio não foi medido separadamente.",
+    "A seleção dos filtros locais de Categoria e Produto não foi alterada neste reteste; a configuração local foi preservada e a fase 5.3 contém evidência funcional anterior."
+  ],
+  "visual": {
+    "openButtonText": "#FFFFFF",
+    "closeButtonFill": "#DBEAFE",
+    "closedPageNoVisibleOverlap": true,
+    "productsGroupHeight": 224,
+    "openGroupHeight": 136,
+    "panelSurface": "#FFFFFF",
+    "groupRelativeCoordinatesFixed": true,
+    "closeButtonText": "#142238",
+    "openButtonFill": "#1D4ED8",
+    "buttonTextFontSizePt": 16,
+    "openButtonContrastRatio": 6.7,
+    "closeButtonContrastRatio": 13.08
+  },
+  "evidence": [
+    "analise-comercial-aberto.jpg",
+    "analise-comercial-fechado.jpg",
+    "custos-margens-aberto.jpg",
+    "custos-margens-fechado.jpg",
+    "navegacao-page-navigator.jpg",
+    "performance-analyzer-warm.jpg",
+    "phase-5.4.1-performance-warm.json",
+    "produtos-categorias-aberto.jpg",
+    "produtos-categorias-fechado.jpg",
+    "referencia-antes-analise-comercial-fase-5.2.png",
+    "referencia-antes-custos-margens-fase-5.4.jpg",
+    "referencia-antes-produtos-categorias-fase-5.3.png",
+    "referencia-antes-visao-executiva-fase-5.1.2.png",
+    "visao-executiva-aberto.jpg",
+    "visao-executiva-fechado.jpg"
+  ],
+  "performance": {
+    "maxLifecycleMs": 338,
+    "minLifecycleMs": 132,
+    "warmRefreshRecorded": true,
+    "events": 170,
+    "initialLoadLifecycles": 0,
+    "coldLoadMeasured": false,
+    "visualLifecycles": 15,
+    "file": "phase-5.4.1-performance-warm.json"
+  },
+  "phase": "5.4.1"
+}
