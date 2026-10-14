@@ -14,7 +14,7 @@
 | Posicionamento | Inteligência comercial, financeira e operacional baseada em dados |
 | Personalidade | Tecnológica, confiável, objetiva, moderna e profissional |
 
-Usar “InfoTech Intelligence” como wordmark tipográfico no cabeçalho e “InfoTech” em identificação institucional compacta ou rodapé. A navegação deve privilegiar nomes de área; títulos de página descrevem a pergunta analítica. O rodapé, quando útil, informa o intervalo de dados e a perspectiva temporal, nunca presume que a data de hoje seja a última atualização. Não criar logotipo, endereço, CNPJ, história, número de funcionários ou outros dados institucionais nesta fase. Manter o nome em um único ponto de configuração visual para permitir substituição futura.
+Na linha de base v0.2, usar “InfoTech Intelligence” como wordmark tipográfico no cabeçalho. A proposta gráfica da Fase 5.4.2 acrescenta um monograma I/T e mantém o nome oficial; ela é candidata à v0.3 e aguarda revisão estética final. “InfoTech” pode identificar institucionalmente um rodapé compacto. A navegação deve privilegiar nomes de área; títulos de página descrevem a pergunta analítica. O rodapé, quando útil, informa o intervalo de dados e a perspectiva temporal, nunca presume que a data de hoje seja a última atualização. Não criar endereço, CNPJ, história, número de funcionários ou outros dados institucionais. Manter o nome em um único ponto de configuração visual para permitir substituição futura.
 
 ## 2. Tokens de cor
 
@@ -164,7 +164,15 @@ O Desktop instalado expôs estes visuais nativos durante a inspeção do painel:
 
 ### DS-C01 — Cabeçalho corporativo
 
-**Homologado na Visão Executiva.** Wordmark 30 pt, nome da página 12 pt, cores Text Primary/Text Secondary; textbox em x=36, y=22, 1848 × 76 px. Usar o nome da página sem período estático quando o slicer permitir outras datas. Texto alternativo também deve evitar datas fixas. Depende da identidade InfoTech; Page Navigator futuro permanece proposto e precisa de validação dos rótulos e espaço.
+**Linha de base v0.2:** wordmark 30 pt, nome da página 12 pt, cores Text Primary/Text Secondary; textbox em x=36, y=22, 1848 × 76 px na Visão Executiva. Usar o nome da página sem período estático quando o slicer permitir outras datas. Texto alternativo também deve evitar datas fixas.
+
+**Candidato à v0.3 — Fase 5.4.2:** símbolo monograma vetorial 48 × 48 px em x=36, y=36 e textbox da marca em x=96, y=22, 520 × 76 px. O wordmark permanece em 30 pt e o nome da página em 12 pt. A composição foi aplicada às quatro páginas, mantendo o Page Navigator a partir de x=636 e o botão Filtros. A inspeção visual registrada após reabrir o PBIP observou o símbolo ao lado do cabeçalho nas quatro páginas; não há capturas locais exportáveis nesta entrega e a validação visual completa continua pendente. Esta composição não é identidade definitiva até revisão estética do usuário.
+
+**Biblioteca candidata:** `powerbi/branding/infotech/infotech-monogram.svg` é a variante aplicada, com viewBox 64 × 64, traços azul Primary `#2563EB` e verde-petróleo Secondary `#0F9D92`, fundo transparente e geometria original I/T sem dependência de fontes. Recomenda-se área de apresentação mínima de 40 × 40 px e manter proporção quadrada, sem recortar, recolorir, adicionar sombra ou esticar. `infotech-monogram-mono.svg` é alternativa de uma cor; `infotech-horizontal.svg` é proposta horizontal e não está aplicada. Manter respiro visual ao redor e usar apenas sobre fundo claro. O arquivo vetorial aplicado foi registrado no pacote de recursos do PBIP; testar abertura/reabertura no Desktop antes de distribuição.
+
+As três propostas avaliadas foram: A) monograma geométrico I/T, preferido pelo usuário para o piloto; B) estrutura abstrata de nós conectados para sugerir inteligência de dados; C) wordmark com detalhe geométrico discreto. A e suas variações são as únicas desenhadas como vetores locais nesta fase; B e C permanecem conceitos documentais. O usuário ainda deve revisar a estética da composição antes de qualquer promoção.
+
+DS-C02 refinado, DS-C03 refinado, padrão de cartões secundários e acabamento do Page Navigator são **candidatos à v0.3**; a Fase 5.4.2 preservou seus estilos e comportamentos existentes. O botão Filtros mantém texto, azul `#1D4ED8`, branco e 16 pt; Fechar filtros mantém `#DBEAFE`, texto `#142238` e 16 pt. Nenhum ícone foi acrescentado ao botão, evitando elementos sobrepostos ao bookmark. Os cartões mantêm valores 32 pt e títulos 13 pt, sem alteração de métricas ou números. O navegador nativo permanece sem alterações.
 
 ### DS-C02 — Barra de filtros
 
