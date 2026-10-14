@@ -1,0 +1,77 @@
+[
+  {
+    "file": "estado-inicial-devolucoes-restaurado-aberto.png",
+    "bytes": 110277,
+    "sha256": "A0477C32BE9AF9BA4A29387F09CF140958E1D9D8B98D62D973D90017C946A80A"
+  },
+  {
+    "file": "F03-devolucoes-jan-set-kpis.png",
+    "bytes": 104749,
+    "sha256": "DC9E829E703D197B69182F7166F5C8F23711BB4572773992DC47247D7DBCD397"
+  },
+  {
+    "file": "F03-periodo-jan-set-2026.png",
+    "bytes": 107433,
+    "sha256": "C5C1EE5FD43F1B93290B00B74051F6B0ED6732753B6E16EC28024CB5FFB19ED5"
+  },
+  {
+    "file": "F04-slider-inicio-movido.png",
+    "bytes": 109257,
+    "sha256": "22DD8D765BE5A0DD2B1941D6EF520AF854C6ADD132F899D5D7CFC4088DB56ACC"
+  },
+  {
+    "file": "F05-slider-fim-movido.png",
+    "bytes": 108908,
+    "sha256": "D2C6396609510BE883B46C81CCC4DBB3F6AD3A3A43558333049773B2353DF6DB"
+  },
+  {
+    "file": "F06-painel-reaberto-periodo-preservado.png",
+    "bytes": 103291,
+    "sha256": "4E0717F9C188EE8FE5313715878C7129FE9FE8950A9668BB9E2A9CA3E93D120C"
+  },
+  {
+    "file": "products-local-product-selected.png",
+    "bytes": 96620,
+    "sha256": "DBE3698AEBCA599927F9A94349DB31DA8CB2C6E21654F8C8A6909979DED24FA8"
+  },
+  {
+    "file": "S04-custos-selecao-origem.png",
+    "bytes": 124236,
+    "sha256": "9104AA773E788117FA0C0BDD6EFBDE83D7F7B4368F40A89251C853897932CF3E"
+  },
+  {
+    "file": "S04-devolucoes-periodo-canal-sincronizados.png",
+    "bytes": 120311,
+    "sha256": "81FF35BE2AC495148EBB742C99AF89AEFF5AD10D49647CDA304F9B4C3A515EE2"
+  },
+  {
+    "file": "S05-devolucoes-para-executiva-sync.png",
+    "bytes": 102163,
+    "sha256": "268EAFE8FF4681945C69FA646851B9103C9B7903BA943BD0E0665FA3B85299BC"
+  },
+  {
+    "file": "S06-produtos-filtros-compartilhados-todos.png",
+    "bytes": 107293,
+    "sha256": "CE730BB4A9A78E802B546C8AAA263E9D130D15C3BB0FEC260EC651814FD5D7B9"
+  },
+  {
+    "file": "S07-executiva-para-devolucoes.png",
+    "bytes": 102283,
+    "sha256": "D1E1E3023824838AEEDF18E3604CD9BF920397A77E801E03F87A3DC96B057322"
+  },
+  {
+    "file": "README.md",
+    "bytes": 2494,
+    "sha256": "FD651BDEB05D05BEE5A2C85BC69C1FE73DCF99F3B8886E70B417F08137BA539F"
+  },
+  {
+    "file": "test-matrix.md",
+    "bytes": 5688,
+    "sha256": "12A699839E7C89DBD24598209D2CC04CB67BC33FF9BA5074F9AE0FFE3951FB55"
+  },
+  {
+    "file": "phase-5.6a.2-desktop-test-automation.md",
+    "bytes": 7854,
+    "sha256": "1C1EB85290F990F351AD5D796A8355372D6CB3C9A0FFD8CD6327318101237741"
+  }
+]

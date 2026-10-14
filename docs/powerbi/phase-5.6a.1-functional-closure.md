@@ -97,3 +97,9 @@ Uma confirmação objetiva dos resultados desses passos permitirá atualizar ape
 ## 9. Git
 
 O commit desta etapa deve conter somente este relatório, sua evidência bruta e atualizações documentais do status. PBIR/TMDL, `docs/powerbi/PowerBIPerformanceData.json`, ZIPs antigos e demais alterações preexistentes ficam fora do stage. Nenhum push, merge, rebase ou amend será executado.
+
+## Complemento posterior — Fase 5.6A.2 (2026-10-14)
+
+A limitação de automação registrada neste relatório foi superada em execução posterior usando Computer Use no Desktop em modo de edição. F01–F14, S01–S07, cinco percursos do Page Navigator, seleção/limpeza de filtros locais, interações categoria/produto/mês, botões do painel e ciclo salvar-fechar-reabrir passaram conforme a nova matriz. S04 e S05 foram conferidos novamente com o Page Navigator. O ciclo persistente terminou com Devoluções, painel fechado e quatro KPIs no contexto salvo. Nenhum refresh foi executado.
+
+O registro original desta Fase 5.6A.1 permanece histórico e sua classificação continua descrevendo somente aquela execução: **PARTIAL — MANUAL TESTS PENDING**. O resultado atualizado está em [`phase-5.6a.2-desktop-test-automation.md`](phase-5.6a.2-desktop-test-automation.md). Tab/foco por teclado, clique originado por cartão KPI e configuração interna de bookmarks ficaram `NOT TESTED`; não há defeito comprovado.
