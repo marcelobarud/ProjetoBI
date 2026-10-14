@@ -149,3 +149,11 @@ Nenhuma divergência semântica foi observada nas consultas executadas e nenhum 
 ## 16. Git
 
 Somente este relatório, a atualização histórica de 5.5, o status do plano/arquitetura e as evidências selecionadas pertencem ao commit desta auditoria. Alterações PBIR/TMDL e arquivos históricos preexistentes permanecem fora do stage.
+
+## Complemento posterior — Fase 5.6A.1 (2026-10-14)
+
+A classificação original desta auditoria permanece **PARTIAL** como registro do que foi testado naquela execução. A retomada funcional está documentada em [`phase-5.6a.1-functional-closure.md`](phase-5.6a.1-functional-closure.md), com matriz em `evidence/phase-5.6a/functional-closure/test-matrix.md` e export novo do Performance Analyzer.
+
+Na página Devoluções, foram exercitados no Desktop: abertura sem erro, contexto inicial, bookmarks de abrir/fechar painel, seleção/limpeza do quinto item do Top 5 e leitura dos cinco SKUs visíveis. A seleção filtrou os KPIs e reduziu a série; limpar restaurou os valores. Os dois SKUs finais coincidem com a consulta DAX prévia. Um ciclo aquecido do Performance Analyzer exportou 180 eventos, com 18 ciclos visuais concluídos (`status=1`); trata-se de uma única amostra, sem benchmark frio nem estatística de campanha repetida.
+
+Digitação de datas, alças do slider, Canal/Loja, sincronização direcional, isolamento local entre páginas, Page Navigator e teclado continuam `NOT TESTED`. O ciclo salvar-fechar-reabrir foi executado parcialmente: Custos e Margens abriu sem erro com os quatro KPIs/contexto restaurados; Devoluções também renderizou depois, com o painel aberto, mas seus KPIs e todos os destinos não foram conferidos no ciclo. O Desktop regravou `pages.json` e `pt-BR.tmdl`; após fechamento, ambos foram restaurados byte a byte ao snapshot protetor. O controle de computador não conseguiu operar campos/alças em modo de edição; isso é limitação de automação e não evidência de defeito do relatório. Não houve refresh nem alteração semântica. A Fase 5.6A.1 permanece **PARTIAL — MANUAL TESTS PENDING**; não iniciar 5.6B/5.6C até solicitação explícita.

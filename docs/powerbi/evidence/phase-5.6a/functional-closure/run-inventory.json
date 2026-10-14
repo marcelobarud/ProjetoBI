@@ -1,0 +1,46 @@
+{
+  "phase": "5.6A.1",
+  "date": "2026-10-14",
+  "result": "PARTIAL — MANUAL TESTS PENDING",
+  "snapshot": {
+    "path": "C:\\Users\\D2\\AppData\\Local\\Temp\\ProjetoBI-Phase-5.6A1-20261014-154559.zip",
+    "sha256": "A31B3438C5638C09163679DB98252294946E3FA8FA6A315040F4FDB532B5613E"
+  },
+  "artifacts": [
+    {
+      "path": "docs/powerbi/phase-5.6a.1-functional-closure.md",
+      "sha256": "C9BDA02533C84658D292FF3C29B0EF176B2CEAD56B2D19C772941C5953ACE74A",
+      "bytes": 13421
+    },
+    {
+      "path": "docs/powerbi/phase-5.6a-integrated-functional-audit.md",
+      "sha256": "AC4113CAF41077F8E0336E44D311B3D49FF75C22C0D6F08B90032501C1FD7A7F",
+      "bytes": 12717
+    },
+    {
+      "path": "docs/powerbi/phase-5.5-returns-dashboard.md",
+      "sha256": "441D6E95B174C7CAF9EB7152152457846E52C7D70C282586F5F29E5F39B0B46D",
+      "bytes": 10190
+    },
+    {
+      "path": "docs/powerbi/DASHBOARD_ARCHITECTURE.md",
+      "sha256": "1CAA2ED75920DC8C0F26A9B1277070B1C5829319DFE601E389C5E80342A8E5EC",
+      "bytes": 19097
+    },
+    {
+      "path": "docs/PROJECT_COMPLETION_PLAN.md",
+      "sha256": "2BC210172D66D63D35724D02C739A9B4E975E11D2BC8178A5C8D97B0D99C74DD",
+      "bytes": 60123
+    },
+    {
+      "path": "docs/powerbi/evidence/phase-5.6a/functional-closure/test-matrix.md",
+      "sha256": "3A323426703456E87E19097B4560AD5ABF6C967BEECBFF94DD160A718ADE2CE4",
+      "bytes": 2715
+    },
+    {
+      "path": "docs/powerbi/evidence/phase-5.6a/functional-closure/performance-analyzer-devolucoes.json",
+      "sha256": "D0D31B791DC213ECC07AD53ADBF2517E5066BB583222B23E7B6B15398E543F69",
+      "bytes": 43552
+    }
+  ]
+}
