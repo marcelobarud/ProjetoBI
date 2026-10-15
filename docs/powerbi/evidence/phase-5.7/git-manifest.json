@@ -1,0 +1,47 @@
+{
+  "generatedUtc": "2026-10-15T00:54:53.3278637Z",
+  "workspace": "D:\\Codex\\ProjetoBI",
+  "branch": "main",
+  "head": "e91ce059dd44ee34a9d7c3e9134338f441efc6b6",
+  "upstream": "origin/main",
+  "upstreamHead": "e91ce059dd44ee34a9d7c3e9134338f441efc6b6",
+  "divergence": {
+    "localOnly": 0,
+    "remoteOnly": 0
+  },
+  "remoteHeads": [
+    "main"
+  ],
+  "remoteTags": 0,
+  "fetch": "git fetch origin completed; verified with git ls-remote",
+  "initialWorkingTree": {
+    "staged": 0,
+    "modifiedTracked": 94,
+    "untracked": 11,
+    "gitDiffStat": "94 files changed, 1665 insertions(+), 428 deletions(-)",
+    "ignoredPowerBiCacheFiles": 4,
+    "ignoredPowerBiCacheBytes": 38803965.0,
+    "ignoredLocalEnvPresent": true,
+    "envContentsRead": false,
+    "windowsCredentialManagerRead": false,
+    "gitOperationInProgress": false
+  },
+  "pushHistory": {
+    "PreviousRemoteTip": "6e470d36451ece7d47922a771231a02c5e8cedef",
+    "PushObservedAt": "2026-10-14 21:34:47 -03:00",
+    "PushedTip": "588f3988e6bd5531f97dfb602b5e23842f978a0e",
+    "CommitsFromPreviousRemoteTip": 19,
+    "SubsequentPushObservedAt": "2026-10-14 21:41:34 -03:00",
+    "SubsequentTip": "e91ce059dd44ee34a9d7c3e9134338f441efc6b6",
+    "AdditionalCommits": 1,
+    "TotalCommitsFromPreviousRemoteTip": "20"
+  },
+  "preflightSnapshot": {
+    "path": "C:\\Users\\D2\\AppData\\Local\\Temp\\ProjetoBI-Phase5.7-preflight-20261014-214619.zip",
+    "sha256": "1E85C44EBDB064C1DD83BB3B953C525C54D706D42536472C71A05296012A6785"
+  },
+  "remoteArchive": {
+    "path": "outside workspace temporary snapshot",
+    "sha256": "2508DE5F58E883844086F25A1A79B92AD642DE91B9C10EA426B734DCBF02E952"
+  }
+}

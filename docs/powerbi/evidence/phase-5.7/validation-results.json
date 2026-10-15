@@ -1,0 +1,99 @@
+{
+  "generatedUtc": "2026-10-15T00:56:45.2640654Z",
+  "scope": "Static inspection of git archive origin/main e91ce059dd44ee34a9d7c3e9134338f441efc6b6 and workspace",
+  "remote": {
+    "pbipDescriptorValid": true,
+    "reportPbirDescriptorValid": true,
+    "semanticPbismDescriptorValid": true,
+    "pageCount": 5,
+    "pageIds": [
+      "8b8186ab91fc09fae9a2",
+      "c5202600000000000001",
+      "d5302600000000000001",
+      "e5402600000000000001",
+      "f5502600000000000001"
+    ],
+    "displayNames": [
+      "Visão Executiva",
+      "Análise Comercial",
+      "Produtos e Categorias",
+      "Custos e Margens",
+      "Devoluções"
+    ],
+    "allCanvases1920x1080": true,
+    "fitToWidth": true,
+    "visualContainersPerPage": [
+      17,
+      22,
+      19,
+      22,
+      18
+    ],
+    "pbirDefinitionJsonFiles": 117,
+    "invalidPbirDefinitionJson": 0,
+    "wholeArchiveJsonFiles": 142,
+    "invalidWholeArchiveJson": 0,
+    "tables": 10,
+    "measures": 55,
+    "displayFolders": 11,
+    "relationships": 21,
+    "importPartitions": 10,
+    "directQueryPartitions": 0,
+    "postgresSourceTables": 8,
+    "calendarEndDate": "2026-09-30",
+    "pageOrderReferencesValid": true,
+    "visualInteractionsInvalidReferences": 30,
+    "tmdlParserAvailable": false,
+    "desktopOpened": false,
+    "refreshExecuted": false,
+    "postgresAccessed": false
+  },
+  "workspace": {
+    "pageCount": 5,
+    "allCanvases1920x1080": true,
+    "pageIdsMatchRemote": true,
+    "tables": 10,
+    "measures": 55,
+    "displayFolders": 11,
+    "relationships": 21,
+    "pbirDefinitionJsonFiles": 117,
+    "invalidPbirDefinitionJson": 0,
+    "returnsPageVisualInteractions": "array absent"
+  },
+  "assets": {
+    "sourceMonogram": "powerbi/branding/infotech/infotech-monogram.svg",
+    "embeddedMonogram": "powerbi/ProjetoBI.Report/StaticResources/RegisteredResources/infotech-monogram6402263922348279.svg",
+    "sourceAndEmbeddedSha256": "D762678E082E5713C28128C81F3E84A3038A89941D40BC0E3A92FAF77A18A542",
+    "theme": "powerbi/themes/infotech-light.json",
+    "themePresent": true,
+    "absoluteFilesystemPathsFound": false
+  },
+  "comparison": {
+    "localTrackedModified": 94,
+    "untracked": 11,
+    "ignoredPowerBiCacheFiles": 4,
+    "stagedAtEntry": 0,
+    "pbirTrackedJsonModified": 93,
+    "pbirJsonCanonicalDifferences": 20,
+    "pbirJsonCanonicalEquivalentSerializations": 73,
+    "localCultureTmdlAddedLines": 738,
+    "sourceTablesTmdlChanged": 0,
+    "remoteActivePage": "d5302600000000000001",
+    "workspaceActivePage": "f5502600000000000001",
+    "remoteQueryLimitOption": "absent",
+    "workspaceQueryLimitOption": "None"
+  },
+  "limitations": [
+    "TMDL received declaration/count checks only; no dedicated TMDL parser or Desktop validation tool was available.",
+    "PBIR/JSON static inspection is not proof of a clean-machine Power BI Desktop open.",
+    "Untracked evidence ZIP contents and ignored .env values were not inspected.",
+    "No refresh, database connection, SQL reconciliation, or Power BI Service publication was performed."
+  ],
+  "semanticContracts": [
+    "Revenue analytical after returns subtracts commercial returned value in order-date cohort.",
+    "Adjusted COGS retains completed original COGS and subtracts only sellable reversal; non-sellable loss remains and is not subtracted twice.",
+    "Gross profit and margin formula definitions present.",
+    "Operational transaction documentation separates commercial return from refund.",
+    "Table/measure/relationship TMDL unchanged between workspace and origin/main."
+  ]
+}

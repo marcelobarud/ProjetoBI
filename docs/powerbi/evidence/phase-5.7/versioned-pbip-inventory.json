@@ -1,0 +1,269 @@
+{
+  "workspaceHead": "e91ce059dd44ee34a9d7c3e9134338f441efc6b6",
+  "remote": {
+    "Pages": [
+      {
+        "Id": "8b8186ab91fc09fae9a2",
+        "DisplayName": "Visão Executiva",
+        "Width": 1920,
+        "Height": 1080,
+        "DisplayOption": "FitToWidth",
+        "VisualContainers": 17,
+        "SyncGroups": [
+          "InfoTech.Canal",
+          "InfoTech.Loja",
+          "InfoTech.PeriodoComercial"
+        ],
+        "VisualInteractionEntries": 1,
+        "BrokenVisualInteractionRefs": 0
+      },
+      {
+        "Id": "c5202600000000000001",
+        "DisplayName": "Análise Comercial",
+        "Width": 1920,
+        "Height": 1080,
+        "DisplayOption": "FitToWidth",
+        "VisualContainers": 22,
+        "SyncGroups": [
+          "InfoTech.Canal",
+          "InfoTech.Loja",
+          "InfoTech.PeriodoComercial"
+        ],
+        "VisualInteractionEntries": 44,
+        "BrokenVisualInteractionRefs": 0
+      },
+      {
+        "Id": "d5302600000000000001",
+        "DisplayName": "Produtos e Categorias",
+        "Width": 1920,
+        "Height": 1080,
+        "DisplayOption": "FitToWidth",
+        "VisualContainers": 19,
+        "SyncGroups": [
+          "InfoTech.Canal",
+          "InfoTech.Loja",
+          "InfoTech.PeriodoComercial"
+        ],
+        "VisualInteractionEntries": 18,
+        "BrokenVisualInteractionRefs": 0
+      },
+      {
+        "Id": "e5402600000000000001",
+        "DisplayName": "Custos e Margens",
+        "Width": 1920,
+        "Height": 1080,
+        "DisplayOption": "FitToWidth",
+        "VisualContainers": 22,
+        "SyncGroups": [
+          "InfoTech.Canal",
+          "InfoTech.Loja",
+          "InfoTech.PeriodoComercial"
+        ],
+        "VisualInteractionEntries": 30,
+        "BrokenVisualInteractionRefs": 0
+      },
+      {
+        "Id": "f5502600000000000001",
+        "DisplayName": "Devoluções",
+        "Width": 1920,
+        "Height": 1080,
+        "DisplayOption": "FitToWidth",
+        "VisualContainers": 18,
+        "SyncGroups": [
+          "InfoTech.Canal",
+          "InfoTech.Loja",
+          "InfoTech.PeriodoComercial"
+        ],
+        "VisualInteractionEntries": 30,
+        "BrokenVisualInteractionRefs": 30
+      }
+    ],
+    "Metrics": {
+      "TableCount": 10,
+      "TableNames": [
+        "_Medidas",
+        "DimCalendario",
+        "DimCanal",
+        "DimCliente",
+        "DimLoja",
+        "DimProduto",
+        "FatoCustoFulfillment",
+        "FatoDevolucoes",
+        "FatoItensPedido",
+        "FatoPedidos"
+      ],
+      "MeasureCount": 55,
+      "UniqueDisplayFolders": 11,
+      "DisplayFolderNames": [
+        "01 | Pedidos",
+        "02 | Faturamento",
+        "03 | Descontos",
+        "04 | Ticket Médio",
+        "05 | Produtos e Itens",
+        "06 | Inteligência Temporal",
+        "07 | Indicadores Percentuais",
+        "08 | Devoluções",
+        "09 | Custos e COGS",
+        "10 | Lucro e Margem",
+        "11 | Análise Financeira Temporal"
+      ],
+      "RelationshipCount": 21,
+      "ImportPartitions": 10,
+      "PostgreSQLSourceTables": [
+        "DimCanal",
+        "DimCliente",
+        "DimLoja",
+        "DimProduto",
+        "FatoCustoFulfillment",
+        "FatoDevolucoes",
+        "FatoItensPedido",
+        "FatoPedidos"
+      ],
+      "CalendarEndDate": "2026-09-30",
+      "PtBRCultureBytes": 21,
+      "ReportQueryLimitOptionPresent": false,
+      "JsonFilesUnderReportDefinition": 117,
+      "InvalidJsonCount": 0,
+      "InvalidJson": [],
+      "BrokenVisualInteractionRefs": 30
+    }
+  },
+  "generatedUtc": "2026-10-15T00:54:25.7530883Z",
+  "comparison": {
+    "remoteBrokenVisualInteractionRefs": 30,
+    "workspaceVsRemoteModelCountsEqual": true,
+    "pageCountSame": true,
+    "workspaceBrokenVisualInteractionRefs": 0,
+    "samePageIds": true
+  },
+  "source": "git archive origin/main extracted outside the workspace",
+  "workspace": {
+    "Pages": [
+      {
+        "Id": "8b8186ab91fc09fae9a2",
+        "DisplayName": "Visão Executiva",
+        "Width": 1920,
+        "Height": 1080,
+        "DisplayOption": "FitToWidth",
+        "VisualContainers": 17,
+        "SyncGroups": [
+          "InfoTech.Canal",
+          "InfoTech.Loja",
+          "InfoTech.PeriodoComercial"
+        ],
+        "VisualInteractionEntries": 1,
+        "BrokenVisualInteractionRefs": 0
+      },
+      {
+        "Id": "c5202600000000000001",
+        "DisplayName": "Análise Comercial",
+        "Width": 1920,
+        "Height": 1080,
+        "DisplayOption": "FitToWidth",
+        "VisualContainers": 22,
+        "SyncGroups": [
+          "InfoTech.Canal",
+          "InfoTech.Loja",
+          "InfoTech.PeriodoComercial"
+        ],
+        "VisualInteractionEntries": 44,
+        "BrokenVisualInteractionRefs": 0
+      },
+      {
+        "Id": "d5302600000000000001",
+        "DisplayName": "Produtos e Categorias",
+        "Width": 1920,
+        "Height": 1080,
+        "DisplayOption": "FitToWidth",
+        "VisualContainers": 19,
+        "SyncGroups": [
+          "InfoTech.Canal",
+          "InfoTech.Loja",
+          "InfoTech.PeriodoComercial"
+        ],
+        "VisualInteractionEntries": 18,
+        "BrokenVisualInteractionRefs": 0
+      },
+      {
+        "Id": "e5402600000000000001",
+        "DisplayName": "Custos e Margens",
+        "Width": 1920,
+        "Height": 1080,
+        "DisplayOption": "FitToWidth",
+        "VisualContainers": 22,
+        "SyncGroups": [
+          "InfoTech.Canal",
+          "InfoTech.Loja",
+          "InfoTech.PeriodoComercial"
+        ],
+        "VisualInteractionEntries": 30,
+        "BrokenVisualInteractionRefs": 0
+      },
+      {
+        "Id": "f5502600000000000001",
+        "DisplayName": "Devoluções",
+        "Width": 1920,
+        "Height": 1080,
+        "DisplayOption": "FitToWidth",
+        "VisualContainers": 18,
+        "SyncGroups": [
+          "InfoTech.Canal",
+          "InfoTech.Loja",
+          "InfoTech.PeriodoComercial"
+        ],
+        "VisualInteractionEntries": 0,
+        "BrokenVisualInteractionRefs": 0
+      }
+    ],
+    "Metrics": {
+      "TableCount": 10,
+      "TableNames": [
+        "_Medidas",
+        "DimCalendario",
+        "DimCanal",
+        "DimCliente",
+        "DimLoja",
+        "DimProduto",
+        "FatoCustoFulfillment",
+        "FatoDevolucoes",
+        "FatoItensPedido",
+        "FatoPedidos"
+      ],
+      "MeasureCount": 55,
+      "UniqueDisplayFolders": 11,
+      "DisplayFolderNames": [
+        "01 | Pedidos",
+        "02 | Faturamento",
+        "03 | Descontos",
+        "04 | Ticket Médio",
+        "05 | Produtos e Itens",
+        "06 | Inteligência Temporal",
+        "07 | Indicadores Percentuais",
+        "08 | Devoluções",
+        "09 | Custos e COGS",
+        "10 | Lucro e Margem",
+        "11 | Análise Financeira Temporal"
+      ],
+      "RelationshipCount": 21,
+      "ImportPartitions": 10,
+      "PostgreSQLSourceTables": [
+        "DimCanal",
+        "DimCliente",
+        "DimLoja",
+        "DimProduto",
+        "FatoCustoFulfillment",
+        "FatoDevolucoes",
+        "FatoItensPedido",
+        "FatoPedidos"
+      ],
+      "CalendarEndDate": "2026-09-30",
+      "PtBRCultureBytes": 21280,
+      "ReportQueryLimitOptionPresent": true,
+      "JsonFilesUnderReportDefinition": 117,
+      "InvalidJsonCount": 0,
+      "InvalidJson": [],
+      "BrokenVisualInteractionRefs": 0
+    }
+  },
+  "remoteCommit": "e91ce059dd44ee34a9d7c3e9134338f441efc6b6"
+}

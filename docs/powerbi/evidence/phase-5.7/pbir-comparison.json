@@ -1,0 +1,47 @@
+{
+  "trackedPbirJsonFilesChanged": 93,
+  "canonicalStructuralOrValueDifferences": 20,
+  "canonicalEquivalentSerializationDifferences": 73,
+  "canonicalDifferentPaths": [
+    "powerbi/ProjetoBI.Report/definition/pages/8b8186ab91fc09fae9a2/visuals/a1000000000000000001/visual.json",
+    "powerbi/ProjetoBI.Report/definition/pages/8b8186ab91fc09fae9a2/visuals/a2000000000000000001/visual.json",
+    "powerbi/ProjetoBI.Report/definition/pages/8b8186ab91fc09fae9a2/visuals/a2000000000000000002/visual.json",
+    "powerbi/ProjetoBI.Report/definition/pages/8b8186ab91fc09fae9a2/visuals/a2000000000000000003/visual.json",
+    "powerbi/ProjetoBI.Report/definition/pages/8b8186ab91fc09fae9a2/visuals/f5422600000000000001/visual.json",
+    "powerbi/ProjetoBI.Report/definition/pages/c5202600000000000001/visuals/b2000000000000000001/visual.json",
+    "powerbi/ProjetoBI.Report/definition/pages/c5202600000000000001/visuals/b2000000000000000002/visual.json",
+    "powerbi/ProjetoBI.Report/definition/pages/c5202600000000000001/visuals/b2000000000000000003/visual.json",
+    "powerbi/ProjetoBI.Report/definition/pages/c5202600000000000001/visuals/f5432600000000000001/visual.json",
+    "powerbi/ProjetoBI.Report/definition/pages/d5302600000000000001/visuals/d2000000000000000001/visual.json",
+    "powerbi/ProjetoBI.Report/definition/pages/d5302600000000000001/visuals/d2000000000000000002/visual.json",
+    "powerbi/ProjetoBI.Report/definition/pages/d5302600000000000001/visuals/d2000000000000000003/visual.json",
+    "powerbi/ProjetoBI.Report/definition/pages/d5302600000000000001/visuals/f5442600000000000001/visual.json",
+    "powerbi/ProjetoBI.Report/definition/pages/e5402600000000000001/visuals/e2000000000000000001/visual.json",
+    "powerbi/ProjetoBI.Report/definition/pages/e5402600000000000001/visuals/e2000000000000000002/visual.json",
+    "powerbi/ProjetoBI.Report/definition/pages/e5402600000000000001/visuals/e2000000000000000003/visual.json",
+    "powerbi/ProjetoBI.Report/definition/pages/e5402600000000000001/visuals/f5412600000000000001/visual.json",
+    "powerbi/ProjetoBI.Report/definition/pages/f5502600000000000001/page.json",
+    "powerbi/ProjetoBI.Report/definition/pages/pages.json",
+    "powerbi/ProjetoBI.Report/definition/report.json"
+  ],
+  "localOnlyTmdlCultureChange": {
+    "path": "powerbi/ProjetoBI.SemanticModel/definition/cultures/pt-BR.tmdl",
+    "addedLines": 738,
+    "scope": "linguisticMetadata generated entries; table TMDL, measures, relationships unchanged"
+  },
+  "diffHighlights": {
+    "syncedFilterControlsChanged": 12,
+    "pageFilterControlStatesChanged": 4,
+    "executiveLineVisualStylePropertiesChanged": 1,
+    "returnPageRemoteVisualInteractionEntries": 30,
+    "returnPageLocalVisualInteractionEntries": 0,
+    "returnPageLocalVisualInteractionsMissing": true,
+    "returnPageActive": "f5502600000000000001",
+    "remoteActivePage": "d5302600000000000001",
+    "localQueryLimitOption": "None",
+    "remoteQueryLimitOptionPresent": false,
+    "remoteDevolucoesRefsPointOutsidePage": 30,
+    "localDevolucoesRefsPointOutsidePage": 0
+  },
+  "scope": "Local workspace versus origin/main at e91ce05; no files changed by audit"
+}
