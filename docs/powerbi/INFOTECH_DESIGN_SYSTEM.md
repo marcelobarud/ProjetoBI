@@ -479,3 +479,15 @@ Inventário conferido sem edição: cinco páginas; canvas 1920 × 1080; dez tab
 | v0.1 | Fase 5.0 | Tema InfoTech Intelligence — Light e tokens iniciais; histórico preservado |
 | v0.2 | Fase 5.1.2 e evoluções 5.2–5.5 | Cabeçalho, paleta, tipografia, DS-C01–06 e páginas comerciais; seções históricas 1–18 mantêm decisões/candidatos da época |
 | v0.3 | Fase 5.6C, 2026-10-14 | Estética das cinco páginas aprovada explicitamente; geometria PBIR, Page Navigator, DS-C02, variações, precisão 1L específica, governança, rastreabilidade e limitações consolidadas. Documentação-only; sem PBIR, sem nova validação assistiva e sem template instalável |
+
+### 19.16 Estado inicial acordado — Fase 5.8.1
+
+O enquadramento-alvo para abertura das cinco páginas é `FitToPage`, preservando o canvas Full HD de 1920 × 1080. O painel de filtros recolhível começa fechado; o botão Filtros abre a camada e Fechar filtros a recolhe, preservando as seleções. A Visão Executiva permanece como página inicial. A seleção inicial acordada para o PBIX é período 04/01/2026–30/09/2026, Canal e Loja em Todos.
+
+**Status desta fase:** o candidato derivado do commit versionado foi alterado estaticamente para `FitToPage` nas cinco páginas e Visão Executiva como página ativa. A configuração de grupo oculto e os bookmarks de abrir/fechar, com `suppressData=true`, já estavam no commit-base. Persistência após salvar/fechar/reabrir, enquadramento renderizado e interatividade continuam pendentes de validação no Power BI Desktop; o PBIX demonstrativo ainda não foi atualizado. Esta decisão não reescreve as medições históricas de FitToWidth das fases anteriores e não afirma responsividade universal.
+
+### 19.16 Estado inicial acordado — Fase 5.8.1
+
+O enquadramento-alvo para abertura das cinco páginas é `FitToPage`, preservando o canvas Full HD de 1920 × 1080. O painel de filtros recolhível começa fechado; o botão Filtros abre a camada e Fechar filtros a recolhe, preservando as seleções. A Visão Executiva permanece como página inicial. A seleção inicial acordada para o PBIX é período 04/01/2026–30/09/2026, Canal e Loja em Todos.
+
+**Status desta fase:** o candidato derivado do commit versionado foi alterado estaticamente para `FitToPage` nas cinco páginas. A configuração de grupo oculto e os bookmarks de abrir/fechar, com `suppressData=true`, já estavam no commit-base. Persistência após salvar/fechar/reabrir, enquadramento renderizado e interatividade continuam pendentes de validação no Power BI Desktop; o PBIX demonstrativo ainda não foi atualizado. Esta decisão não reescreve as medições históricas de FitToWidth das fases anteriores e não afirma responsividade universal.

@@ -1,0 +1,72 @@
+{
+  "phase": "5.8.1",
+  "date": "2026-10-15",
+  "classification": "PARTIAL",
+  "source": {
+    "head": "26f22102c9cb3a427f41242b6300bd70eef7c1cd",
+    "branch": "main",
+    "origin_ahead_of_head": 0,
+    "head_ahead_of_origin": 0,
+    "preexisting_worktree_entries": 108,
+    "initial_staged_entries": 0
+  },
+  "snapshot": {
+    "external_archive": "ProjetoBI-Phase5.8.1-preflight-20261015-112150.zip",
+    "bytes": 38371211,
+    "sha256": "E6F2A8E3093978981E459197F318A5E67AD98ECACB8EF7D88BB07846AFFBEBC2"
+  },
+  "candidate": {
+    "derived_from_clean_head_only": true,
+    "report_json_files_parsed": 117,
+    "invalid_json_files": 0,
+    "active_page_before": "d5302600000000000001",
+    "active_page_after": "8b8186ab91fc09fae9a2",
+    "active_page_after_display_name": "Visão Executiva",
+    "pages": [
+      {"id":"8b8186ab91fc09fae9a2","name":"Visão Executiva","baseline":"FitToWidth","candidate":"FitToPage","width":1920,"height":1080},
+      {"id":"c5202600000000000001","name":"Análise Comercial","baseline":"FitToWidth","candidate":"FitToPage","width":1920,"height":1080},
+      {"id":"d5302600000000000001","name":"Produtos e Categorias","baseline":"FitToWidth","candidate":"FitToPage","width":1920,"height":1080},
+      {"id":"e5402600000000000001","name":"Custos e Margens","baseline":"FitToWidth","candidate":"FitToPage","width":1920,"height":1080},
+      {"id":"f5502600000000000001","name":"Devoluções","baseline":"FitToWidth","candidate":"FitToPage","width":1920,"height":1080}
+    ],
+    "filter_groups_hidden_by_default": 5,
+    "bookmarks": 10,
+    "bookmark_sections_missing_visualContainers": 0,
+    "open_bookmarks_hidden_state": false,
+    "close_bookmarks_hidden_state": true,
+    "bookmarks_suppress_data": true
+  },
+  "semantic_model": {
+    "tables": 10,
+    "measures": 55,
+    "relationships": 21,
+    "semantic_definitions_changed": false,
+    "refresh_executed": false,
+    "postgresql_accessed": false
+  },
+  "pbix": {
+    "updated": false,
+    "previous_bytes": 38910666,
+    "previous_sha256": "398EB0B3866810F2ABD787AC71FAE4ED9CD8327A84589BF43567F7CA85A399D2",
+    "new_bytes": null,
+    "new_sha256": null,
+    "desktop_open_save_reopen": "NOT TESTED",
+    "offline_without_postgresql": "PENDING"
+  },
+  "desktop_runtime": {
+    "performed": false,
+    "reason": "No controllable Windows application window was exposed in the current session.",
+    "screenshots_captured": false
+  },
+  "license": {
+    "spdx": "MIT",
+    "year": 2026,
+    "copyright_holder_confirmed_by_user": "Marcelo Vinicius Moreira Barud Torres"
+  },
+  "git": {
+    "push": false,
+    "tag_created": false,
+    "release_created": false,
+    "visibility_changed": false
+  }
+}

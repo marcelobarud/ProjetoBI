@@ -62,7 +62,7 @@ Análise de valores devolvidos e seus efeitos comerciais e financeiros.
 
 ## Demonstração
 
-O arquivo demonstrativo preparado para revisão é um PBIX local, com dados sintéticos incorporados. Ainda não foi anexado a uma GitHub Release nem publicado. A homologação foi **parcial**: a abertura, as cinco páginas, filtros e persistência foram verificados no Power BI Desktop; a validação em ambiente isolado, sem acesso ao PostgreSQL, continua pendente. Consulte o [guia do PBIX](docs/portfolio/PBIX_DEMO_GUIDE.md) e a [minuta de Release](docs/portfolio/GITHUB_RELEASE_DRAFT.md).
+O PBIX demonstrativo local contém dados sintéticos incorporados e foi homologado parcialmente. A abertura, as cinco páginas, os filtros e a persistência foram verificados no Power BI Desktop; o teste em ambiente isolado sem PostgreSQL continua pendente. A correção atual define `FitToPage` como alvo no PBIP versionado, mas a validação no Desktop e a regeneração do PBIX ainda não foram concluídas. Não use o PBIX anterior como se contivesse essa correção. Consulte o [guia do PBIX](docs/portfolio/PBIX_DEMO_GUIDE.md) e a [minuta de Release](docs/portfolio/GITHUB_RELEASE_DRAFT.md); nenhum arquivo foi publicado.
 
 ## Desenvolvimento assistido por IA
 
@@ -72,7 +72,7 @@ Ferramentas de IA auxiliaram análise, implementação, documentação e testes 
 
 A acessibilidade recebeu refinamentos, mas permanece **parcial**: o projeto não declara conformidade WCAG nem homologação universal em dispositivos móveis. As páginas foram concebidas em Full HD. Algumas limitações de densidade e escala dos visuais estão registradas na documentação do Design System.
 
-O projeto segue em desenvolvimento. Experimentos futuros com HTML ou visuais personalizados não fazem parte desta demonstração. A licença de uso ainda não foi definida; não existe arquivo LICENSE, portanto a publicação do código não concede automaticamente permissões de reutilização.
+O projeto segue em desenvolvimento. Experimentos futuros com HTML ou visuais personalizados não fazem parte desta demonstração. O conteúdo original do projeto, nos limites dos direitos do titular, está sob a [licença MIT](LICENSE), que permite uso, cópia, modificação, distribuição, sublicenciamento e venda mediante preservação dos avisos de copyright e licença. Bibliotecas, marcas e outros materiais de terceiros mantêm suas próprias condições e não recebem automaticamente a licença MIT do projeto.
 
 ## Tecnologias e documentação
 
