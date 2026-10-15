@@ -1,0 +1,33 @@
+{
+  "candidateSource": "Temporary archive of HEAD e0654b1 plus only the locally corrected Devolucoes page.json",
+  "candidateArchiveSha256": "DA4FFA8B8B526866A1BEE99F4612536AD3DEFBEE43CD42CFAD387FF4977767C6",
+  "candidateWasOpenedInDesktop": false,
+  "desktopVisualObservation": "The user's open workspace showed the Returns page rendered at 47%; not treated as candidate runtime validation. No refresh or save was performed.",
+  "reportJsonCount": 117,
+  "invalidJson": 0,
+  "pageOrder": [
+    "8b8186ab91fc09fae9a2",
+    "c5202600000000000001",
+    "d5302600000000000001",
+    "e5402600000000000001",
+    "f5502600000000000001"
+  ],
+  "pages": [
+    {"name":"Visão Executiva","width":1920,"height":1080,"displayOption":"FitToWidth","visuals":17,"interactionEntries":1,"invalidRefs":0},
+    {"name":"Análise Comercial","width":1920,"height":1080,"displayOption":"FitToWidth","visuals":22,"interactionEntries":44,"invalidRefs":0},
+    {"name":"Produtos e Categorias","width":1920,"height":1080,"displayOption":"FitToWidth","visuals":19,"interactionEntries":18,"invalidRefs":0},
+    {"name":"Custos e Margens","width":1920,"height":1080,"displayOption":"FitToWidth","visuals":22,"interactionEntries":30,"invalidRefs":0},
+    {"name":"Devoluções","width":1920,"height":1080,"displayOption":"FitToWidth","visuals":18,"interactionEntries":0,"invalidRefs":0}
+  ],
+  "allPagesKeepSynchronizedGroups": [
+    "InfoTech.PeriodoComercial",
+    "InfoTech.Canal",
+    "InfoTech.Loja"
+  ],
+  "bookmarks": {"count":10,"allHaveVisualContainers":true,"targetsExist":true},
+  "semanticModel": {"tableFiles":10,"measures":55,"uniqueDisplayFolders":11,"relationships":21},
+  "approvedLineChartLabelPrecision": {"Visão Executiva":"1L","Análise Comercial":"1L"},
+  "brandResource": {"sourceSvgSha256":"D762678E082E5713C28128C81F3E84A3038A89941D40BC0E3A92FAF77A18A542","registeredSvgSha256":"D762678E082E5713C28128C81F3E84A3038A89941D40BC0E3A92FAF77A18A542","match":true},
+  "correction": "Only the 30 invalid cross-page visualInteractions entries were removed from Devoluções page.json.",
+  "gateB": "PARTIAL: candidate was not opened in Desktop; only the user's current workspace rendered visually."
+}
