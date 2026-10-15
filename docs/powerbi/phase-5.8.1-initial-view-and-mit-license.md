@@ -1,7 +1,7 @@
 # Fase 5.8.1 — Estado inicial dos dashboards e licença MIT
 
 **Data:** 2026-10-15
-**Resultado:** **PARTIAL — PBIR preparado estaticamente; validação no Desktop e novo PBIX pendentes**
+**Resultado:** **PASS — validação visual e persistência confirmadas pelo usuário; teste offline sem PostgreSQL permanece pendente**
 **HEAD de entrada:** `26f22102c9cb3a427f41242b6300bd70eef7c1cd` (`main`, sincronizada com `origin/main`)
 
 ## Objetivo e limites
@@ -48,18 +48,22 @@ O candidato limpo derivado do HEAD foi validado estaticamente:
 - dez bookmarks com `visualContainers` presentes;
 - modelo com dez tabelas, 55 medidas e 21 relacionamentos.
 
-**Validação no Power BI Desktop: não executada.** A sessão atual não expôs um aplicativo Windows controlável para o Desktop. Nenhuma página foi aberta, salva ou reaberta pelo Desktop nesta fase; nenhum screenshot novo foi capturado. Por isso não se afirma que o Desktop reconheceu ou persistiu essas mudanças, nem que a composição inteira foi vista no viewport.
+**Controle direto do Desktop pelo Codex: não disponível.** Nenhuma captura foi obtida nesta sessão. Posteriormente, o usuário confirmou que validou o PBIP no Desktop e que o PBIX corrigido foi salvo e reaberto; as confirmações manuais e a inspeção estática do arquivo são registradas separadamente abaixo.
 
-## PBIX demonstrativo
+## Atualização de validação e PBIX — 2026-10-15
 
-O PBIX externo não foi alterado, exportado ou substituído. A cópia existente continua identificada pela homologação anterior:
+O usuário confirmou que validou o PBIP no Desktop e que estava correto. Relatou que a versão PBIX anterior tinha um bookmark aberto e algumas páginas em `FitToWidth`, corrigiu os problemas e salvou a nova versão no caminho abaixo. Após selecionar Visão Executiva como página inicial e salvar/reabrir, o usuário confirmou que essa página abre primeiro e que Devoluções inicia com o painel fechado. Estas são confirmações manuais fornecidas pelo usuário; não houve controle direto da janela do Desktop nesta sessão nem screenshots novos.
 
-- Caminho: `D:\Codex\ProjetoBI-Distribution\Fase-5.7.2\ProjetoBI-InfoTech-Demo.pbix`
-- Tamanho: 38.910.666 bytes
-- SHA-256: `398EB0B3866810F2ABD787AC71FAE4ED9CD8327A84589BF43567F7CA85A399D2`
-- Estado anterior: Visão Executiva, filtros fechados, Canal/Loja Todos e período 04/01/2026–30/09/2026; a versão anterior não continha o enquadramento desta fase comprovado.
+- PBIX: `D:\Codex\ProjetoBI-Distribution\Fase-5.7.2\ProjetoBI-InfoTech-Demo.pbix`
+- Tamanho verificado após a última gravação: **38.911.257 bytes**
+- SHA-256 verificado: `B114FE56897C8376E6FF896ABF4FDF478D8203498925BF255B6E8A8D1CDB8E6B`
+- Versão Desktop instalada no ambiente: **2.158.1304.0** (versão que salvou este arquivo não foi capturada diretamente)
 
-**G3 — novo PBIX: PENDENTE.** Sem operação nativa no Desktop, não foi possível salvar a versão corrigida, fechar e reabrir, confirmar dados/modelo e produzir novo tamanho/hash. Não foi editado o contêiner binário. A validação isolada sem PostgreSQL permanece pendente, sem promoção de status.
+O pacote foi aberto somente para leitura como arquivo ZIP/PBIR: 127 entradas, incluindo modelo e definições do relatório. A inspeção confirmou cinco páginas em canvas 1920 × 1080 com `FitToPage`, Visão Executiva ativa, todos os cinco grupos de filtros com `isHidden=true` e dez bookmarks com `visualContainers`, dados suprimidos e estados de abertura/fechamento opostos. O usuário também confirmou que Devoluções inicia com o painel fechado após salvar/reabrir.
+
+A homologação anterior registrada para o PBIX antigo permanece histórica em `docs/powerbi/phase-5.7.2.1-public-pbix-closure.md`; o hash novo acima substitui o hash antigo somente para o artefato atual. O PBIX anterior permanece dentro do snapshot externo de preflight indicado no início deste relatório; não há cópia separada dele na pasta de distribuição.
+
+**G3 — PBIX: PASS por validação manual do usuário e inspeção estrutural.** O usuário confirmou a correção, o salvamento e a reabertura, inclusive o painel fechado em Devoluções. Tamanho/hash e estrutura PBIR foram verificados localmente. A validação isolada sem PostgreSQL continua pendente. Nenhum refresh, alteração no PostgreSQL, DAX, Power Query ou relacionamentos foi realizado; não houve edição direta do contêiner binário.
 
 ## Licença MIT
 
@@ -75,15 +79,15 @@ As evidências estáticas estão em `docs/powerbi/evidence/phase-5.8.1/`, com re
 
 | Gate | Estado | Evidência e limite |
 |---|---|---|
-| G1 — PBIR | **PARTIAL** | Configuração estática `FitToPage` nas cinco páginas e Visão Executiva ativa; falta reconhecer/salvar/reabrir no Desktop. |
-| G2 — interatividade | **PARTIAL** | Grupos e bookmarks existentes estão estruturalmente coerentes; não reexercitados em runtime nesta fase. |
-| G3 — PBIX | **PENDENTE** | Artefato não atualizado nem reaberto. PBIX anterior e hash preservados. |
+| G1 — PBIR | **PASS por relato do usuário e inspeção estática** | O usuário confirmou validação correta do PBIP; PBIX confirma cinco páginas `FitToPage`, canvas Full HD e Visão Executiva ativa. |
+| G2 — interatividade | **PASS por relato do usuário; estrutura verificada** | O usuário validou o PBIP e corrigiu o bookmark que estava aberto. Os dez bookmarks mantêm estado abrir/fechar e supressão de dados; Devoluções foi confirmada fechada após reabrir. |
+| G3 — PBIX | **PASS por relato do usuário e inspeção estrutural** | PBIX corrigido, salvo e reaberto segundo o usuário; tamanho/hash e pacote verificados. A verificação offline sem PostgreSQL permanece pendente. |
 | G4 — licenciamento | **PASS** | Texto MIT integral, ano e titular confirmados; README atualizado com ressalva de terceiros. |
 | G5 — integridade | **PASS estático** | Dez tabelas, 55 medidas e 21 relações verificadas; nenhuma definição semântica alterada, nenhum refresh ou acesso ao PostgreSQL. |
 | G6 — Git | **PASS após commit parcial** | Somente alterações desta fase serão commitadas; alterações locais anteriores ficam fora; sem push. |
 
 ## Resultado e continuação necessária
 
-O pacote documental, a licença e a configuração PBIR estática estão preparados. A fase permanece **PARTIAL** até validação visual/funcional do PBIP no Desktop, salvamento/reabertura e geração de um novo PBIX pelo Desktop. O artefato anterior não deve ser divulgado como se incluísse o novo estado. A exportação PDF, hash e tamanho finais só poderão ser registrados após essa etapa; não se executa refresh nem teste no PostgreSQL.
+O PBIP e o novo PBIX foram validados manualmente pelo usuário; a estrutura, as cinco páginas, os bookmarks, o tamanho e o hash foram conferidos localmente. O usuário confirmou que, após salvar e reabrir, o PBIX inicia em Visão Executiva; a inspeção do pacote agora também confirma essa página ativa e `FitToPage` nas cinco páginas. A Fase 5.8.1 está **PASS** para apresentação e persistência. A validação offline sem PostgreSQL permanece pendente e deve continuar identificada como tal em materiais de distribuição. O PBIX anterior não deve ser divulgado como se incluísse o novo estado. Não houve refresh nem teste no PostgreSQL.
 
 Commit local desta entrega parcial: `fix(powerbi): prepara abertura parcial e adiciona licenca MIT`. Nenhum push, merge, rebase, tag, Release ou alteração de visibilidade foi realizado.

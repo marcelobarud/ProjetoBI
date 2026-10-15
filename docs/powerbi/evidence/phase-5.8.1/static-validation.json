@@ -1,7 +1,7 @@
 {
   "phase": "5.8.1",
   "date": "2026-10-15",
-  "classification": "PARTIAL",
+  "classification": "PASS_FOR_PRESENTATION; OFFLINE_VALIDATION_PENDING",
   "source": {
     "head": "26f22102c9cb3a427f41242b6300bd70eef7c1cd",
     "branch": "main",
@@ -23,11 +23,46 @@
     "active_page_after": "8b8186ab91fc09fae9a2",
     "active_page_after_display_name": "Visão Executiva",
     "pages": [
-      {"id":"8b8186ab91fc09fae9a2","name":"Visão Executiva","baseline":"FitToWidth","candidate":"FitToPage","width":1920,"height":1080},
-      {"id":"c5202600000000000001","name":"Análise Comercial","baseline":"FitToWidth","candidate":"FitToPage","width":1920,"height":1080},
-      {"id":"d5302600000000000001","name":"Produtos e Categorias","baseline":"FitToWidth","candidate":"FitToPage","width":1920,"height":1080},
-      {"id":"e5402600000000000001","name":"Custos e Margens","baseline":"FitToWidth","candidate":"FitToPage","width":1920,"height":1080},
-      {"id":"f5502600000000000001","name":"Devoluções","baseline":"FitToWidth","candidate":"FitToPage","width":1920,"height":1080}
+      {
+        "id": "8b8186ab91fc09fae9a2",
+        "name": "Visão Executiva",
+        "baseline": "FitToWidth",
+        "candidate": "FitToPage",
+        "width": 1920,
+        "height": 1080
+      },
+      {
+        "id": "c5202600000000000001",
+        "name": "Análise Comercial",
+        "baseline": "FitToWidth",
+        "candidate": "FitToPage",
+        "width": 1920,
+        "height": 1080
+      },
+      {
+        "id": "d5302600000000000001",
+        "name": "Produtos e Categorias",
+        "baseline": "FitToWidth",
+        "candidate": "FitToPage",
+        "width": 1920,
+        "height": 1080
+      },
+      {
+        "id": "e5402600000000000001",
+        "name": "Custos e Margens",
+        "baseline": "FitToWidth",
+        "candidate": "FitToPage",
+        "width": 1920,
+        "height": 1080
+      },
+      {
+        "id": "f5502600000000000001",
+        "name": "Devoluções",
+        "baseline": "FitToWidth",
+        "candidate": "FitToPage",
+        "width": 1920,
+        "height": 1080
+      }
     ],
     "filter_groups_hidden_by_default": 5,
     "bookmarks": 10,
@@ -45,18 +80,35 @@
     "postgresql_accessed": false
   },
   "pbix": {
-    "updated": false,
+    "updated": true,
     "previous_bytes": 38910666,
     "previous_sha256": "398EB0B3866810F2ABD787AC71FAE4ED9CD8327A84589BF43567F7CA85A399D2",
-    "new_bytes": null,
-    "new_sha256": null,
-    "desktop_open_save_reopen": "NOT TESTED",
-    "offline_without_postgresql": "PENDING"
+    "new_bytes": 38911257,
+    "new_sha256": "B114FE56897C8376E6FF896ABF4FDF478D8203498925BF255B6E8A8D1CDB8E6B",
+    "desktop_open_save_reopen": "USER_CONFIRMED_SAVED_AND_REOPENED; executive page active; Devolucoes filter panel closed",
+    "offline_without_postgresql": "PENDING",
+    "package_archive_readable": true,
+    "package_entries": 127,
+    "active_page": "Visão Executiva",
+    "page_count": 5,
+    "all_pages_fit_to_page": true,
+    "filter_groups_hidden_serialized": 5,
+    "devolucoes_group_isHidden": "PRESENT_TRUE",
+    "bookmarks": 10,
+    "bookmark_states_serialized": "OPEN=false, CLOSE=true; all have visualContainers and suppressData=true",
+    "desktop_installed_version": "2.158.1304.0",
+    "desktop_saving_version": null
   },
   "desktop_runtime": {
     "performed": false,
-    "reason": "No controllable Windows application window was exposed in the current session.",
-    "screenshots_captured": false
+    "reason": "No Desktop process/window control in this session; manual validations were reported by the user.",
+    "screenshots_captured": false,
+    "user_reported_pbip_validated": true,
+    "user_reported_pbix_corrected": true,
+    "user_reported_pbix_saved_and_reopened": true,
+    "user_reported_executive_page_active_after_reopen": true,
+    "user_reported_devolucoes_panel_closed_after_reopen": true,
+    "direct_ui_observation": false
   },
   "license": {
     "spdx": "MIT",
@@ -68,5 +120,12 @@
     "tag_created": false,
     "release_created": false,
     "visibility_changed": false
+  },
+  "user_reported_validation": {
+    "pbip_validated": true,
+    "pbix_corrections_saved": true,
+    "desktop_close_reopen_confirmed": true,
+    "executive_page_active_after_reopen": true,
+    "devolucoes_panel_closed_after_reopen": true
   }
 }
