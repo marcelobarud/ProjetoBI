@@ -1,50 +1,91 @@
-# ProjetoBI
+# ProjetoBI — Business Intelligence com desenvolvimento assistido por IA
 
-Projeto de Business Intelligence para estudo e prática, com foco em construir gradualmente um fluxo completo desde um sistema operacional relacional até relatórios analíticos.
+**InfoTech Intelligence** é um projeto de estudo de ponta a ponta em Business Intelligence, construído para uma empresa fictícia do segmento de informática.
 
-## Objetivo
+> **Em desenvolvimento · Primeira demonstração · Dados 100% sintéticos**
 
-Criar um ambiente coerente para praticar integração de dados, transformação, modelagem semântica, métricas e visualização. O domínio será uma empresa fictícia do segmento de informática. Os detalhes do negócio e a modelagem são definidos em fases, com revisão antes da implementação.
+O ProjetoBI demonstra como uma operação comercial pode ser modelada em PostgreSQL e explorada com Power BI, com atenção à integridade dos dados, rastreabilidade das métricas e evolução incremental do produto. O trabalho combina implementação e revisão humanas com assistência de IA; decisões, escopo e validações permanecem sob supervisão humana.
 
-## Visão geral da arquitetura
+## O que o projeto demonstra
 
-- **PostgreSQL** será a fonte de dados e representará o ecossistema operacional da empresa.
-- **Python** implementa o gerador sintético determinístico de dados mestres e do ecossistema transacional no profile smoke.
-- **Power BI** será a camada analítica, incluindo Power Query, modelo semântico, DAX e relatórios.
-- **Git/GitHub** será usado para versionar o código, a documentação e os arquivos de projeto apropriados. A configuração de um remoto ocorrerá em uma fase futura, se necessário.
+- Uma base operacional coerente com **41 tabelas** em PostgreSQL.
+- Um modelo semântico Power BI com **10 tabelas**: quatro fatos, cinco dimensões e a tabela `_Medidas`.
+- **55 medidas DAX** e 21 relacionamentos documentados.
+- Dados inteiramente sintéticos, com 120.000 pedidos aceitos e período comercial de 1º de janeiro de 2023 a 30 de setembro de 2026.
+- Cinco páginas analíticas voltadas a perguntas executivas, comerciais, de produto, custos e devoluções.
 
-O banco operacional deverá representar um ecossistema empresarial coerente, e não apenas as necessidades imediatas de um dashboard. A seleção das tabelas e dos campos analíticos será decidida mais adiante, durante a exploração dos dados.
+As 41 tabelas operacionais e as 10 tabelas semânticas são camadas diferentes: a primeira representa processos da operação; a segunda organiza a análise. O modelo não converte o banco operacional em um esquema estrela.
 
-## Estrutura de diretórios
+## Arquitetura
 
-| Diretório/arquivo | Finalidade |
-| --- | --- |
-| `database/migrations/` | Migrações SQL versionadas do banco operacional. |
-| `database/seeds/` | Futuras cargas iniciais controladas. |
-| `database/queries/` | Consultas SQL do projeto. |
-| `database/tests/` | Verificações estruturais e smoke tests SQL transacionais. |
-| `data-generator/src/` | Pacote Python de configuração, geração, validação e smoke transacional reversível. |
-| `data-generator/tests/` | Testes unitários e teste de integração PostgreSQL com `ROLLBACK`. |
-| `powerbi/` | Projeto Power BI Desktop em PBIP, com modelo TMDL e relatório PBIR; fluxo documentado em [`powerbi/README.md`](powerbi/README.md). |
-| `docs/architecture/` | Documentação conceitual de arquitetura. |
-| `docs/business/` | Escopo, regras e conceitos do domínio empresarial. |
-| `docs/database/` | Documentação futura do banco de dados. |
-| `docs/powerbi/` | Documentação futura da camada Power BI. |
-| `scripts/` | Scripts auxiliares do projeto. |
-| `.env.example` | Modelo sem credenciais para configuração local futura. |
-| `AGENTS.md` | Orientações para futuras execuções do Codex neste projeto. |
+```mermaid
+flowchart LR
+  G[Gerador sintético determinístico] --> PG[(PostgreSQL 18)]
+  PG --> PQ[Power Query]
+  PQ --> M[Modelo semântico Power BI<br/>10 tabelas · 55 medidas DAX]
+  M --> R[InfoTech Intelligence<br/>5 páginas analíticas]
+```
 
-## Estado atual
+## Galeria
 
-**M0–M6, M5 e Fases 4.0–4.6 concluídos; Fase 4.5A.1 regularizada.** O Portfolio sintético de 120.000 pedidos está persistido no PostgreSQL 18.6 e conciliado com os 13 baselines SQL. O PBIP [`powerbi/ProjetoBI.pbip`](powerbi/ProjetoBI.pbip) contém 55 medidas comerciais e financeiras em `_Medidas`, distribuídas em 11 Display Folders. A Fase 4.5C validou reconciliações SQL × DAX, contextos dimensionais e temporais, precisão escalada, refresh e reabertura. A Fase 4.6 auditou as 10 tabelas, 21 relações, dependências e desempenho; o modelo está pronto para iniciar dashboards, ainda não implementados. A working tree PBIP preexistente foi preservada e possui plano documentado de regularização. Consulte [`docs/powerbi/phase-4.6-semantic-model-audit.md`](docs/powerbi/phase-4.6-semantic-model-audit.md) e [`docs/git/POWERBI_WORKTREE_AUDIT.md`](docs/git/POWERBI_WORKTREE_AUDIT.md), além de [`docs/powerbi/phase-4.5c-financial-dax-measures.md`](docs/powerbi/phase-4.5c-financial-dax-measures.md), [`powerbi/README.md`](powerbi/README.md), [`docs/PROJECT_COMPLETION_PLAN.md`](docs/PROJECT_COMPLETION_PLAN.md) e [`docs/data-generation/portfolio-validation.md`](docs/data-generation/portfolio-validation.md).
+As imagens abaixo são renderizações rasterizadas das cinco páginas exportadas pelo Power BI para PDF na Fase 5.7.2, em 15 de outubro de 2026. São evidência visual derivada daquela exportação, não capturas atuais da janela do Desktop. A homologação posterior do PBIX está descrita em [Fase 5.7.2.1](docs/powerbi/phase-5.7.2.1-public-pbix-closure.md). [Abrir o PDF de origem](docs/powerbi/evidence/phase-5.7.2/pbix-exportado-powerbi.pdf).
 
-## Fases previstas
+### Visão Executiva
 
-1. Revisar e aprovar o domínio conceitual (concluído) e consolidar a proposta relacional operacional (Fases 2A e 2A.1 concluídas).
-2. Implementar e validar o esquema operacional no PostgreSQL 18 (Fases 2B, 2B.1 e 2B.2 concluídas; o dataset Portfolio foi persistido depois, na Fase M5).
-3. Planejar e desenvolver a geração de dados sintéticos consistentes em Python. Fases 3A–3E.1 e M0–M5 concluídos; o Portfolio foi carregado e os baselines reconciliados. O registro operacional está em [`portfolio-validation.md`](docs/data-generation/portfolio-validation.md) e no [`plano mestre`](docs/PROJECT_COMPLETION_PLAN.md).
-4. Explorar e selecionar os dados que farão parte da camada analítica.
-5. Construir e validar o modelo semântico e a biblioteca de medidas comerciais/financeiras no Power BI (Fases 4.3–4.6 concluídas; 10 tabelas, 55 medidas e 21 relações).
-6. Desenvolver e revisar dashboards em uma fase futura autorizada; nenhuma página analítica foi implementada ainda.
+Visão de receita, lucro, margem, pedidos concluídos e tendências consolidadas.
 
-As fases são uma visão de alto nível; decisões detalhadas serão registradas quando cada etapa for iniciada.
+![Visão Executiva](docs/portfolio/images/01-visao-executiva.png)
+
+### Análise Comercial
+
+Exploração de pedidos, receita, canais, lojas e evolução comercial.
+
+![Análise Comercial](docs/portfolio/images/02-analise-comercial.png)
+
+### Produtos e Categorias
+
+Comparação de desempenho entre produtos e categorias.
+
+![Produtos e Categorias](docs/portfolio/images/03-produtos-categorias.png)
+
+### Custos e Margens
+
+Leitura de custos, lucro e margem por período e recortes comerciais.
+
+![Custos e Margens](docs/portfolio/images/04-custos-margens.png)
+
+### Devoluções
+
+Análise de valores devolvidos e seus efeitos comerciais e financeiros.
+
+![Devoluções](docs/portfolio/images/05-devolucoes.png)
+
+## Demonstração
+
+O arquivo demonstrativo preparado para revisão é um PBIX local, com dados sintéticos incorporados. Ainda não foi anexado a uma GitHub Release nem publicado. A homologação foi **parcial**: a abertura, as cinco páginas, filtros e persistência foram verificados no Power BI Desktop; a validação em ambiente isolado, sem acesso ao PostgreSQL, continua pendente. Consulte o [guia do PBIX](docs/portfolio/PBIX_DEMO_GUIDE.md) e a [minuta de Release](docs/portfolio/GITHUB_RELEASE_DRAFT.md).
+
+## Desenvolvimento assistido por IA
+
+Ferramentas de IA auxiliaram análise, implementação, documentação e testes dentro de escopos definidos e revisados por uma pessoa. O processo incluiu validação manual e correções iterativas; por exemplo, foram corrigidos erros de conversão no Power Query, serialização de bookmarks e legibilidade visual. Isso não significa desenvolvimento autônomo, nem constitui uma medição de produtividade.
+
+## Acessibilidade e limitações
+
+A acessibilidade recebeu refinamentos, mas permanece **parcial**: o projeto não declara conformidade WCAG nem homologação universal em dispositivos móveis. As páginas foram concebidas em Full HD. Algumas limitações de densidade e escala dos visuais estão registradas na documentação do Design System.
+
+O projeto segue em desenvolvimento. Experimentos futuros com HTML ou visuais personalizados não fazem parte desta demonstração. A licença de uso ainda não foi definida; não existe arquivo LICENSE, portanto a publicação do código não concede automaticamente permissões de reutilização.
+
+## Tecnologias e documentação
+
+- PostgreSQL 18 e SQL para a camada operacional.
+- Python para geração de dados sintéticos determinísticos.
+- Power BI Desktop, Power Query, modelo semântico, DAX, PBIR e TMDL.
+- Git para histórico e documentação incremental.
+
+Documentos de referência:
+
+- [Plano mestre do projeto](docs/PROJECT_COMPLETION_PLAN.md)
+- [Arquitetura do banco](docs/database/)
+- [Design System InfoTech v0.3](docs/powerbi/phase-5.6c-design-system-v0.3.md)
+- [Relatório de preparação da apresentação pública — Fase 5.8](docs/powerbi/phase-5.8-first-public-presentation.md)
+
+Nenhuma instância pública ou publicação foi criada nesta etapa.
