@@ -1,0 +1,55 @@
+{
+  "phase": "5.7.2",
+  "classification": "PARTIAL",
+  "sourceCommit": "5433d26284b76c07081e73bc1be7aba516d2fa51",
+  "candidateArchive": {
+    "path": "C:\\Users\\D2\\AppData\\Local\\Temp\\ProjetoBI-Phase5.7.2-candidate-20261015-093200.zip",
+    "sha256": "4B770412950665A988D5E3FC49AEC4AD80AF4CA80C9EF29F43D5D7E69316F57D"
+  },
+  "staticChecks": {
+    "jsonCount": 117,
+    "jsonParseErrors": 0,
+    "pages": [
+      {"name": "Visão Executiva", "width": 1920, "height": 1080, "visuals": 17},
+      {"name": "Análise Comercial", "width": 1920, "height": 1080, "visuals": 22},
+      {"name": "Produtos e Categorias", "width": 1920, "height": 1080, "visuals": 19},
+      {"name": "Custos e Margens", "width": 1920, "height": 1080, "visuals": 22},
+      {"name": "Devoluções", "width": 1920, "height": 1080, "visuals": 18}
+    ],
+    "navigatorDestinations": 5,
+    "globalFilterSyncGroups": ["InfoTech.Canal", "InfoTech.Loja", "InfoTech.PeriodoComercial"],
+    "bookmarksWithVisualContainers": 10,
+    "danglingVisualInteractionReferences": 0,
+    "semanticModel": {"tables": 10, "measures": 55, "displayFolders": 11, "relationships": 21},
+    "approvedMonetaryLineChartsLabelPrecision": "1L",
+    "infotechThemePresent": true
+  },
+  "desktopValidation": {
+    "candidateOpened": true,
+    "dataRenderedFromCopiedImportCache": true,
+    "fivePagesVisited": true,
+    "periodAndChannelCrossPagePropagationObserved": true,
+    "storeFilterExercised": true,
+    "refreshExecuted": false
+  },
+  "importCache": {
+    "source": "D:\\Codex\\ProjetoBI\\powerbi\\ProjetoBI.SemanticModel\\.pbi\\cache.abf",
+    "copiedOnlyToTemporaryCandidate": true,
+    "sizeBytes": 38797870,
+    "sha256": "36664F23ECA1A39762A86008E95D59AD663BD99F92106CE0437CD1E3502D7305"
+  },
+  "pbix": {
+    "path": "D:\\Codex\\ProjetoBI-Distribution\\Fase-5.7.2\\ProjetoBI-InfoTech-Demo.pbix",
+    "sizeBytes": 38910373,
+    "sha256": "E25600A3F7EFF6AAFC36956B730D6F4DEE6C6F33369FF698CB86C96A931D1453",
+    "desktopVersion": "2.158.1304.0",
+    "generatedAt": "2026-10-15T09:23:32-03:00",
+    "nativePowerBiPdfExport": {"pages": 5, "sizeBytes": 467549, "sha256": "38D2AB2ED72646724FEFCA5811E12329F83BBC32376D0F531EB94368852AC465"}
+  },
+  "notTested": [
+    "Reopen PBIX after closing it",
+    "Open final PBIX with PostgreSQL inaccessible",
+    "Capture and archive real Desktop-window screenshots",
+    "Inspect every internal PBIX container block for embedded sensitive values"
+  ]
+}

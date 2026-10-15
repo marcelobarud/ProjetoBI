@@ -1,6 +1,6 @@
 # ProjetoBI — Plano Mestre de Conclusão e Preparação para Power BI
 
-**Status:** M5 PASS — Portfolio persistido e reconciliado; estados anteriores permanecem registrados com suas limitações. Fase 5.6C: InfoTech Design System v0.3 consolidado, estética aprovada, acessibilidade parcial e mobile não homologado. Fase 5.7.1: regularização seletiva PBIR documentada e preparada em candidato isolado; Gate A estático PASS, Gate B Desktop PARTIAL, Gate C documentação PASS e Gate D segurança PARTIAL até inspeção do conteúdo distribuível. O workspace entrou com 94 modificações rastreadas e 11 arquivos não rastreados, inventariados e preservados; nenhuma alteração preexistente fora do escopo foi incluída. Não houve refresh, acesso PostgreSQL, geração de PBIX ou push. Ver `docs/powerbi/phase-5.7.1-public-distribution-readiness.md` e `docs/powerbi/evidence/phase-5.7.1/`.
+**Status:** M5 PASS — Portfolio persistido e reconciliado; estados anteriores permanecem registrados com suas limitações. Fase 5.6C: InfoTech Design System v0.3 consolidado, estética aprovada, acessibilidade parcial e mobile não homologado. Fase 5.7.1: regularização PBIR estática PASS. Fase 5.7.2: **PARTIAL** — PBIR isolado abriu com dados Import e o PBIX demonstrativo foi gerado; reabertura do PBIX, isolamento real do PostgreSQL e screenshots do Desktop não foram concluídos. A worktree entrou com 104 caminhos locais alterados/não rastreados, inventariados e preservados; nenhuma alteração preexistente fora do escopo foi incluída. Não houve refresh, acesso PostgreSQL, publicação ou push. Ver `docs/powerbi/phase-5.7.2-public-pbix-validation.md` e `docs/powerbi/evidence/phase-5.7.2/`.
 **Diretório:** `D:\Codex\ProjetoBI`
 **Objetivo principal:** concluir e validar o dataset Portfolio, disponibilizar baselines SQL confiáveis e preparar a exploração analítica no Power BI.
 
@@ -389,7 +389,13 @@ O objetivo completo será alcançado quando:
 - A documentação do dataset estiver completa.
 - O ProjetoBI estiver pronto para iniciar o trabalho no Power BI.
 
-**Status final esperado: `PROJECTBI READY FOR POWER BI`.**
+**Marco técnico original:** `PROJECTBI READY FOR POWER BI` (M5/M6); o destino de portfólio público e seus critérios adicionais estão registrados abaixo.
+
+## Direcionamento de portfólio público
+
+O destino do ProjetoBI como portfólio é **repositório GitHub + PBIX demonstrativo + documentação técnica + imagens/vídeo para LinkedIn**. A Fase 5.8 deverá decidir o empacotamento/apresentação e concluir as validações pendentes do PBIX antes de publicação. Publicação não é automática.
+
+Power BI Service, gateway e refresh agendado ficam fora do caminho crítico de entrega pública; permanecem apenas como opções futuras de hospedagem/operação, e os registros históricos das fases anteriores são preservados. Esta decisão não promove acessibilidade parcial ou layout mobile a homologação integral.
 
 ## 16. Registro de execução
 
@@ -512,6 +518,7 @@ O objetivo completo será alcançado quando:
 | Fase 5.6C — Consolidação do Design System v0.3 | PASS — consolidado | Documento preserva histórico v0.2 e consolida identidade, tokens, geometria, componentes, DS-C02, tipografia, precisão monetária, checklist, governança e rastreabilidade. Aprovação estética explícita registrada; acessibilidade parcial, sem WCAG PASS, e viewport/mobile universal não homologados. Sem PBIR/TMDL semântico/refresh. Ver `docs/powerbi/phase-5.6c-design-system-v0.3.md`. |
 | Fase 5.7 — Auditoria de prontidão, integridade Git e entrega | PASS — auditoria concluída; E1 GO, E2 NO-GO, E3 NOT EVALUATED | `origin/main` sincronizada em `e91ce05`; 19 commits até `588f398` e mais 1 até `e91ce05` confirmados. O archive remoto contém cinco páginas e o modelo esperado, mas mantém 30 referências de interação inválidas em Devoluções e difere materialmente do workspace em 20 JSON PBIR. Reprodutibilidade fiel pendente; modelo Import requer PostgreSQL/credenciais/refresh. Nenhum segredo de alta confiança identificado no escopo pesquisado; acessibilidade parcial, mobile e publicação não homologados. Ver `docs/powerbi/phase-5.7-release-readiness-audit.md` e `evidence/phase-5.7/`. |
 | Fase 5.7.1 — Regularização PBIR e preparação para distribuição pública | PARTIAL — candidato estático aprovado; abertura isolada no Desktop pendente | Comparação individual dos 20 diffs estruturais e exclusão dos 73 diffs de serialização. Candidato temporário deriva do HEAD local mais a remoção das 30 interações cross-page inválidas de Devoluções; 117 JSONs parseiam, cinco páginas 1920×1080, bookmarks completos e nenhuma referência inválida. Desktop aberto mostra o workspace atual renderizado, mas o candidato limpo não foi aberto isoladamente; por isso Gate B permanece PARTIAL. Modalidades propostas: PBIP público e PBIX offline sintético futuro; sem PBIX, Release, publicação, refresh ou PostgreSQL nesta fase. Ver `docs/powerbi/phase-5.7.1-public-distribution-readiness.md` e o ZIP de evidências da fase. |
+| Fase 5.7.2 — PBIX demonstrativo público e validação de distribuição | PARTIAL — PBIR candidato abriu isolado com dados Import e PBIX foi gerado; Gate D incompleto | O PBIR candidato do commit `5433d26` foi aberto no Desktop com cache Import copiado isoladamente; cinco páginas renderizadas e navegação, filtros e propagação de período/canal observados. Desktop salvou nativamente `ProjetoBI-InfoTech-Demo.pbix` fora do Git (38.910.373 bytes; SHA-256 e versão registrados no relatório). Exportação PDF nativa contém cinco páginas. Não houve refresh nem acesso/alteração do PostgreSQL. Reabertura do PBIX final, teste com origem inacessível, screenshots do Desktop e inspeção interna exaustiva do contêiner permanecem NOT TESTED; dados sintéticos públicos por autorização explícita. Ver `docs/powerbi/phase-5.7.2-public-pbix-validation.md` e o ZIP de evidências. |
 
 **Evolução da identidade:** a denominação **InfoTech Intelligence** documentada na Fase 5.0 foi substituída oficialmente por **InfoTech** na Fase 5.4.2.1. Os registros e relatórios das fases anteriores permanecem históricos; ver `docs/powerbi/phase-5.4.2.1-infotech-branding-closure.md`.
 
