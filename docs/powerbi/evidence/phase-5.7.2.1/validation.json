@@ -1,0 +1,57 @@
+{
+  "phase": "5.7.2.1",
+  "validated_at": "2026-10-15",
+  "result": "PARTIAL — OFFLINE VALIDATION PENDING",
+  "artifact": {
+    "path": "D:\\Codex\\ProjetoBI-Distribution\\Fase-5.7.2\\ProjetoBI-InfoTech-Demo.pbix",
+    "size_bytes": 38910666,
+    "sha256": "398EB0B3866810F2ABD787AC71FAE4ED9CD8327A84589BF43567F7CA85A399D2",
+    "page_count": 5,
+    "model_mode": "Import (documented; data displayed without refresh)",
+    "saved_state": {
+      "page": "Visão Executiva",
+      "filter_panel": "closed",
+      "date_from": "2026-01-04",
+      "date_to": "2026-09-30",
+      "channel": "All",
+      "store": "All",
+      "local_product_or_category_selection": "none observed"
+    }
+  },
+  "backup": {
+    "path": "D:\\Codex\\ProjetoBI-Distribution\\Fase-5.7.2.1\\ProjetoBI-InfoTech-Demo-before-5721.pbix",
+    "size_bytes": 38910399,
+    "sha256": "1E9E6BDD059FFB096650B465B398FD51FF2F3E01CE312DB0B1DCAC1121D73046"
+  },
+  "checks": {
+    "opened_without_error": "PASS",
+    "five_pages_rendered_with_data": "PASS",
+    "page_navigator": "PASS",
+    "date_between_and_two_handle_slider": "PASS (slider moved; manual typing not retested)",
+    "channel_and_store_filtering": "PASS (incompatible combination produced blank visuals; changing to a compatible channel repopulated them)",
+    "cross_page_filter_sync": "PASS (date and channel observed on another page)",
+    "filter_panel_open_close": "PASS",
+    "financial_spot_check": "PASS (values recorded in phase report)",
+    "saved_state_survived_close_and_reopen": "PASS",
+    "refresh_executed": false,
+    "postgres_accessed_or_changed": false,
+    "offline_postgresql_independence": "NOT TESTED",
+    "distribution_directory_contains_only_pbix": "PASS",
+    "credentials_or_env_files_found_in_distribution_directory": false,
+    "pbix_container_exhaustively_inspected": false,
+    "desktop_screenshots_archived": false
+  },
+  "limitations": [
+    "No isolated Windows environment without PostgreSQL was available.",
+    "Date text entry was not retested; date selection was adjusted with the Between slider.",
+    "Native Desktop screenshots could not be safely archived; the tool exposed a partial capture overlay and the attempt was cancelled.",
+    "Power BI Desktop version 2.158.1304.0 is from the prior generation record and was not rechecked during this validation.",
+    "No exhaustive low-level inspection of every PBIX container block was performed."
+  ],
+  "git": {
+    "branch": "main",
+    "source_head": "647bdb2c4740131374547b6cfedf669b3b048471",
+    "preexisting_status_entries_preserved": 104,
+    "push_or_release": false
+  }
+}
