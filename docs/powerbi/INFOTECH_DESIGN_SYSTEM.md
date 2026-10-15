@@ -1,8 +1,8 @@
-# InfoTech — Design System v0.2
+# InfoTech — Design System v0.3
 
-**Estado:** v0.2 consolidada na Fase 5.1.2. Desde a Fase 5.4.2.1, o nome vigente da marca é **InfoTech**; os registros anteriores usam “InfoTech Intelligence” e permanecem preservados como histórico. A regularização atual está em homologação visual parcial. Os sete cenários da Visão Executiva receberam aprovação manual do usuário, com ressalva de tipografia corrigida nos três gráficos e reinspecionada por captura do Desktop. Ver `phase-5.1.2-executive-dashboard-homologation.md` para evidências e limitações.
+**Versão vigente:** InfoTech Design System v0.3, consolidada na Fase 5.6C em 2026-10-14. O usuário aprovou explicitamente a estética atual das cinco páginas após a Fase 5.6B.1. Esta versão documenta e governa a implementação existente; não redesenha páginas, não muda o modelo e não certifica acessibilidade ou responsividade universal.
 
-**Proposto** significa orientação ainda sem implementação validada; **implementado** significa presente no PBIP; **homologado** significa implementado e validado no Desktop por relato manual ou inspeção visual identificada. A homologação se limita aos cenários e ao ambiente documentados. Navegação futura, mobile, mensagens especiais de ausência de dados, tooltips personalizados e compatibilidade com leitor de tela continuam propostos ou não verificados.
+**Preservação de histórico:** as seções 1–18 registram a v0.2 e os retratos das fases em que foram escritos, incluindo estados “candidato” ou “pendente” corretos à época. A referência normativa consolidada atual é a seção 19; ela resolve esses estados conforme PBIR, evidências reais e testes posteriores, sem reescrever fases passadas. “Implementado” descreve PBIR; “funcionalmente validado” limita-se aos cenários identificados; “aprovado esteticamente” registra a decisão explícita do usuário.
 
 ## 1. Identidade
 
@@ -302,3 +302,180 @@ A quinta página preserva **InfoTech v0.2** como referência vigente. A composi�
 | Contexto de custos de devolução | Sellable reduz COGS analítico; non-sellable já está incorporado | Nota exibida; a perda não pode ser deduzida novamente. A v0.2 não aprova uma soma de impacto financeiro total |
 
 Não há medida de reembolso efetivo no modelo. As medidas disponíveis para contagem de itens/unidades usam recebimento, enquanto o slider compartilhado está definido como coorte do pedido; elas não foram promovidas a KPIs dessa página. A operação por data de recebimento fica para estudo futuro com contratos temporais e filtros próprios. Nenhuma tipografia de devoluções é classificada como padrão homologado sem leitura ampliada em Full HD e Fit to Page. Ver [relatório da Fase 5.5](phase-5.5-returns-dashboard.md) e [capturas reais](evidence/phase-5.5/).
+
+## 19. Referência normativa — InfoTech Design System v0.3
+
+Esta seção é a referência atual para reproduzir e manter as cinco páginas. Se um registro histórico das seções 1–18 divergir por refletir o estado anterior, prevalecem aqui os valores atuais verificados. A v0.3 consolida padrões existentes; não cria um tema instalável, template independente nem nova funcionalidade.
+
+### 19.1 Identidade, princípios e fontes
+
+- Marca oficial: **InfoTech**. “InfoTech Intelligence” fica somente como identificação histórica dos primeiros artefatos; não usar como nome atual.
+- Símbolo aplicado: monograma vetorial geométrico I/T, com traços azul e verde-petróleo, fundo transparente e proporção quadrada. Fonte `powerbi/branding/infotech/infotech-monogram.svg`; recurso PBIR `powerbi/ProjetoBI.Report/StaticResources/RegisteredResources/infotech-monogram6402263922348279.svg`. Ambos têm viewBox 64 × 64 e SHA-256 `29CA228E30EF819E4EF204C8864CCA155F31EB9C979E6E25E779E736667B343A`. Não redesenhar, esticar, recortar, recolorir ou adicionar sombra nesta fase.
+- Princípios: minimalismo, superfícies claras, hierarquia analítica, azul como destaque, verde-petróleo moderado, bordas discretas e elementos decorativos contidos. Não depender somente da cor para transmitir significado.
+- Fontes de verdade: PBIR atual para propriedades/posições; capturas reais em `evidence/phase-5.6b/` e `evidence/phase-5.6b.1/`; testes F01–F14/S01–S07 em `phase-5.6a.2-desktop-test-automation.md`; relatórios históricos para o alcance de cada fase.
+
+### 19.2 Tokens cromáticos
+
+A paleta permanece inalterada. Os pares de contraste são verificações específicas, não uma auditoria de todos os pixels do relatório.
+
+| Token | Valor | Uso consolidado |
+|---|---|---|
+| Primary | `#2563EB` | Seleção ativa, links e destaque principal |
+| Secondary | `#0F9D92` | Série secundária e traço do monograma; evitar texto pequeno sobre branco |
+| Background | `#F5F7FB` | Canvas claro |
+| Surface | `#FFFFFF` | Cartões, navegador inativo e conteúdo |
+| Text Primary | `#142238` | Wordmark, títulos, números e texto principal |
+| Text Secondary | `#5B6B82` | Nome de página e texto auxiliar |
+| Border | `#E2E8F0` | Divisores, contornos e hover do Page Navigator; não usar como texto |
+| Filter Button | `#1D4ED8` | Preenchimento de Filtros |
+| Filter Close Surface | `#DBEAFE` | Superfície de Fechar filtros |
+
+Positive `#15803D`, Negative `#B91C1C` e Warning `#B45309`, preservados da v0.2 e disponíveis no tema, são semânticos; não significam que cada KPI use essas cores. A sequência categórica começa `#2563EB`, `#0F9D92`, `#D97706`, `#7C3AED`, `#B91C1C`, `#475569`, `#0891B2`, `#A16207`; limitar séries e complementar cor por rótulo/posição quando necessário.
+
+Checagens registradas: Primary/branco 5,17:1; Secondary/branco 3,36:1; Text Primary/branco 15,96:1; Text Secondary/branco 5,43:1; texto branco no botão `#1D4ED8` 6,70:1; Text Primary `#142238` em `#DBEAFE` 13,08:1. Secondary não é padrão para texto pequeno sobre branco. As razões correspondem a pares de tokens específicos, não a todos os elementos, fundos e estados. Não declarar conformidade WCAG global.
+
+### 19.3 Canvas, escala e estrutura
+
+- As cinco páginas medem 1920 × 1080 px, proporção 16:9, e têm `displayOption: FitToWidth` nos `page.json` atuais. O zoom muda o tamanho aparente, não a geometria PBIR.
+- Margem de referência 36 px; unidade de espaçamento conceitual 8 px. O grid de 12 colunas é diretriz, não grade física aplicada pelo Power BI. Não inferir geometria uniforme onde as páginas variam.
+- **Fit to Width** apresenta a largura do canvas; **Fit to Page** mostra largura e altura, reduzindo o zoom; **Actual Size/100%** inspeciona dimensão lógica e pode exigir rolagem. Fit to Width foi configurado nas cinco páginas, mas não garante leitura em qualquer monitor.
+- Fase 5.6B: viewport de Computer Use 1152 × 575 px; Fit to Width entre 36% e 51%, Fit to Page 37% e inspeção a 100%. Fase 5.6B.1: monitor 1366 × 768 px, escala Windows 100%, janela 1366 × 720 px, Fit to Width 47%; as duas linhas de receita foram conferidas também a 100%. São condições observadas, não requisitos universais de hardware.
+- Reservar espaço para títulos completos em pt-BR e rolagem nativa onde necessária. Não remover categorias/pontos nem reduzir fontes automaticamente para eliminar rolagem.
+
+### 19.4 DS-C01 — cabeçalho InfoTech
+
+| Elemento | Implementação de referência |
+|---|---|
+| Monograma | SVG 48 × 48 px, x=36, y=36; viewBox fonte 64 × 64 |
+| Caixa de texto marca/página | x=96, y=22, 430 × 76 px |
+| Wordmark | InfoTech, Segoe UI Semibold, 30 pt, `#142238` |
+| Nome da página | Segoe UI, 12 pt, `#5B6B82`, abaixo do wordmark |
+| Navegador | Inicia em x=546, y=30 |
+
+As posições foram conferidas nos cinco `visual.json`. O SVG não contém wordmark: InfoTech é texto PBIR. Não fixar período dinâmico no cabeçalho. A caixa implementada tem 430 px; 520 px é medida de proposta histórica, não da implementação atual.
+
+### 19.5 DS-C07 — Page Navigator nativo
+
+O visual nativo Page Navigator usa uma linha e cinco colunas: Visão Executiva, Análise Comercial, Produtos e Categorias, Custos e Margens e Devoluções. Referência: x=546, y=30, 1090 × 56 px; padding da célula 4 px; Segoe UI Semibold 14 pt. Padrão: fundo branco/texto `#142238`; ativo: `#2563EB`/branco; hover registrado: `#E2E8F0`. Botão Filtros adjacente: x=1652, y=30, 232 × 56 px, texto centralizado Semibold 16 pt, fundo `#1D4ED8` e curva PBIR configurada em 8 px.
+
+Os cinco destinos e os estados ativos foram exercitados. A automação usou seleção do Page Navigator e `Ctrl+Space`; é uma técnica observada nesta versão, não promessa de compatibilidade universal. Não substituir o navegador por cinco botões. Referências: `a7000000000000000001`, `b7000000000000000001`, `d7000000000000000001`, `e7000000000000000001` e `f5500000000000000002` em suas páginas.
+
+### 19.6 DS-C02 — painel recolhível de filtros
+
+O grupo de filtros fica em x=24, y=96, largura 1872 px; altura 136 px nas páginas regulares e 224 px em Produtos e Categorias, com coordenadas internas relativas ao grupo. Aberto, sobrepõe intencionalmente parte da primeira faixa analítica; fechado, libera o conteúdo. Não é uma coluna permanente reservada. Estado aberto/fechado pode variar conforme o estado salvo da página.
+
+| Controle | Geometria/referência | Contrato |
+|---|---|---|
+| Período comercial | x=36, y=104, 760 × 112 px | `DimCalendario[Data]`, Between; título Semibold 13 pt; dois campos editáveis e slider horizontal de duas alças; fonte/campos 13 pt configurados |
+| Canal | x=820, y=112, 450 × 80 px | Dropdown nativo, filtro global |
+| Loja | x=1286, y=112, 402 × 80 px | Dropdown nativo, filtro global |
+| Filtros | x=1652, y=30, 232 × 56 px | Bookmark para abrir; aparência na seção 19.5 |
+| Fechar filtros | Posição relativa à camada agrupada, 180 × 56 px | Bookmark para fechar; `#DBEAFE`, texto `#142238`, Semibold 16 pt |
+| Categoria/Produto | Apenas em Produtos e Categorias | Seleções locais, não sincronizadas |
+
+Os três grupos encontrados em cada uma das cinco páginas são `InfoTech.PeriodoComercial`, `InfoTech.Canal` e `InfoTech.Loja`. Datas digitadas/arrastadas, Canal/Loja, combinações/limpeza, efeitos analíticos e sincronização foram testados em F01–F14/S01–S07. Categoria/Produto permaneceram locais nos cenários exercitados; reabrir o painel preservou seleção. Isto não cobre todo estado de filtro possível.
+
+A interação dos botões no canvas e abrir/fechar foi observada. A configuração interna completa dos bookmarks (Display/Data/visuais selecionados) não foi reinspecionada integralmente na 5.6A.2. Alterar bookmark, grupos, visibilidade ou hierarquia é de alto risco e requer regressão funcional. Conferir ambos os estados e o conteúdo sobreposto.
+
+### 19.7 DS-C03 — cartões KPI
+
+Cartões nativos Card, superfície branca; título Segoe UI Semibold 13 pt, valor Semibold 32 pt nos principais. Referência de quatro cartões 450 × 136 px nos x=36, 502, 968 e 1434, espaçados em 16 px. A unidade/contexto deve ser explícita. Não acrescentar sombra, raio ou padding não confirmado no PBIR.
+
+| Página | Variação legítima observada |
+|---|---|
+| Visão Executiva | Quatro KPIs em y=128: receita líquida, lucro, margem e pedidos concluídos |
+| Análise Comercial | Quatro principais em y=128; quatro subordinados de 450 × 100 px em y=280 |
+| Produtos e Categorias | Quatro KPIs financeiros em y=128; grão de item/produto |
+| Custos e Margens | Quatro KPIs em y=128; quatro complementares de 450 × 112 px em y=304; legenda de seção 1848 × 31 px em y=272 |
+| Devoluções | Quatro KPIs em y=128 com contexto explícito para devolução comercial, reversão sellable, perda non-sellable e percentual |
+
+O tamanho configurado não assegura escala renderizada universal. Não atribuir total de cabeçalho a Produto/Categoria nem deduzir perda non-sellable do COGS ajustado novamente. Zero válido permanece zero; BLANK não é zero. Não calcular margem agregada como média de margens.
+### 19.8 DS-C04 — gráficos temporais e DS-C05 — rankings/matriz
+
+| Componente e referência | Construção consolidada | Variações/limites |
+|---|---|---|
+| Linha receita/lucro executiva, `a4000000000000000001` | x=36, y=284, 1848 × 340 px; título 17 pt; eixos 16 pt; legenda 15 pt; eixo em milhões | Receita líquida e lucro por mês; eixo usa `labelPrecision=1L` desde 5.6B.1 |
+| Receita mensal comercial, `b4000000000000000001` | x=36, y=396, 912 × 320 px; título 17 pt; eixos 16 pt; legenda 15 pt; milhões | Coorte por data do pedido; `labelPrecision=1L`; rolagem temporal preserva todos os pontos |
+| Volume mensal, `b4000000000000000002` | x=972, y=396, 912 × 320 px | Série de contagem, não eixo monetário |
+| Custos por coorte, `e5000000000000000001` | x=36, y=432, 1848 × 248 px; título 17 pt, eixos 16 pt, legenda 15 pt | Receita após devoluções, COGS e lucro por data do pedido; precisão de eixo 0 |
+| Produtos, `d5000000000000000001/2` | Duas barras 912 × 340 px em x=36/972, y=284; título 17 pt; categoria 16 pt; moeda 14 pt | Top 5 por SKU com nome completo em tooltip; 12 categorias. Rolagem de categorias é intencional |
+| Matriz `d6000000000000000001` | x=36, y=648, 1848 × 396 px; Categoria → Produto, inicialmente recolhida | Unidades, linhas, receitas, COGS, lucro e margem preservam o grão; rolagem vertical |
+| Devoluções `f5500000000000000016/17/18` | Linha em R$ mil e barras por categoria/Top 5 produto | Linha e rankings por coorte do pedido; tooltip identifica produto |
+
+Títulos de gráfico usam Segoe UI Semibold 17 pt; eixos/categorias em geral 16 pt; legenda temporal 15 pt. Exceção: eixos monetários de rankings comerciais/de produto podem usar 14 pt conforme densidade. Unidades, escalas, responsividade e precisão são locais a cada visual. `labelPrecision=1L` vale apenas para os dois eixos temporais de receita da Executiva e Comercial, quando zero casas arredondava ticks próximos em rótulos repetidos/ambíguos. A precisão das medidas DAX não mudou. Outros eixos mantêm suas configurações locais.
+
+### 19.9 Números, tempo e contexto analítico
+
+- Cultura visual pt-BR: `R$`, ponto de milhar e vírgula decimal; moeda em cartões/tabelas com duas casas segundo a medida; percentual com duas casas; contagem inteira. Valor negativo mantém sinal explícito conforme o formato do campo. Rótulos abreviados nativos não substituem o valor completo em cartão/tooltip.
+- Unidade/escala é propriedade local: há eixos em milhões (`labelDisplayUnits=1000000D`), milhares (`1000D`) e valores sem abreviação. Só os dois eixos temporais de receita aprovados usam uma casa; demais visuais têm precisão própria. Não arredondar medidas intermediárias para aparência.
+- Período comercial usa `DimCalendario[Data]` em Between. Os dois campos são editáveis; slider permite ajuste gráfico e não substitui digitação para data exata em zoom reduzido.
+- Perspectivas: coorte/data do pedido para receita financeira/comercial, produto e devolução; `movement_date` para movimento operacional de custos; `return_received_date` para recebimento operacional de devolução. Não misturar as séries como uma cronologia. O dataset termina em 30/09/2026; não extrapolar pelo relógio atual.
+- Valor comercial devolvido não é refund efetivo. Reversão sellable reduz COGS analítico; perda non-sellable já está incluída no COGS ajustado. Definições completas ficam nas descrições de `_Medidas.tmdl` e em `DASHBOARD_ARCHITECTURE.md`.
+
+### 19.10 DS-C06 — interações, estados e reutilização
+
+Categoria/Produto filtram ou realçam análises locais de itens nas páginas pertinentes; não atribuem medidas de cabeçalho a produtos. Período/Canal/Loja preservam sincronização nos cenários aprovados; limpeza seletiva conserva as demais seleções testadas. Rankings e matrizes preservam grão, ordenação e Top N reais.
+
+Não converter BLANK em zero, esconder categorias para simular Top N, somar percentuais ou depender apenas de cor. A mensagem personalizada “Sem dados” é recomendação, não estado implementado universalmente. Reutilizar componentes reproduzindo propriedades PBIR e validando o comportamento nativo, não imitando pixels de uma captura.
+
+### 19.11 Acessibilidade — validação parcial
+
+**Observado/testado:** inspeção visual das cinco páginas, checagens de pares de contraste da seção 19.2 e cenários de filtros, navegação, resposta dos KPIs e persistência F01–F14/S01–S07. Parte dos visuais contém propriedades `altText`; sua presença no PBIR não prova qualidade assistiva.
+
+**Não homologado:** percurso completo por Tab, tab order/foco perceptível em todos os controles, operação integral por teclado, nomes acessíveis de todos os elementos, leitor de tela, escala de cinza, cobertura de contraste de todos os textos/estados, avaliação assistiva e certificação WCAG. Aprovação estética não certifica acessibilidade.
+
+**Recomendação para fase autorizada:** conferir cada página por teclado, ordem/foco, campos/slider/botões, nomes acessíveis/texto alternativo, leitor de tela e contraste em estados renderizados; distinguir seleção sem depender só de cor. As recomendações não autorizam alteração PBIR nesta consolidação.
+
+### 19.12 Viewport e responsividade
+
+A referência é desktop 16:9 Full HD. Fit to Width reduz a escala aparente; 47%, 37% e 100% são zooms observados em janelas/sessões específicas. A Fase 5.6B inspecionou todas as páginas em Fit to Width e, em condições documentadas, Fit to Page/100%; a 5.6B.1 conferiu as duas linhas de receita em Fit to Width e 100%. Rolagem de calendário, matriz e listas longas é nativa e preserva categorias/pontos. O painel aberto cobre temporariamente a primeira faixa analítica.
+
+Não há layout mobile específico nem leitura validada em todos os tamanhos/proporções de tela. Não classificar o sistema como universalmente responsivo, nem tratar tipografia configurada como defeito só porque encolhe no zoom reduzido. Conferir a escala efetiva no dispositivo-alvo em fase autorizada.
+### 19.13 Governança de mudança
+
+| Risco | Exemplos | Revisão obrigatória |
+|---|---|---|
+| Baixo | Correção de texto, pequeno espaçamento, borda ou tipografia sem mudar significado | Diff PBIR/documental e comparação da peça afetada em Fit to Width e tamanho real adequado |
+| Médio | Geometria de cartões/gráficos, cabeçalho, Page Navigator, densidade e distribuição | Rever página inteira e estados relevantes; verificar cortes/rolagem, os cinco destinos e salvar/fechar/reabrir se PBIR mudar |
+| Alto | Bookmarks, grupos sincronizados, interações/DataFilter, perspectiva temporal, DAX, relações, modelo, fontes ou dados | Autorização específica, auditoria técnica/analítica e regressão proporcional; testar origem/destino/persistência. Não chamar de ajuste visual simples |
+
+#### Checklist reutilizável de nova página
+
+- [ ] Confirmar objetivo, grão, medidas autorizadas e perspectiva temporal.
+- [ ] Usar marca InfoTech, SVG I/T, tokens existentes e tipografia documentada.
+- [ ] Canvas 1920 × 1080; respeitar alinhamentos/margens e ajustar ao conteúdo real.
+- [ ] Cabeçalho identifica página; Page Navigator nativo preserva os cinco destinos e estado ativo.
+- [ ] Definir filtros globais/locais e preservar os grupos `InfoTech.*` conforme o contrato.
+- [ ] KPI inclui nome/unidade, grão, elegibilidade, BLANK/zero, sinal e formato; não atribuir valor de cabeçalho ao produto.
+- [ ] Gráfico tem título, eixo/unidade, ordenação e perspectiva identificada; conferir escala/fonte/precisão do visual.
+- [ ] Ranking declara Top N e ordenação real; matriz preserva hierarquia e rolagem sem ocultar membros.
+- [ ] Separar interação, reconciliação analítica, aprovação visual e revisão assistiva.
+- [ ] Conferir Fit to Width e tamanho ampliado; testar estados aberto/fechado do painel.
+- [ ] Registrar limitações, links e evidências sem tratá-las como certificação.
+- [ ] Se PBIR mudar, validar persistência/reabertura e integridade; refresh somente com autorização explícita.
+
+### 19.14 Rastreabilidade atual
+
+| Padrão | Implementação de referência | Evidência | Estado v0.3 |
+|---|---|---|---|
+| Identidade, cabeçalho e monograma | Cinco cabeçalhos e SVG fonte/registrado | Fases 5.4.2.1/5.6B; capturas 5.6B.1 | Estética aprovada; dimensões conferidas no PBIR |
+| Canvas/enquadramento | Cinco páginas 1920 × 1080 em `FitToWidth` | Fase 5.6B e capturas 5.6B.1 | Implementado; viewport universal não homologado |
+| Page Navigator | `a700…`, `b700…`, `d700…`, `e700…`, `f550…0002` | Fase 5.6A.2 e F01–F14/S01–S07 | Funcionalmente validado no Desktop; técnica `Ctrl+Space` limitada ao ambiente |
+| DS-C02 e grupos | Slicers em cinco páginas; nomes `InfoTech.*` | Fases 5.2.1/5.4.1/5.6A.2 | Cenários funcionais aprovados; opções internas completas dos bookmarks não revalidadas |
+| Cartões KPI | Visuais por página e medidas `_Medidas` | Fases 5.6A.2/5.6B/5.6B.1 | Estética aprovada; acessibilidade parcial |
+| Linhas, rankings e matriz | Visuais listados em 19.8 | Fases 5.3/5.5/5.6B/5.6B.1 | Composições aprovadas; scroll/densidade são variações |
+| Precisão monetária 1L | `a4000000000000000001`, `b4000000000000000001` | Fase 5.6B.1, antes/depois Fit to Width e 100% | Aprovada somente para esses dois eixos |
+| Contratos de grão/tempo | Medidas `_Medidas`; `DASHBOARD_ARCHITECTURE.md` | Fases 4.5C/5.3–5.6A.2 | Sem alteração na 5.6C; revisar ao criar página |
+| Acessibilidade assistiva | Ainda sem validação completa | Fases 5.6A.2/5.6B | Pendente; sem WCAG PASS |
+
+Páginas PBIR: `8b8186ab91fc09fae9a2` (Executiva), `c5202600000000000001` (Comercial), `d5302600000000000001` (Produtos), `e5402600000000000001` (Custos), `f5502600000000000001` (Devoluções). Abreviações com reticências na tabela são somente de leitura; nomes completos estão nos diretórios do PBIR.
+
+### 19.15 Inventário e histórico de versão
+
+Inventário conferido sem edição: cinco páginas; canvas 1920 × 1080; dez tabelas; 55 medidas em `_Medidas`; 11 valores únicos de Display Folder; 21 relacionamentos. Contagem do TMDL do modelo semântico, não da database operacional.
+
+| Versão | Marco | Registro |
+|---|---|---|
+| v0.1 | Fase 5.0 | Tema InfoTech Intelligence — Light e tokens iniciais; histórico preservado |
+| v0.2 | Fase 5.1.2 e evoluções 5.2–5.5 | Cabeçalho, paleta, tipografia, DS-C01–06 e páginas comerciais; seções históricas 1–18 mantêm decisões/candidatos da época |
+| v0.3 | Fase 5.6C, 2026-10-14 | Estética das cinco páginas aprovada explicitamente; geometria PBIR, Page Navigator, DS-C02, variações, precisão 1L específica, governança, rastreabilidade e limitações consolidadas. Documentação-only; sem PBIR, sem nova validação assistiva e sem template instalável |

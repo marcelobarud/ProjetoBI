@@ -1,6 +1,6 @@
 # Arquitetura inicial dos dashboards — InfoTech
 
-**Escopo:** arquitetura de cinco páginas para Desktop. A Fase 5.6A.2 automatizou e aprovou os testes funcionais F01–F14 e S01–S07 no Desktop, inclusive filtros, slider, sincronização, Page Navigator e persistência. Tab/foco por teclado, clique originado por cartão KPI e configuração interna de bookmarks ficaram NOT TESTED; ver `phase-5.6a.2-desktop-test-automation.md`. O nome vigente da marca é InfoTech, aprovado na Fase 5.4.2.1; “InfoTech Intelligence” é a denominação histórica das fases iniciais. Design System v0.2 preservado, com novos componentes candidatos à v0.3. Relações, medidas e dados permanecem aprovados. A Fase 5.4 validou reconciliações e parte das interações no Desktop; ver seu relatório para alcance e limitações.
+**Escopo:** arquitetura de cinco páginas para Desktop. A Fase 5.6A.2 automatizou e aprovou os testes funcionais F01–F14 e S01–S07 no Desktop, inclusive filtros, slider, sincronização, Page Navigator e persistência. Tab/foco por teclado, clique originado por cartão KPI e configuração interna de bookmarks ficaram NOT TESTED; ver `phase-5.6a.2-desktop-test-automation.md`. O nome vigente da marca é InfoTech, aprovado na Fase 5.4.2.1; “InfoTech Intelligence” é a denominação histórica das fases iniciais. InfoTech Design System v0.3 consolidado na Fase 5.6C após aprovação estética explícita do usuário; registros e candidatos da v0.2 permanecem preservados como histórico. Relações, medidas e dados permanecem aprovados. A Fase 5.4 validou reconciliações e parte das interações no Desktop; ver seu relatório para alcance e limitações.
 
 ## 1. Contratos do modelo usados no desenho
 
@@ -114,3 +114,12 @@ Nenhum achado P0 foi observado. Painéis DS-C02 abertos continuam sobrepondo tem
 ## 11. Acabamento tipográfico candidato — Fase 5.6B.1
 
 Na inspeção no Desktop de 2026-10-14, os eixos de moeda dos gráficos temporais de receita da Visão Executiva e Análise Comercial foram exibidos em milhões com precisão zero, fazendo alguns ticks arredondarem para rótulos repetidos. A propriedade `labelPrecision` passou para `1L` em ambos os visuais e foi observada em Fit to Width e Actual Size/100%. Unidade automática e medidas não mudaram. Este é um ajuste candidato: não altera retroativamente o Design System v0.2 nem deve ser promovido a padrão v0.3 antes da aprovação estética do usuário. Relatório e capturas: `phase-5.6b.1-visual-finishing.md` e `evidence/phase-5.6b.1/`.
+## 12. InfoTech Design System v0.3 — consolidação documental
+
+Após a Fase 5.6B.1, o usuário aprovou explicitamente a estética atual das cinco páginas. A seção 19 de `INFOTECH_DESIGN_SYSTEM.md` é a referência normativa v0.3; estados “candidato” nas seções/fases anteriores descrevem checkpoints históricos.
+
+O PBIR foi conferido sem alteração: cinco páginas 1920 × 1080 em `FitToWidth`; 10 tabelas, 55 medidas, 11 nomes distintos de Display Folder e 21 relacionamentos. O monograma I/T aplicado corresponde ao SVG-fonte por SHA-256. A biblioteca documenta geometria real de cabeçalho/navegador, DS-C02 com `InfoTech.PeriodoComercial`, `InfoTech.Canal`, `InfoTech.Loja`, variações por página e diferenças tipográficas locais.
+
+A convenção `labelPrecision=1L` vale somente para as linhas de receita da Visão Executiva (`a4000000000000000001`) e da Análise Comercial (`b4000000000000000001`). A Fase 5.6A.2 aprovou F01–F14/S01–S07; opções internas completas dos bookmarks permanecem não reinspecionadas. Acessibilidade assistiva é parcial, sem certificação WCAG; FitToWidth não garante leitura universal e não há layout mobile homologado.
+
+Relatório: `phase-5.6c-design-system-v0.3.md`. Evidências reutilizadas sem duplicação: `evidence/phase-5.6b/` e `evidence/phase-5.6b.1/`. Não houve nova inspeção Desktop nem refresh nesta consolidação.
