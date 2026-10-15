@@ -1,0 +1,60 @@
+{
+  "phase": "5.6B.1",
+  "validatedAt": "2026-10-14",
+  "application": {
+    "name": "Power BI Desktop",
+    "version": "2.158.1304.0 (Microsoft Store)",
+    "reopenedWithoutError": true,
+    "refreshExecuted": false,
+    "closedUsing": "Discarded transient navigation and zoom state"
+  },
+  "display": {
+    "monitorPixels": "1366x768",
+    "capturedWindowPixels": "1366x720",
+    "windowsScale": "100%",
+    "fitToWidthZoom": "47%",
+    "actualSize": "100%"
+  },
+  "pagesObserved": [
+    "Visão Executiva",
+    "Análise Comercial",
+    "Produtos e Categorias",
+    "Custos e Margens",
+    "Devoluções"
+  ],
+  "visualChanges": [
+    {
+      "page": "Visão Executiva",
+      "visual": "monthly revenue and gross profit line",
+      "property": "labelPrecision",
+      "before": "0L",
+      "after": "1L",
+      "unit": "automatic millions",
+      "visualResult": "ticks visibly distinct at Fit to Width and Actual Size/100%"
+    },
+    {
+      "page": "Análise Comercial",
+      "visual": "commercial revenue temporal chart",
+      "property": "labelPrecision",
+      "before": "0L",
+      "after": "1L",
+      "unit": "automatic millions",
+      "visualResult": "ticks visibly distinct at Fit to Width and Actual Size/100%"
+    }
+  ],
+  "preservation": {
+    "semanticModel": "unchanged",
+    "measures": "unchanged",
+    "relationships": "unchanged",
+    "PowerQuery": "unchanged",
+    "PostgreSQL": "unchanged",
+    "refresh": "not performed",
+    "filterValues": "not altered"
+  },
+  "limitations": [
+    "Actual Size/100% naturally requires canvas scrolling.",
+    "Fit to Width screenshot is reduced to 47% on this display.",
+    "No WCAG contrast certification, assistive technology review, or other physical monitor testing was performed.",
+    "Visual approval remains with the user; this change is not yet a Design System v0.3 standard."
+  ]
+}

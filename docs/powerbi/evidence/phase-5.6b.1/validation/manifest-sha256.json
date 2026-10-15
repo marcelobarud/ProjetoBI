@@ -1,0 +1,186 @@
+{
+  "phase": "5.6B.1",
+  "algorithm": "SHA-256",
+  "generatedAt": "2026-10-14",
+  "note": "Hashes cover every file under this phase evidence folder except this manifest itself and the archive; image dimensions are pixel dimensions.",
+  "files": [
+    {
+      "path": "after/01-executiva-100-eixo-1-decimal.jpg",
+      "bytes": 123158,
+      "sha256": "CE0C7AF630BBFDBC61BAF236F55B0F1D0B31864C8FF57343E4555E2979D11C15",
+      "width": 1366,
+      "height": 720
+    },
+    {
+      "path": "after/01-executiva-fit-width-pos-ajuste.jpg",
+      "bytes": 127628,
+      "sha256": "6F3BF2F0B5E2BF4F28E941CF7E78CC6815775AA581A7BD57D1DBAC6FD01FAE73",
+      "width": 1366,
+      "height": 720
+    },
+    {
+      "path": "after/01-executiva-fit-width.jpg",
+      "bytes": 127628,
+      "sha256": "6F3BF2F0B5E2BF4F28E941CF7E78CC6815775AA581A7BD57D1DBAC6FD01FAE73",
+      "width": 1366,
+      "height": 720
+    },
+    {
+      "path": "after/02-comercial-100-eixo-1-decimal.jpg",
+      "bytes": 125498,
+      "sha256": "F0DE8D03E9F47677C8672B338F6C3E4F93A7E528F042D81003AC36B8022DA8EC",
+      "width": 1366,
+      "height": 720
+    },
+    {
+      "path": "after/02-comercial-fit-width-ajuste.jpg",
+      "bytes": 132735,
+      "sha256": "82A7C6C2547AEA83E14A90216B1D45F8616FB1B1000BF213C9FEE5B4ACA423AA",
+      "width": 1366,
+      "height": 720
+    },
+    {
+      "path": "after/02-comercial-fit-width-pos-ajuste.jpg",
+      "bytes": 132735,
+      "sha256": "82A7C6C2547AEA83E14A90216B1D45F8616FB1B1000BF213C9FEE5B4ACA423AA",
+      "width": 1366,
+      "height": 720
+    },
+    {
+      "path": "after/03-produtos-fit-width-pos-ajuste.jpg",
+      "bytes": 149375,
+      "sha256": "25BCF51677791A379FE938CF8BA2867DBA4A4C2AD28A51B178D8CB91CF6FC7C1",
+      "width": 1366,
+      "height": 720
+    },
+    {
+      "path": "after/04-custos-fit-width-pos-ajuste.jpg",
+      "bytes": 142899,
+      "sha256": "DA765894F030A692BA025F71539ACE5B243E90ADBB831F0123498D3A43B149AF",
+      "width": 1366,
+      "height": 720
+    },
+    {
+      "path": "after/05-devolucoes-fit-width-pos-ajuste.jpg",
+      "bytes": 144491,
+      "sha256": "E198EEF00E48B86EF0ABD387812F451B365734FCDB80E3F139B7995F406EC933",
+      "width": 1366,
+      "height": 720
+    },
+    {
+      "path": "before/01-executiva-100-cartoes-painel-fechado.jpg",
+      "bytes": 110612,
+      "sha256": "DE03D7B7851266C7C5C04FDABF7FFCFE9E75AC85A745B28680C2749FD42F360B",
+      "width": 1366,
+      "height": 720
+    },
+    {
+      "path": "before/01-executiva-100-segmento-direito.jpg",
+      "bytes": 109531,
+      "sha256": "B440A3313A8A03DACF3DCEEA08A4566FFC96FCA44C9CFA31D0FB7976DC6D2596",
+      "width": 1366,
+      "height": 720
+    },
+    {
+      "path": "before/01-executiva-100-top-left.jpg",
+      "bytes": 104313,
+      "sha256": "9225B60A7FF98420553251D82FB9E6AE61864942302A72D51AE5559DBCC79CA4",
+      "width": 1366,
+      "height": 720
+    },
+    {
+      "path": "before/01-executiva-fit-width-painel-aberto.jpg",
+      "bytes": 101644,
+      "sha256": "2C5611647BF4B1A000B78477DDA2D3097231A49ABCDBEFEEB3B4605AEB66A12C",
+      "width": 1366,
+      "height": 720
+    },
+    {
+      "path": "before/01-executiva-fit-width-painel-fechado.jpg",
+      "bytes": 113306,
+      "sha256": "623C62E11006EE3FDCD65183FE4E9890E6B030DEA831C8ABF44DC468913EC05E",
+      "width": 1366,
+      "height": 720
+    },
+    {
+      "path": "before/01-visao-executiva-contexto-inicial.jpg",
+      "bytes": 126876,
+      "sha256": "6729CE997095C13AB6647312946B2CE96386D9BC29B6603BCDCA475BB286AA64",
+      "width": 1366,
+      "height": 720
+    },
+    {
+      "path": "before/02-comercial-100-cartoes-e-eixo.jpg",
+      "bytes": 108941,
+      "sha256": "C886F19FE5DA45BC901727CBD3C2CA6D421DE4805180787E1EB4B40CA5B24FA0",
+      "width": 1366,
+      "height": 720
+    },
+    {
+      "path": "before/02-comercial-fit-width-painel-aberto.jpg",
+      "bytes": 117003,
+      "sha256": "A9459C1D5A126317CB65309B09ED47964D71923AD0150BB1932F55BCA0BB87FB",
+      "width": 1366,
+      "height": 720
+    },
+    {
+      "path": "before/03-produtos-100-matriz.jpg",
+      "bytes": 150132,
+      "sha256": "21D128660F216DC72372D7382E0CCD998C4D3DD92088660DFF80DC9473FE98F4",
+      "width": 1366,
+      "height": 720
+    },
+    {
+      "path": "before/03-produtos-fit-width-painel-fechado.jpg",
+      "bytes": 157575,
+      "sha256": "DE19524A7B77A31954C1BCD441BA5BFADE84264C589BC4B4B2695F51BC54DE5A",
+      "width": 1366,
+      "height": 720
+    },
+    {
+      "path": "before/04-custos-100-evolucao.jpg",
+      "bytes": 128832,
+      "sha256": "7B84614A36CE22714C3AA58D32C193206E20EBECEBE2C1B93741B0D08DC911DE",
+      "width": 1366,
+      "height": 720
+    },
+    {
+      "path": "before/04-custos-fit-width-painel-aberto.jpg",
+      "bytes": 136460,
+      "sha256": "55FF29A1DC28AC6AF659BEDFED5C753DDA91FE9A336061C64139145922B218C0",
+      "width": 1366,
+      "height": 720
+    },
+    {
+      "path": "before/04-custos-fit-width-painel-fechado.jpg",
+      "bytes": 138627,
+      "sha256": "DB5311C98FEBA476794C71FB11C82F1B221C18DCF4EB29CF849D3E85E558CA04",
+      "width": 1366,
+      "height": 720
+    },
+    {
+      "path": "before/05-devolucoes-100-graficos.jpg",
+      "bytes": 126689,
+      "sha256": "AD6C872085C9C76A2D9D25468D9B5219032825E3D14BAD334D0F187DBCD2EF1B",
+      "width": 1366,
+      "height": 720
+    },
+    {
+      "path": "before/05-devolucoes-fit-width-painel-fechado.jpg",
+      "bytes": 135758,
+      "sha256": "CE038AE6375176D38A07E99A4889C3AF7A77C707CC947037FDA5EF6DD5531595",
+      "width": 1366,
+      "height": 720
+    },
+    {
+      "path": "comparisons/visual-comparison.md",
+      "bytes": 2423,
+      "sha256": "82D38C1AB519C9D178EB6E335803FABFB4F979633C8E3E892D55A8C7970EF9A6"
+    },
+    {
+      "path": "validation/technical-validation.json",
+      "bytes": 1918,
+      "sha256": "ED42EA78FDB165A8C390ED1B1B5D39463012696D004F0ABC41AD3116A71CC712"
+    }
+  ]
+}
